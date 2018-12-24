@@ -106,6 +106,3 @@ venv.bak/
 # db
 db/
 example/db
-
-#input sample
-input.fas
