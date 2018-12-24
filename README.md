@@ -1,4 +1,5 @@
 # run_dbcan
 
-cite us 
+cite us from http://cys.bios.niu.edu/dbCAN2
+
 
