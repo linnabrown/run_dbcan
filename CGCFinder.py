@@ -1,12 +1,15 @@
 ##################################################
-# CGCFinder v3
+# CGCFinder v4
 #
 # Rewriten for dbCAN2
 #
-# Written by Tanner Yohe under the supervision of
+# Written by Le Huang under the supervision of
 # Dr. Yin at NIU
 #
-# Last updated 4/9/18
+#
+# Last updated 12/24/18
+#-updating info
+#-adding stp
 ##################################################
 
 
@@ -20,7 +23,7 @@ parser = argparse.ArgumentParser(description='CAZyme Gene Cluster Finder')
 
 parser.add_argument('gffFile', help='GFF file containing genome information')
 parser.add_argument('--distance', '-d', type=int, choices=[0,1,2,3,4,5,6,7,8,9,10], default=2, help='The distance allowed between two signature genes')
-parser.add_argument('--siggenes', '-s', choices=['all', 'tp', 'tf'], default='all', help='Signature genes types required. all=CAZymes,TC,TF; tp=CAZymes,TC; tf=CAZymes,TF')
+parser.add_argument('--siggenes', '-s', choices=['all', 'tp', 'tf','stp','tp+tf','tp+stp','tf+stp'], default='all', help='Signature genes types required. all=CAZymes,TC,TF; tp=CAZymes,TC; tf=CAZymes,TF')
 parser.add_argument('--output', '-o', help='Output file name')
 
 args = parser.parse_args()
@@ -30,20 +33,32 @@ args = parser.parse_args()
 out = open(args.output, 'w+')
 
 #global vars
-cluster = [0, 0, 0] #cazyme, tp, tf
+cluster = [0, 0, 0, 0] #cazyme, tp, tf, stp
 num_clusters = 0
 
 #define boolean function to determine if a cluster meets cluster requirements
 def isCluster(): 
 	global cluster
 	if args.siggenes == 'all':
-		if cluster[0] > 0 and cluster[1] > 0 and cluster[2] > 0:
+		if cluster[0] > 0 and cluster[1] > 0 and cluster[2] > 0 and cluster[3]:
 			return True
 	elif args.siggenes == 'tf':
 		if cluster[0] > 0 and cluster[2] > 0:
 			return True
 	elif args.siggenes == 'tp':
 		if cluster[0] > 0 and cluster[1] > 0:
+			return True
+	elif args.siggenes == 'stp':
+		if cluster[0] > 0 and cluster[3] > 0:
+			return True
+	elif args.siggenes == 'tp+tf':
+		if cluster[0] > 0 and cluster[1] > 0 and cluster[2]>0:
+			return True
+	elif args.siggenes == 'tp+stp':
+		if cluster[0] > 0 and cluster[1] > 0 and cluster[3]>0:
+			return True
+	elif args.siggenes == 'tf+stp':
+		if cluster[0] > 0 and cluster[2] > 0 and cluster[3]>0:
 			return True
 	else:
 		print('Warning: invalid siggenes argument')
@@ -54,14 +69,16 @@ def isImportant(gene):
 	if gene == 'CAZyme':
 		return True
 	else:
-		if gene == 'TC' and (args.siggenes == 'tp' or args.siggenes == 'all'):
+		if gene == 'TC' and (args.siggenes == 'tp' or args.siggenes == 'all' or args.siggenes == 'tp+tf' or args.siggenes == 'tp+stp'):
 			return True
-		if gene == 'TF' and (args.siggenes == 'tf' or args.siggenes == 'all'):
+		if gene == 'TF' and (args.siggenes == 'tf' or args.siggenes == 'all' or args.siggenes == 'tp+tf' or args.siggenes == 'tf+stp'):
+			return True
+		if gene == 'STP' and (args.siggenes == 'stp' or args.siggenes == 'all'or args.siggens == 'tp+stp' or args.siggenes == 'tf+stp' ):
 			return True
 	return False
 
 def isSigGene(gene):
-	if gene == 'CAZyme' or gene == 'TC' or gene == 'TF':
+	if gene == 'CAZyme' or gene == 'TC' or gene == 'TF' or gene == 'STP':
 		return True
 	else:
 		return False
@@ -75,6 +92,8 @@ def increaseClusterCount(gene):
 		cluster[1] += 1
 	elif gene == 'TF':
 		cluster[2] += 1
+	elif gene == 'STP':
+		cluster[3] += 1
 	else:
 		print("Warning: increaseClusterCount was called on bad functional domain")
 

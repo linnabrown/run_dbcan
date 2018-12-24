@@ -216,12 +216,15 @@ if find_clusters:
     print("*****************************CGC-Finder start************************************")
 
 ########################
-# Begin TF and TP prediction
+# Begin TF,TP, STP prediction
 
     call(['diamond', 'blastp', '-d', dbDir+'tf.dmnd', '-e', '1e-10', '-q', '%suniInput' % outPath, '-k', '1', '-p', '1', '-o', outDir+prefix+'tf.out', '-f', '6'])
     call(['diamond', 'blastp', '-d', dbDir+'tcdb.dmnd', '-e', '1e-10', '-q', '%suniInput' % outPath, '-k', '1', '-p', '1', '-o', outDir+prefix+'tp.out', '-f', '6'])
+    
+
     tp = set()
     tf = set()
+
     tp_genes = {}
     tf_genes = {}
     with open(outDir+prefix+'tf.out') as f:
