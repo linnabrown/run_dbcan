@@ -107,5 +107,5 @@ venv.bak/
 db/
 example/db
 
-## signalp
+# signalp
 tools/
