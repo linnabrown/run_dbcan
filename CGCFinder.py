@@ -129,7 +129,6 @@ def startSearch(startRow, contig):
 						for note in notes:
 							if "ID" in note:
 								ID = note.split("=")[1]
-						global genome
 						row = [str(j), fd, str(upDown[1]), str(upDown[0]), 'CGC'+str(num_clusters), contig[j][0], contig[j][3], contig[j][4], ID, contig[j][6], contig[j][8]]
 					else:
 						row = [str(j), 'null', 'null', 'null', 'CGC'+str(num_clusters), contig[j][0], contig[j][3], contig[j][4], ID, contig[j][6]]

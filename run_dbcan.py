@@ -109,7 +109,7 @@ if args.tools != 'all':
 outPath = outDir + prefix
 
 if inputType == 'prok':
-    call(['prodigal', '-i', input, '-a', '%suniInput'%outPre, '-o', '%sprodigal.gff'%outPath, '-f', 'gff', '-q'])
+    call(['prodigal', '-i', input, '-a', '%suniInput'%outPath, '-o', '%sprodigal.gff'%outPath, '-f', 'gff', '-q'])
 if inputType == 'meta':
     call(['FragGeneScan1.30/run_FragGeneScan.pl', '-genome='+input, '-out=%sfragGeneScan'%outPath, '-complete=1', '-train=complete', '-thread=10'])
 
@@ -488,25 +488,25 @@ hotpep_genes = unique(hotpep_genes)
 
 
 
-diamond_fams = {};
-hmmer_fams = {};
-hotpep_fams = {};
+diamond_fams = {}
+hmmer_fams = {}
+hotpep_fams = {}
 # parse input, stroe needed variables
 if(arr_diamond != None):
     for i in range (1,len(arr_diamond)):
-        row = arr_diamond[i].split("\t");
-        fam = row[1].split("|");
-        diamond_fams[row[0]] = fam[1];
+        row = arr_diamond[i].split("\t")
+        fam = row[1].split("|")
+        diamond_fams[row[0]] = fam[1]
 
 if(arr_hmmer !=None):
     for i in range (len(arr_hmmer)):
-        row = arr_hmmer[i].split("\t");
-        fam = row[0].split(".");
-        fam = fam[0]+"("+row[7]+"-"+row[8]+")";
+        row = arr_hmmer[i].split("\t")
+        fam = row[0].split(".")
+        fam = fam[0]+"("+row[7]+"-"+row[8]+")"
         if(row[2] not in hmmer_fams):
-            hmmer_fams[row[2]] = [];
+            hmmer_fams[row[2]] = []
 
-        hmmer_fams[row[2]].append(fam);
+        hmmer_fams[row[2]].append(fam)
 
 
 if(arr_hotpep != None) :
@@ -523,32 +523,31 @@ overall_table = []
 with open(workdir+"overview.txt", 'w+') as fp:
     fp.write("Gene ID\tHMMER\tHotpep\tDIAMOND\tSignalp\t#ofTools\n")
     for gene in all_genes:
-        hits = {"diamond" : "N", "hmmer" : "N", "hotpep" : "N", "signalp" : "N", "tools" : 0};
-        csv = ["gene", "N", "N", "N", "N", 0];
-        csv[0] = gene;
+        hits = {"diamond" : "N", "hmmer" : "N", "hotpep" : "N", "signalp" : "N", "tools" : 0}
+        csv = ["gene", "N", "N", "N", "N", 0]
+        csv[0] = gene
         if(arr_hmmer != None):
             if gene in hmmer_genes:
-                csv[5]+=1;
-                hits["tools"]+=1;
-                txt = [];
+                csv[5]+=1
+                hits["tools"]+=1
+                txt = []
                 for i in range(len(hmmer_fams[gene])):
-                    txt.append(hmmer_fams[gene][i]);
-                    temp = hmmer_fams[gene][i].split("(");
-                    hmmer_fams[gene][i] = ("(").join(temp);
-
+                    txt.append(hmmer_fams[gene][i])
+                    temp = hmmer_fams[gene][i].split("(")
+                    hmmer_fams[gene][i] = ("(").join(temp)
                 hmmer_fams[gene] = ("+").join(hmmer_fams[gene])
-                hits["hmmer"] = hmmer_fams[gene];
-                csv[1] = ("+").join(txt);
+                hits["hmmer"] = hmmer_fams[gene]
+                csv[1] = ("+").join(txt)
         else:
 
-            csv[1] = "-";
-            hits["hmmer"] = "-";
+            csv[1] = "-"
+            hits["hmmer"] = "-"
 
         if(arr_hotpep!= None):
             if( gene in hotpep_genes):
-                csv[5]+=1;
-                hits["tools"]+=1;
-                temp = [];
+                csv[5]+=1
+                hits["tools"]+=1
+                temp = []
                 if gene in hotpep_fams:
                     for i in range(len(hotpep_fams[gene])):
                         temp.append(hotpep_fams[gene][i])
@@ -556,30 +555,29 @@ with open(workdir+"overview.txt", 'w+') as fp:
                     hits["hotpep"] = ("+").join(hotpep_fams[gene])
                     csv[2] = ("+").join(temp)
         else:
-            csv[2] = "-";
-            hits["hotpep"] = "-";
+            csv[2] = "-"
+            hits["hotpep"] = "-"
 
         if(arr_diamond != None):
             if(gene in diamond_genes):
-                csv[5]+=1;
-                hits["tools"]+=1;
-                fams = diamond_fams[gene].split("+");
-                hits["diamond"] = "";
-                csv[3] = diamond_fams[gene];
+                csv[5]+=1
+                hits["tools"]+=1
+                fams = diamond_fams[gene].split("+")
+                hits["diamond"] = ""
+                csv[3] = diamond_fams[gene]
 
         else:
-            csv[3] = "-";
-            hits["diamond"] = "-";
+            csv[3] = "-"
+            hits["diamond"] = "-"
 
         if gene in sigp_genes :
-            hits["signalp"] = "Y (1-"+sigp_genes[gene]+")";
-            csv[4] = "Y(1-"+sigp_genes[gene]+")";
+            hits["signalp"] = "Y (1-"+sigp_genes[gene]+")"
+            csv[4] = "Y(1-"+sigp_genes[gene]+")"
 
 
         else:
-            hits["geneID"] = gene;
-
-        overall_table.append(hits);
+            hits["geneID"] = gene
+        overall_table.append(hits)
 
 
         temp = "\t".join(str(x) for x in csv) + "\n"
