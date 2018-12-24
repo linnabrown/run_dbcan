@@ -1,0 +1,334 @@
+.TH signalp 1 \" -*- nroff -*-
+
+.SH NAME
+signalp \- predict signal peptides in proteins
+
+.SH SYNOPSIS
+\fBsignalp\fP
+[\fB\-c\fP \fIlength\fP]
+[\fB-f short\fP|\fBlong\fP|\fBall\fP|\fBsummary\fP]
+[\fB-g png\fP|\fBpng+eps\fP]
+        [\fB-h\fP] [\fB-k\fP] [\fB-l\fP \fIfile\fP] [\fB-m\fP \fIfile\fP]
+[\fB-M\fP \fIlength\fP] [\fB-n\fP \fIfile\fP]
+        [\fB-s best\fP|\fBnotm\fP]
+[\fB-t euk\fP|\fBgram+\fP|\fBgram-\fP] [\fB-u\fP \fIcutoff\fP]
+[\fB-U\fP \fIcutoff\fP]
+        [\fB-v\fP] [\fB-V\fP] [\fIfile\fP ...]
+.SH DESCRIPTION
+.B signalp
+predicts the presence and location of signal peptide cleavage sites in amino
+acid sequences from different organisms: Gram-positive bacteria, Gram-negative
+bacteria, and eukaryotes. The method incorporates a prediction of cleavage
+sites and a signal peptide/non-signal peptide prediction based on a combination
+of several artificial neural networks. Two types of neural networks have been
+trained: SignalP-noTM and SignalP-TM, where SignalP-noTM is most similar to the
+previous version of SignalP (ver 3.0) whereas the SignalP-TM method was trained
+specifically to discriminate between a signal peptide and an N-terminal
+transmembrane region. Predictions are made by both methods and the default
+behaviour is to choose the most likely prediction. It is however possible to
+specifically choose SignalP-noTM predictions to keep a functionality where the
+user believes that submitted sequences do not include a transmembrane region.
+
+To run SignalP 4.1 in the "sensitive" mode which has the same
+sensitivity as SignalP 3.0, the user has to specify D-score cutoff
+values. See the \fB-u\fP and \fB-U\fP options, below.
+
+The method is described in detail in the references quoted below.
+
+.B Input
+
+The input is taken from \fIfile\fP or, if no file is specified, the standard
+input. The input format, described below, is Pearson \fBFASTA\fP (see CAVEATS
+below). Several input
+files may be specified on the same command line.
+
+Each sequence must be preceded by a sequence header line starting with the
+symbol `>' immediately followed by a unique name (identifier) of the
+sequence. The names longer than 55 characters will be truncated to that
+length. The input sequences are expected to have unique names after truncation;
+if a sequence name is repeated only the last sequence with that name will
+be processed. The rest of the header line, separated from the sequence name
+by whitespace, is ignored. 
+
+The sequences must be written using the one letter abbreviations
+for the amino acids:
+
+     \fBacdefghiklmnpqrstvwy\fP or \fBACDEFGHIKLMNPQRSTVWY\fP
+
+Other letters and digits will be converted to `X' and treated as
+unknown amino acids. Other characters like blanks will be ignored.
+
+By default, only the first 70 N-terminal amino acids are used for predictions.	
+
+.B Output
+
+For each input sequence, signalp will return three scores between 0 and 1 for
+each sequence position (depending on choice of output format):
+
+.B C-score
+(raw cleavage site score)
+     The output score from networks trained to recognize
+     cleavage sites vs. other sequence positions. Trained to
+     be high at position +1 (immediately after the cleavage
+     site), and low at all other positions.
+
+.B S-score
+(signal peptide score)
+     The output score from networks trained to recognize
+     signal peptide vs. non-signal-peptide positions.
+     Trained to be high at all positions before the cleavage
+     site, and low at positions after the cleavage site and
+     in the N-terminals of non-secretory proteins.
+
+.B Y-score
+(combined cleavage site score)
+     The prediction of cleavage site location is optimized
+     by observing where the C-score is high and the S-score
+     changes from a high to a low value.  The Y-score
+     formalizes this by combining the height of the C-score
+     with the slope of the S-score.
+
+.in +5n
+Specifically, the Y-score is a geometric average between the C-score and a
+smoothed derivative of the S-score (i.e. the difference between the mean
+S-score over \fId\fP positions before and \fId\fP positions after the current
+position, where \fId\fP varies with the chosen network ensemble).
+.in -5n
+
+.B signalp
+will then report the maximal C-, S-, and Y- scores, the mean S-score in the
+interval between the N-terminal and the site with the maximal Y-score and,
+finally, the D-score, a weighted average of the S-mean and Y-max score. The
+final, combined prediction of the presence of a signal peptide in the sequence
+is based on the D-score.
+
+The high detail level of the output is intended to allow for interpretation
+of borderline cases by the user.
+
+If the sequence is predicted to have a signal peptide, the predicted cleavage
+site is located immediately before the position with the maximal Y-score.
+.SH OPTIONS
+.TP
+.BI \-c " length"
+"cut": truncate the input sequences to the specified \fIlength\fP from the
+N-terminal. The default is 70 residues. The value of "0" disables truncation.
+.TP
+.BI \-f " format"
+"format": produce output in the specified \fIformat\fP. The valid formats are:
+.RS
+.TP
+.B short
+Write only one line of concluding scores per sequence. Intended for analysis
+of large datasets where machine-readable output is required. This is the
+default format.
+.TP
+.B long
+Write the scores for each position in each sequnce.
+.TP
+.B all
+Write predictions for both Signalp-TM and SignalP-noTM networks. Five columns
+with cleavage site (CS) and Signal Peptide (SP) predictions for both SigP-noTM
+and SigP-TM methods and TM prediction for each position.
+.TP
+.B summary
+Write only the concluding scores for each sequence. This is essentially the
+same information as the 'short' format.
+.RE
+.TP
+.BI \-g " format"
+"graphics": generate graphics illustrating the predictions, in the
+specified \fIformat\fP. The valid formats are:
+.RS
+.TP
+.B png
+save plots in Portable Network Graphics format (\fBPNG\fP) under the
+names 'xxx.png', where xxx is the name of the input sequence, taken from the
+input in FASTA.
+.TP
+.B png+eps
+Save plots in both \fBPNG\fP and \fBEPS\fP formats as described above.
+.RE
+.TP
+\.B \-h
+"help": print the allowed command lime syntax and exit.
+.TP
+.B \-k
+"keep": keep the temporary directory after execution. The default is not to
+do that.
+.TP
+.BI \-l " file"
+"log": log remarks and comments to \fIfile\fP. \fIstderr\fP is default. This
+option will only work if \fB\-v\fP is also given.
+.TP
+.BI \-m " file"
+"mature": generate a FASTA \fIfile\fP with mature sequences based on the
+predictions. By default it is not done.
+.TP
+.BI \-M " length"
+"minimal": set the minimal predicted signal peptide length to \fIlength\fP. The
+default is 10.
+.TP
+.BI \-n " file"
+"n-s-e": generate a \fBGFF\fP (name-start-end) \fIfile\fP with the predicted
+signal peptides. By default it is not done.
+.TP
+.BI \-s " method"
+Use the specified \fImethod\fP. The valid methods are:
+.RS
+.TP
+.B best (default)
+The method decides which neural networks predictions give the best result
+choosing predictions from either SignalP-TM or SignalP-noTM
+networks. For 'gram+' organisms it is always SignalP-TM networks.
+.TP
+.B notm
+The SignalP-noTM neural networks are specifically chosen.
+.RE
+.TP
+.BI \-t " type"
+"type": use networks and models trained on sequences from the specified
+organism \fItype\fP. The valid types are:
+
+	\fBeuk\fP		eukaryotes (\fBdefault\fP)
+.br
+	\fBgram-\fP	Gram-negative bacteria
+.br
+	\fBgram+\fP 	Gram-positive bacteria
+.TP
+.BI \-u " cutoff"
+"user": user defined D-cutoff for noTM networks. A score above the specified
+cutoff will result in a positive prediction of a signal peptide. The cutoff
+determines the yes/no answer only, the prediction process is not affected. The
+default cutoffs are:
+
+	euk		\fB0.45\fP
+.br
+	gram+	\fB0.57\fP
+.br
+	gram-	\fB0.57\fP
+
+The "sensitive" cutoffs (for reproducing the SignalP 3.0 sensitivity)
+are: 
+
+	euk		\fB0.34\fP
+.br
+	gram+	\fB0.42\fP
+.br
+	gram-	\fB0.42\fP
+.TP
+.BI \-U " cutoff"
+"User": user defined D-cutoff for TM networks. A score above the specified
+cutoff will result in a positive prediction of a signal peptide. The cutoff
+determines the yes/no answer only, the prediction process is not affected. The
+default cutoffs are:
+
+	euk		\fB0.50\fP
+.br
+	gram+	\fB0.45\fP
+.br
+	gram-	\fB0.51\fP
+
+The "sensitive" cutoffs (for reproducing the SignalP 3.0 sensitivity)
+are: 
+
+	euk		\fB0.34\fP
+.br
+	gram+	\fB0.42\fP
+.br
+	gram-	\fB0.42\fP
+.TP
+.B \-v
+"verbose": verbose mode; the deafult is not verbose.
+.TP
+.B \-V
+"version": print SignalP version and exit.
+.TP
+.I "file ..."
+The \fIfile\fP to process. If not specified, \fIstdin\fP will be used instead.
+
+.SH CAVEATS
+
+If
+.B SignalP
+is used with graphics, the
+.B FASTA
+sequence names (i.e. everything between the '>' character and the first white
+space on the header line)
+are used to generate file names. This will, under any operating system, go
+wrong and generate error messages if the following characters are included
+in the
+.B FASTA
+sequence names:
+
+     "   /   \\
+
+Under Windows, we additionally recommend avoiding the following characters in 
+.B FASTA
+sequence names when using graphics:
+
+     *   :   <   >   ?   |
+
+They will work locally under Cygwin or MobaXterm, but may produce files that
+cannot be opened by other Windows programs outside of Cygwin or MobaXterm.
+
+.SH VERSION
+This manual page describes SignalP 4.1, from December 2012. Additional information
+can be found at:
+
+.B	http://www.cbs.dtu.dk/services/SignalP-4.1/
+
+.SH PROBLEMS AND QUESTIONS
+In the case of technical problems (bugs etc.) please contact
+.B support@cbs.dtu.dk.
+
+Questions on the scientific aspects of the SignalP method should go to
+Henrik Nielsen, hnielsen@cbs.dtu.dk.
+
+.SH REFERENCES
+
+.B Ver. 4.0
+
+"SignalP 4.0 - Discrimination between Signal Peptides and Transmembrane
+Regions"
+.br
+Thomas Nordahl Petersen, Søren Brunak, Gunnar von Heijne and Henrik Nielsen.
+.br
+Nature Methods, 8:785-786, 2011.
+
+.B Ver. 3.0
+
+"Improved prediction of signal peptides - SignalP 3.0"
+Jannick Dyrloev Bendtsen, Henrik Nielsen, Gunnar von Heijne
+(*) and Soren Brunak.
+Journal of Molecular Biology: accepted 2004.
+
+.B Ver. 2.0
+
+"Prediction of signal peptides and signal anchors by a
+hidden Markov model",
+Henrik Nielsen and Anders Krogh
+In: Proceedings of the Sixth International Conference on
+Intelligent Systems for Molecular Biology (ISMB 6), AAAI
+Press, Menlo Park, California, pages 122-130, 1998.
+
+.B Ver. 1.1
+(original paper)
+
+"Identification of prokaryotic and eukaryotic signal
+peptides and prediction of their cleavage sites",
+Henrik Nielsen, Jacob Engelbrecht, Soren Brunak and Gunnar
+von Heijne (*)
+Protein Engineering, vol. 10, pages 1-6, 1997.
+
+
+Center for Biological Sequence Analysis
+The Technical University of Denmark
+DK-2800 Lyngby, Denmark
+
+(*) Department of Biochemistry
+Arrhenius Laboratory
+Stockholm University
+S-106 91 Stockholm, Sweden
+
+.SH SEE ALSO
+chlorop(1), targetp(1), fasta(1)

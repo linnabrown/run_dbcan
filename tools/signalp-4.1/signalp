@@ -1,0 +1,1153 @@
+#!/usr/bin/perl
+
+# SignalP 4.1 main script
+# 
+# 2012, May 11
+
+###############################################################################
+#               GENERAL SETTINGS: CUSTOMIZE TO YOUR SITE
+###############################################################################
+
+# full path to the signalp-4.1 directory on your system (mandatory)
+BEGIN {
+    $ENV{SIGNALP} = '/home/huangle/Desktop/fungi1217/old/run_dbcan/tools/signalp-4.1';
+}
+
+# determine where to store temporary files (must be writable to all users)
+my $outputDir = "/home/huangle/Desktop/fungi1217/old/run_dbcan/tools/signalp-4.1/output";
+
+# max number of sequences per run (any number can be handled)
+my $MAX_ALLOWED_ENTRIES=100000;
+
+###############################################################################
+#               NOTHING SHOULD NEED CHANGING BELOW THIS LINE!
+###############################################################################
+
+my $version='4.1';
+my $signalp_version='signalp ' . "$version";
+
+# in www- mode
+# if www mode option -w the output directory will be $wwwTempRootdir/$wwwTempDir
+my $wwwTempRootDir="/usr/opt/www/pub/CBS";
+my $wwwTempDir="services/SignalP-$version/tmp/$$";
+
+# not in www-mode
+# the output tempory directory
+# plots (png or png+eps) are moved to current working dir
+
+# INITIAL CHECKS
+
+my $platform = `uname -s`;
+chomp $platform;
+# strip spurious CYGWIN suffix, if any (HN+KR, Mar 2016)
+if ( $platform =~ '^CYGWIN' ) { $platform =  "CYGWIN"; }
+my $architecture = `uname -m`; 
+chomp $architecture;
+my $nnhowplayer = "$ENV{SIGNALP}/bin/nnhowplayer.$platform"."_"."$architecture";
+
+#check if there exist the proper version of nnhowplayer 
+die ("File $nnhowplayer cannot be found.") if (! -e $nnhowplayer);
+
+
+# check if the gnuplot is installed 
+my $gnuplotFound = 0;
+{
+	my @paths = split(':' , $ENV{PATH});
+	for my $path (@paths){
+		if ( -e "$path/gnuplot"){
+			$gnuplotFound = 1;
+		}
+	}
+#	die ("Missing dependency: gnuplot") if !$gnuplotFound;
+#       Only die is plotting mode is on and gnuplot is not found
+#       This will be determined once options have been read
+}
+
+my $command="$0 ";
+my $i=0;
+
+while (defined($ARGV[$i])){
+  $command .= "$ARGV[$i] ";
+  $i++;
+}
+
+# import the libraries
+use strict;
+use Getopt::Std;
+use Cwd;
+# use the distribution libraries
+use lib "$ENV{SIGNALP}/lib";
+use FASTA;
+
+
+#
+# Default parameters
+#
+# constants
+my $MAX_FASTA_LENGTH = 70;
+my $MINLEN=10;
+
+# Valid amino acids, upper or lower case else aa is replaced with X
+my $aminoacids = 'ACDEFGHIKLMNPQRSTVWYX';
+
+my $Format = 'short';
+
+# enable / disable ploting predictions results
+my $plotingEnabled=0;          
+
+
+# neural networks organism used for signal peptide predictions
+my $organismType='euk';
+
+# Remove temporary directory after execution of main program
+my $cleanup = 1;
+
+#use only no-Trans Membrane predictions
+my $onlySigP = 0;
+
+# neural networks to use
+# 'best': signalp-tm if TMcount >=4 else use signalp-notm
+# 'notm': User is sure that the equence does not include an N-terminal TM-region
+my $method ='best';
+
+# wwwmode
+my $wwwmode = 0;
+
+# Verbose mode
+my $verbose=0;
+
+my $graphicsType;
+
+# Logfile
+*LOG=*STDERR;
+#
+# Process command line
+#
+getopts('hvl:s:t:f:kg:wm:n:u:U:c:M:T:V')||Usage();
+#
+# Usage
+#
+if (defined($Getopt::Std::opt_h)||defined($Getopt::Std::opt_h)){
+  # Print help message
+  Usage();
+}
+
+# print help information
+sub Usage {
+    print ("\n  Description: Predict signal peptide and cleavage site.\n\n");
+    print "  Usage: $0 -f <format>  -p <graphics-type> -k -s <networks> -t <organism-type> -m <fasta-file> -n <gff-file> -v -l <logfile> -u <value>  -U <value> -w -h -c <value> -T <temp dir> -V <fasta-file\(s\)>\n";
+    print "  Options:\n";
+    print "  -f   Setting the output format ('short', 'long', 'summary' or 'all'). Default: '$Format'\n";
+    print "  -g   Graphics 'png' or 'png+eps'. Default: 'Off'\n";
+    print "  -k   Keep temporary directory. Default: 'Off'\n";
+    print "  -s   Signal peptide networks to use ('best' or 'notm'). Default: 'best'\n";
+    print "  -t   Organism type> \(euk, gram+, gram-\). Default: '$organismType'\n";
+    print "  -m   Make fasta file with mature sequence. Default: 'Off'\n";
+    print "  -n   Make gff file of processed sequences. Default: 'Off'\n";
+    print "  -T   Specify temporary file directory. Default: $outputDir\n";
+    print "  -w   web predictions. Default: 'Off'\n";
+    print "  -u   user defined D-cutoff for noTM networks\n";
+    print "  -U   user defined D-cutoff for TM networks\n";
+    print "  -M   Minimal predicted signal peptide length. Default: [$MINLEN]\n";
+    print "  -c   truncate to sequence length - 0 means no truncation. Default '$MAX_FASTA_LENGTH'\n";
+    print "  -l   Logfile if -v is defined. Default: 'STDERR'\n";
+    print "  -v   Verbose. Default: 'Off'\n";
+    print "  -V   Print SignalP version and exit\n";
+    print "  -h   Print this help information\n\n";
+    exit;                              
+}
+
+if (defined($Getopt::Std::opt_V)){
+    print "$signalp_version\n";
+    exit;
+}
+if (defined($Getopt::Std::opt_v)){
+    $verbose=1;
+}
+
+#
+# Current directory
+#
+my $workingDir = cwd;
+
+if (defined($Getopt::Std::opt_l)){
+    open(LOG,">$Getopt::Std::opt_l");
+}
+
+if ($verbose == 1){
+    print LOG "# Current dir: $workingDir\n";
+}
+
+# Make temporary output directory
+#
+if (defined($Getopt::Std::opt_w)){
+    $wwwmode = 1;
+}
+
+
+# Check if the wwwTempRootDir is a part of the outputDir
+# This is necessary in order to make relative path for files read by www
+if (defined($Getopt::Std::opt_T)){
+    $outputDir=$Getopt::Std::opt_T;
+}
+
+$outputDir .= "/signalp_$$";
+
+if ($wwwmode == 1){
+    $outputDir="$wwwTempRootDir/$wwwTempDir";
+}
+
+if( ! -d $outputDir ){
+    `mkdir -p $outputDir`;
+    if ((! $wwwmode) && (defined($Getopt::Std::opt_T))){
+	print "Temporary files in: $outputDir\n";
+    }
+}
+
+
+if (defined($Getopt::Std::opt_t)){
+    $organismType=$Getopt::Std::opt_t;
+}
+if (defined($Getopt::Std::opt_k)){
+    $cleanup=0;
+}
+if (defined($Getopt::Std::opt_s)){    
+    $method=$Getopt::Std::opt_s;
+		if (($method ne 'best') && ($method ne 'notm')){
+		print STDERR "Unknown values to option -s\n";
+		print STDERR "Valid values are: 'best' or 'notm'\n";
+		exit;
+    }
+    $onlySigP = 1 if $method eq 'notm';
+}
+
+if (defined($Getopt::Std::opt_f)){
+    $Format=$Getopt::Std::opt_f;
+}
+
+my $PNG=0;
+if (defined($Getopt::Std::opt_g)){
+    $graphicsType=$Getopt::Std::opt_g;
+
+    die ("Can not use plotting options - Reason being missing dependency: gnuplot\n") if !$gnuplotFound;
+    if (($graphicsType eq 'png') || ($graphicsType eq 'png+eps')){
+	$plotingEnabled=1;
+	$PNG=1 unless ($graphicsType eq 'png+eps');
+    }
+    else{
+	print STDERR "Unknown graphics type: $Getopt::Std::opt_g\n";
+	print STDERR "Valid graphic types are 'png' or 'png+eps'\n";
+	exit;
+    }
+    
+}
+if (defined($Getopt::Std::opt_c)){
+    $MAX_FASTA_LENGTH=$Getopt::Std::opt_c;
+    if ($MAX_FASTA_LENGTH < 0){
+	die ("Option -c: Truncation value can not be negative - 0 means no truncation\n");
+    }
+}
+if (defined($Getopt::Std::opt_M)){
+    $MINLEN=$Getopt::Std::opt_M;
+}
+#
+# Do not make plots in these Format modes: 'short' and 'all' in wwwmode
+#
+if ( (($Format eq 'short') || ($Format eq 'all')) && ($wwwmode)){
+    $plotingEnabled = 0;
+}
+my $mature=0;
+my $gff=0;
+if (defined($Getopt::Std::opt_m)){
+    $mature=1;
+}
+if (defined($Getopt::Std::opt_n)){
+    $gff=1;
+}
+###############################################################################
+# Main
+#
+###############################################################################
+if ($verbose==1){
+    print LOG ("# $command\n");
+}
+
+########################################################################################
+# 					   SCRIPT INPUT PARAMETERS PROCESSING SECTION                      #
+########################################################################################  
+# check the chosen organisms type (eukaryote, gram+ bacteries and gram- bacteries)
+if(! ($organismType eq 'euk' ||$organismType eq 'gram+' || $organismType eq 'gram-')){
+    print ("Invalid organism type specification: $organismType\n");
+    &cleanup($outputDir);
+}
+
+#check if the chosen format is correct
+if (($Format ne "summary") and ($Format ne "short") and ($Format ne "long") and ($Format ne "all")){
+    print ("\"$Format\" is not a valid format. It can be \"summary\" or\"short\" or \"long\" or \"all\"\n");
+    &cleanup($outputDir);
+}
+
+
+
+########################################################################################
+# 								FASTA FILE PROCESSING SECTION                          #
+########################################################################################
+# init number of predicted signal peptides
+my $signalPeptides=0;
+
+# open file to be used as input to the nnhowplayer
+open(OUTPUT_ACT, ">$outputDir/1stLayerACT");
+
+if ($verbose == 1){
+    print LOG "# Output temp-dir: $outputDir\n";
+}
+
+my %rec=();
+my $sequences = 0;
+my $entries = 0;
+my $aa_error=0;
+
+# store fasta file in temp dir
+open(FASTA,">$outputDir/file.fasta");
+
+while (<>) {
+  if (/^>/) {
+      $entries++;
+  }
+  if ($entries > $MAX_ALLOWED_ENTRIES){
+      print STDERR "# Sequence limit reached: Max $MAX_ALLOWED_ENTRIES sequences are allowed\n";      
+      &cleanup($outputDir);
+  }
+  print FASTA "$_";
+}
+close(FASTA);
+
+#
+# Check fasta sequence and make input file for nnhowplayer
+#
+open(FASTA,"<$outputDir/file.fasta");
+while (! eof (FASTA)){
+    my %fasta = readFASTA(\*FASTA);
+    my $name=$fasta{name};
+    # seqnames>55 truncated to 55, HN, Dec 8, 2016
+    if ( length($name)>55 ) { $fasta{name} = substr($name,0,55); }
+    $rec{$name}{name}=$fasta{name};
+    $rec{$name}{desc}=$fasta{desc};
+    $rec{$name}{cleavage}=0;
+    my $len=$fasta{len};
+    
+    # truncate fasta file to MAX_FASTA_LENGTH
+    if ($len > $MAX_FASTA_LENGTH){
+	if ($MAX_FASTA_LENGTH != 0){
+	    $len=$MAX_FASTA_LENGTH;
+	}
+    }
+    $rec{$name}{len}=$len;
+
+    # Check valid amino acids - B and Z are replaced by X
+    for (my $i = 1; $i <= $len;$i++){
+	my $acid = $fasta{seq}[$i];
+	my $aminoacid=uc($acid);
+	if (index($aminoacids,$aminoacid) < 0){
+	    print STDERR "# Sequence= $name aa= '$acid' pos= $i is an unknown amino amino acid - replaced with 'X' - valid amino acids are upper and lower case $aminoacids\n";
+#	    $aa_error = 1;
+	    $fasta{seq}[$i] = 'X';
+	    $aminoacid='X';
+	}
+#	printf  OUTPUT_ACT ("  %1s %-20s  %5d\n",$fasta{seq}[$i],$fasta{name},$i);
+	printf  OUTPUT_ACT ("  %1s %-20s  %5d\n",$aminoacid,$fasta{name},$i);
+
+    }
+
+}
+
+close(FASTA);
+exit if $aa_error == 1;
+
+close(OUTPUT_ACT);
+
+if ($wwwmode == 1){
+    print "<PRE>\n";
+}
+if (($Format eq 'summary') || ($Format eq 'short') || ($Format eq 'long') || ($Format eq 'all')){
+    &header($organismType, $Format, $version);
+}
+
+# protein types are: 'transmembrane' and 'no-transmembrane'
+my @proteinTypes=("TM", "noTM");
+
+# prediction types are: 'signal peptide' and 'cleavage site'
+my @predictionTypes=('SP', 'CS');
+
+my %param=();
+
+$param{'euk-TM'}{'Drange'}=14;
+$param{'euk-TM'}{'b'}=0.6;
+$param{'euk-TM'}{'Dmaxcut'}=0.5;
+$param{'euk-TM'}{'networks'}='SignalP-TM';
+
+$param{'euk-noTM'}{'Drange'}=22;
+$param{'euk-noTM'}{'b'}=0.46;
+$param{'euk-noTM'}{'Dmaxcut'}=0.45;
+$param{'euk-noTM'}{'networks'}='SignalP-noTM';
+
+$param{'gram+-TM'}{'Drange'}=13;
+$param{'gram+-TM'}{'b'}=0.61;
+$param{'gram+-TM'}{'Dmaxcut'}=0.45;
+$param{'gram+-TM'}{'networks'}='SignalP-TM';
+
+$param{'gram+-noTM'}{'Drange'}=15;
+$param{'gram+-noTM'}{'b'}=0.45;
+$param{'gram+-noTM'}{'Dmaxcut'}=0.57;
+$param{'gram+-noTM'}{'networks'}='SignalP-noTM';
+
+$param{'gram--TM'}{'Drange'}=12;
+$param{'gram--TM'}{'b'}=0.63;
+$param{'gram--TM'}{'Dmaxcut'}=0.51;
+$param{'gram--TM'}{'networks'}='SignalP-TM';
+
+$param{'gram--noTM'}{'Drange'}=12;
+$param{'gram--noTM'}{'b'}=0.53;
+$param{'gram--noTM'}{'Dmaxcut'}=0.57;
+$param{'gram--noTM'}{'networks'}='SignalP-noTM';
+
+#
+# User defined Dmaxcut for noTM networks
+#
+if (defined($Getopt::Std::opt_u)){
+    my $id="$organismType"."-noTM";
+    $param{$id}{Dmaxcut}=$Getopt::Std::opt_u;
+    if ($verbose == 1){
+	print LOG "User defined D-cutoff for noTM networks '$id': $param{$id}{Dmaxcut}\n";
+    }
+}
+
+#
+# User defined Dmaxcut for TM networks
+#
+if (defined($Getopt::Std::opt_U)){
+    my $id="$organismType"."-TM";
+    $param{$id}{Dmaxcut}=$Getopt::Std::opt_U;
+    if ($verbose == 1){
+	print LOG "User defined D-cutoff for TM networks '$id': $param{$id}{Dmaxcut}\n";
+    }
+}
+
+########################################################################################
+# 							  FIRST LAYER NETWORK SECTION                              #
+######################################################################################## 
+
+####################### Call NN player to make predictions from an ensemble of networks ################
+
+
+foreach my $proteinType(@proteinTypes){  
+    foreach my $predictionType(@predictionTypes){
+    	my $cmd="$nnhowplayer -slist $ENV{SIGNALP}/syn/$organismType.$proteinType.$predictionType.list -a $outputDir/1stLayerACT | grep -v \"^#\" > $outputDir/$organismType.$proteinType.$predictionType";
+	if (defined($Getopt::Std::opt_v)){
+	   print LOG ("# Doing: $cmd\n");
+	}
+#	`$cmd`; 
+	if (! fork()){
+	    system($cmd);
+	    exit(0);
+	}
+    }	
+}
+wait;
+wait;
+wait;
+wait;
+
+#the spScore is used to check if the Trans Membrane of No-Trans Membrane predictions should be used 
+my $TMCount = 0;
+# SP_TRESHOLD is a treshold value for spScore  
+my $TM_TRESHOLD = 4;
+
+# the transmembrane signal peptides 
+my $SP_TM_fileName = "$outputDir/$organismType.TM.SP";
+my $SP_noTM_fileName = "$outputDir/$organismType.noTM.SP";
+my $CS_TM_fileName = "$outputDir/$organismType.TM.CS";
+my $CS_noTM_fileName = "$outputDir/$organismType.noTM.CS";
+
+
+if (-e "$SP_TM_fileName"){
+    if (-e "$CS_TM_fileName"){
+	open(TM,"paste $SP_TM_fileName $CS_TM_fileName |");
+    }
+    else{
+	print STDERR ("File not found: $CS_TM_fileName\n");
+	&cleanup($outputDir);
+    }
+}
+else{
+    print STDERR ("File not found: $SP_TM_fileName\n");
+    &cleanup($outputDir);
+}
+
+if (-e "$SP_noTM_fileName"){
+    if (-e "$CS_noTM_fileName"){
+	open(NOTM,"paste $SP_noTM_fileName $CS_noTM_fileName |");
+    }
+    else{
+	print STDERR ("File not found: $CS_noTM_fileName\n");
+	&cleanup($outputDir);
+    }
+}
+else{
+    print STDERR ("File not found: $SP_noTM_fileName\n");
+    &cleanup($outputDir);
+}
+
+my %big=();
+
+# init sequence name 
+my $sequenceName="";
+my $first=1;
+
+LINE: while(! eof (TM)){
+    my $tm_line=<TM>;
+    chomp($tm_line);
+    my @w=split(/\s+/,$tm_line);
+    
+
+    # Store predictions - new sequence once previous name (i.e. $sequenceName) does not match current name (i.e. $w[2])
+    if (($first==1) || ($sequenceName eq $w[2])){
+	$first=0;
+	$sequenceName = $w[2]; 
+	
+	# Store predictions in hash
+	$big{TMSP}{name}=$w[2];
+
+	# amino scid counter
+	my $i=$w[3];
+	$big{TMSP}{length}=$i;
+	$big{TMSP}{aa}[$i]=$w[1];
+	$big{TMSP}{S}[$i]=$w[4];
+	$big{TMSP}{T}[$i]=$w[5];
+	# data from cleavage site predictions
+	$big{TMSP}{C}[$i]=$w[10];
+	$TMCount++ if ($w[4] <= $w[5] and $w[6] <= $w[5]);       
+	
+	
+	#
+	# Now read data from the noTM predictions
+	#
+	my $notm_line=<NOTM>;
+	chomp($notm_line);
+	my @x=split(/\s+/,$notm_line);
+	$sequenceName = $x[2];     
+	$big{noTMSP}{name}=$x[2];
+
+	# Check that name is the same in $SP_TM_fileName $CS_TM_fileName
+	if ($big{TMSP}{name} ne $big{noTMSP}{name}){
+	   STDERR  ("# Name inconsistency between sequence names - TM: $big{TMSP}{name} noTM: $big{noTMSP}{name}\n");
+       	   if  ($cleanup == 1){
+	       &cleanup($outputDir);
+           }
+	}
+
+	# amino acid counter
+	my $j=$x[3];
+	$big{noTMSP}{aa}[$j]=$x[1];
+
+	# Check that amino acids read from TMSP and noTMSP files are the same
+	if ($big{TMSP}{aa}[$j] ne $big{noTMSP}{aa}[$j]){
+	    print STDERR ("# Amino acid inconsistency: $big{TMSP}{name} position $j is '$big{TMSP}{aa}[$j]' and $big{noTMSP}{name} position $j is '$big{noTMSP}{aa}[$j]'\n");
+
+       	   if  ($cleanup == 1){
+	       &cleanup($outputDir);
+           }
+	}
+	$big{noTMSP}{length}=$j;
+	$big{noTMSP}{S}[$j]=$x[4];
+	# data from cleavage site predictions
+	$big{noTMSP}{C}[$j]=$x[9];
+	next LINE;
+    }
+
+    #
+    # For the gram+ organisms it is better to use SignalP-TM method always - there hard coded below i.e. TMcount bigger than TMthreshold
+    #
+    if ($organismType eq 'gram+'){
+	$TMCount=$TM_TRESHOLD+1;
+	if (defined($Getopt::Std::opt_v)){
+	    print LOG ("# TMcount set to TM_TRESHOLD+1 to assure SigP-TM prediction for a gram+ organism\n");
+	}
+    }
+    &predict;
+
+    if ($Format eq 'all'){
+	&printall;
+    }
+
+    # these data are predictions from position 1 in the new sequence
+    $sequenceName = $w[2];     
+    $TMCount=0; 
+    
+    $big{TMSP}{name}=$w[2];
+    my $i=$w[3];
+    $big{TMSP}{length}=$i;
+    $big{TMSP}{aa}[$i]=$w[1];
+
+    #
+    # Data from the SignalP-TM networks (S T N)
+    #
+    $big{TMSP}{S}[$i]=$w[4];
+    $big{TMSP}{T}[$i]=$w[5];
+    # Data from SignalP-TM cleavage site predictions (C N)
+    $big{TMSP}{C}[$i]=$w[10];
+
+
+#
+# Is the TM-prediction prediction (T) the largest value of the three output predictions (S T and N) per amino acid
+#
+    $TMCount++ if ($w[4] <= $w[5] and $w[6] <= $w[5]);
+
+    # First line (i.e. position 1) in noTM predictions
+    my $notm_line=<NOTM>;
+    chomp($notm_line);
+    my @x=split(/\s+/,$notm_line);
+    $sequenceName = $x[2];     
+    $big{noTMSP}{name}=$x[2];
+    my $j=$x[3];
+    $big{noTMSP}{aa}[$j]=$x[1];
+    if ($big{TMSP}{aa}[$j] ne $big{noTMSP}{aa}[$j]){
+	print STDERR ("# Amino acid inconsistency: $big{TMSP}{name} position $j is '$big{TMSP}{aa}[$j]' and $big{noTMSP}{name} position $j is '$big{noTMSP}{aa}[$j]'\n");
+	
+	if  ($cleanup == 1){
+	    &cleanup($outputDir);
+	}
+    }
+    $big{noTMSP}{length}=$j;
+    
+    #
+    # Data from the SignalP-noTM signal peptide prediction networks
+    #
+    $big{noTMSP}{S}[$j]=$x[4];
+
+    # Data from SignalP-noTM cleavage site predictions (C N)
+    $big{noTMSP}{C}[$j]=$x[9];
+}
+# the last sequence
+#print "organism='$organismType'\ttmcount=$TMCount\n";
+if ($organismType eq 'gram+'){
+    $TMCount=$TM_TRESHOLD+1;
+}
+&predict;
+if ($Format eq 'all'){
+    &printall;
+}
+
+
+close(TM);
+close(NOTM);
+
+if ($wwwmode == 1){
+
+    #
+    # Make a fasta file with mature sequences
+    #
+    if ($signalPeptides > 0){
+	open(FSA,"<$outputDir/file.fasta") || die ("File not found: $outputDir/file.fasta\n");
+	open(PROCESSED,">$outputDir/processed.fasta");
+	open(GFF,">$outputDir/gff.txt");
+	#
+	# Make GFF header
+	#
+	print GFF "##gff-version 2\n";
+	print GFF "##sequence-name\tsource\tfeature\tstart\tend\tscore\tN/A ?\n";
+	print GFF "## ---------------------------------------------------------\n";
+	my %fsa=();
+	while (! eof (FSA)){
+	    %fsa=readFASTA(\*FSA);
+	    my $name=$fsa{name};
+	    my $from=$rec{$name}{cleavage};
+	    my $to = $fsa{len};
+	    my $Dscore=$rec{$name}{Dscore};
+	    $fsa{desc} .= " ; MatureChain: $from-$to";
+
+	    if ($from != 0){
+		writeFASTA(\%fsa,\*PROCESSED,$from,$to);
+		my $sigpEnd=$from-1;
+		printf GFF "$name\tSignalP-$version\tSIGNAL\t1\t$sigpEnd\t%5.3f\t.\t.\tYES\n",$Dscore;
+	    }	    
+	}
+	close(FSA);
+	close(PROCESSED);
+	close(GFF);
+	print ("<hr>\n");
+	print ("Signal peptides: $signalPeptides\n");
+	print "# <A HREF=\"/$wwwTempDir/processed.fasta\">processed fasta entries</A>\n";
+	print "# <A HREF=\"/$wwwTempDir/gff.txt\">gff file of processed entries</A>\n";
+    }
+    print "</PRE>\n";
+}
+#
+# Do not cleanup in www-mode option -w or if option -c is defined
+#
+
+if (($plotingEnabled==1) && ($wwwmode == 0)){
+    # only png plots or also eps plots ?
+    if ($PNG){
+	`mv $outputDir/*.png $workingDir`;
+    }
+    else{
+	`mv $outputDir/*.eps $workingDir`;
+	`mv $outputDir/*.png $workingDir`;
+    }
+}
+
+if ($wwwmode==0){
+    if ((defined($Getopt::Std::opt_m)) || (defined($Getopt::Std::opt_n))){
+	if ($signalPeptides > 0){
+	    open(FSA,"<$outputDir/file.fasta") || die ("File not found: $outputDir/file.fasta\n");
+
+
+	    #
+	    # Make a fasta file with mature sequences
+	    #
+	    if ($mature==1){
+		open(PROCESSED,">$Getopt::Std::opt_m");
+	    }
+
+	    #
+	    # Make GFF output file
+	    #
+	    if ($gff==1){
+		open(GFF,">$Getopt::Std::opt_n");
+		#
+		# Make GFF header
+		#
+		print GFF "##gff-version 2\n";
+		print GFF "##sequence-name\tsource\tfeature\tstart\tend\tscore\tN/A ?\n";
+		print GFF "## -----------------------------------------------------------\n";
+	    }
+	    my %fsa=();
+	    while (! eof (FSA)){
+		%fsa=readFASTA(\*FSA);
+		my $name=$fsa{name};
+		my $from=$rec{$name}{cleavage};
+		my $to = $fsa{len};
+		my $Dscore=$rec{$name}{Dscore};
+		if ($from != 0){
+		    $fsa{desc} .= "; MatureChain: $from-$to";
+		    writeFASTA(\%fsa,\*PROCESSED,$from,$to);
+		    if ($gff==1){
+			my $sigpEnd=$from-1;
+			printf GFF "$name\tSignalP-$version\tSIGNAL\t1\t$sigpEnd\t%5.3f\t.\t.\tYES\n",$Dscore;
+		    }
+		}
+	    }
+	    close(FSA);
+	    if ($mature==1){
+		close(PROCESSED);
+	    }
+	    if ($gff==1){
+		close(GFF);
+	    }
+	}
+	else{
+	    print STDERR "# No sequences predicted with a signal peptide\n";
+	}
+    }
+}
+if ($wwwmode ==1){
+    print "Please cite:\n";
+    print "SignalP 4.0: discriminating signal peptides from transmembrane regions\n";
+    print "Petersen TN., Brunak S., von Heijne G. & Nielsen H.\n";
+    print "Nature Methods, 8:785-786, 2011\n";
+}
+if (($cleanup == 1) && ($wwwmode == 0)){
+    &cleanup($outputDir);
+}
+if (($cleanup == 0) && ($wwwmode == 0)){
+    print LOG ("# temporary directory will not be removed: $outputDir\n");
+}
+
+########################################################################################
+#  END OF PROGRAM 
+#
+######################################################################################## 
+
+########################################################################################
+# 							    SUB-ROUTINES SECTION                                   
+#
+######################################################################################## 
+# Remove temp output directory
+sub cleanup{
+    my ($tmpdir) = @_;
+    my $cmd = "rm -rf $outputDir";
+    
+    if ($verbose == 1){
+	print LOG "# Removing temporary directory: $cmd\n";
+    }
+    `$cmd`;
+    exit;
+}
+
+# PREDICTIONS SUB-ROUTINE
+sub predict{
+    my $Dmaxcut='';
+    my $prediction='';
+
+    if (($Format ne 'all') && ($Format ne 'short') && ($wwwmode == 1)){
+		print "<b>" if ($wwwmode);
+		print ">$rec{$sequenceName}{name} $rec{$sequenceName}{desc}\n";
+		print "</b>" if ($wwwmode);
+    }
+
+    $sequences++;
+
+    #the prediction will be done by Transmembrane SignalP-TM Networks
+    if($TMCount >= $TM_TRESHOLD && !$onlySigP){
+		$prediction="$organismType"."-TM";
+		&calc("$prediction", $sequenceName, "TM", "$Format", $sequences);
+    } #the prediction will be done by No-Transmembrane SignalP-noTM Networks
+    else{
+		$prediction="$organismType"."-noTM";
+		&calc("$prediction", $sequenceName, "noTM", "$Format", $sequences); 
+    }
+    $Dmaxcut = $param{$prediction}{'Dmaxcut'};
+
+    &plot("$outputDir/$sequenceName.pred",$sequenceName,"png") if ($plotingEnabled==1); 
+    
+    if ($wwwmode == 1){
+
+	if ($plotingEnabled == 1){
+	    print "<IMG SRC=\"/$wwwTempDir/$sequenceName.png\"><P>\n";
+	    
+	    if ($Format eq 'summary'){
+#		system("cat $outputDir/$sequenceName.summary");
+		system("cat $outputDir/file.summary");
+	    }
+	    if ($Format eq 'long'){
+		system("cat $outputDir/file.long");
+#		system("cat $outputDir/$sequenceName.summary");
+		system("cat $outputDir/file.summary");
+	    }
+	    print "# <A HREF=\"/$wwwTempDir/$sequenceName.pred\">data</A>\n";
+	    if ($graphicsType eq 'png+eps'){
+		print "# <A HREF=\"/$wwwTempDir/$sequenceName.eps\">eps-file</A>\n";
+	    }
+	    print "# <A HREF=\"/$wwwTempDir/$sequenceName.gnu\">gnuplot script</A>\n";
+	    print "<hr>\n" if ($sequences < $entries);
+	}
+	elsif ($plotingEnabled == 0){
+	    if ($Format eq 'summary'){
+#		system("cat $outputDir/$sequenceName.summary");
+		system("cat $outputDir/file.summary");
+	    }
+	    if ($Format eq 'long'){
+		system("cat $outputDir/file.long");
+#		system("cat $outputDir/$sequenceName.summary");
+		system("cat $outputDir/file.summary");
+	    }
+	}
+	
+    }
+    else{
+	if ($Format eq 'long'){
+	    system("cat $outputDir/file.long");
+#	    system("cat $outputDir/$sequenceName.summary");
+	    system("cat $outputDir/file.summary");
+	}
+	if ($Format eq 'summary'){
+#	    system("cat $outputDir/$sequenceName.summary");
+	    system("cat $outputDir/file.summary");
+	}
+	
+    }
+    return;
+}
+
+
+
+# SUB-ROUTINE FOR PLOTING THE SIGNAL PEPTIDE PREDICTION RESULTS         
+sub plot{
+	my ($dataFileName, $seqquenceName, $extension)  = @_;
+	my $plotingDone=0;
+	open(DATA , $dataFileName);
+	
+	my @common = ();
+	my @data = ();
+	my @header = ();
+	my @outputTypePng =();
+	my @outputTypeEps =();
+	my @plotting = ();
+	
+	# seting up the initial ploting parameters
+	push(@common, "#Gnuplot commands for SignalP job\n");
+	# cmd below altered to fit GNUPLOT 4.x	
+	#push(@common, "set data style lines\n");
+	push(@common, "set style data lines\n");
+	push(@common, "set yrange [-0.2:1.1]\n");
+	push(@common, "set ytics 0,0.2,1\n");
+	push(@common, "set format y \"%.1f\"\n");
+	push(@common, "set xlabel \"Position\"\n");
+	push(@common, "set ylabel \"Score\"\n");
+	push(@common, "set nolabel\n");
+	push(@common, "set label \"\" at 0,-0.1 center\n");    
+	
+	# putting in the prediction data
+	while(<DATA>){
+		if($_ =~ /^\s+(\S+)\s+(\S+)\s+(\S+)\s+/) {
+			# cmd below altered to fit GNUPLOT 4.x
+			#push(@data, "set label \"$2\" at $1,-0.1 center\n");
+			push(@data, "set label \"$2\" at $1,-0.1 center font \"Helvetica,7\"\n");
+		} 
+	}
+	close(DATA);
+	
+	# seting up the final ploting parameters
+	push(@header, "set title \"SignalP-$version prediction ($organismType networks): $sequenceName\"\n");
+	push(@header, "set output\n");	
+	# cmd below altered to fit GNUPLOT under CYGWIN	
+	#push(@outputTypePng, "set term png\n");
+	push(@outputTypePng, "set term png font \"Helvetica,12\"\n");
+        push(@outputTypePng, "set output \"$outputDir/$sequenceName.png\"\n");
+
+	# cmd below altered to fit GNUPLOT 4.x
+	#push(@outputTypeEps, "set term postscript eps landscape color\n");
+        push(@outputTypeEps, "set term postscript eps color\n");
+	push(@outputTypeEps, "set output \"$outputDir/$sequenceName.eps\"\n");
+	push(@outputTypeEps, "replot\nset output\n");
+
+	push(@plotting, "plot   \"$outputDir/$sequenceName.pred\" u 1:3 t \"C-score \" w imp, \\\n");
+	push(@plotting, "   	  \"$outputDir/$sequenceName.pred\" u 1:4 t \"S-score \", \\\n");
+	push(@plotting, "  	  \"$outputDir/$sequenceName.pred\" u 1:5 t \"Y-score \", \\\n");   
+	push(@plotting, "  	   0.5 t \"\" w dots\n");
+
+	# open the file to write the gnuplot commands for png
+	open(GPC, ">$outputDir/$sequenceName.gnu");	
+	if ($graphicsType eq 'png+eps') {
+	    print GPC join("", @common, @data, @header, @outputTypePng, @plotting, @outputTypeEps);
+	}
+	else{
+	    print GPC join("", @common, @data, @header, @outputTypePng, @plotting);
+	}
+	close(GPC);
+	
+	#execute the 'gnuplot' command 
+	`gnuplot "$outputDir/$sequenceName.gnu"`;
+
+}
+
+# depending on the $FORMAT variable print verbose or non-verbose output
+sub header{
+    my ($organismType, $Format, $version) = @_;
+   if ($Format eq "summary"){
+	print ("# SignalP-$version $organismType predictions\n");
+    }
+    elsif ($Format eq 'short'){
+	print ("# SignalP-$version $organismType predictions\n");
+	print ("# name                     Cmax  pos  Ymax  pos  Smax  pos  Smean   D     ?  Dmaxcut    Networks-used\n");
+    }
+    elsif (($Format eq 'long') || ($Format eq 'all')){
+	print ("# SignalP-$version $organismType predictions\n");
+    }
+}
+# PREDICTION CALCULATION SUB-ROUTINE 								  
+sub calc{
+    my($prediction, $sequenceName, $TMtype,$Format, $sequenceCounter) = @_;
+    
+    # set up the parameters for computation depending on the organism type & prediction type
+    my $Drange=$param{$prediction}{Drange};
+    my $b=$param{$prediction}{b};
+    my $Dmaxcut=$param{$prediction}{Dmaxcut};
+    my $networks=$param{$prediction}{networks};
+    
+    my $Cmaxcut;
+    my $Ymaxcut;
+    my $Smaxcut;
+    my $Smeancut;
+    my $type="$TMtype"."SP";
+
+    
+    if ($Format eq 'long'){
+	open(LONG,">$outputDir/file.long");
+	print LONG ("# Name=$big{$type}{name}\tLength=$big{$type}{length}\tNetworks=$networks\n");
+	print LONG ("# pos  aa    C       S       Y\n");
+    }
+
+    if ($Format ne 'short'){
+#	open(SUMMARY,">$outputDir/$sequenceName.summary");
+	open(SUMMARY,">$outputDir/file.summary");
+    }
+
+    # open a file where the prediction results will be put
+    if ($plotingEnabled == 1){
+	open(PLOT, ">$outputDir/$sequenceName.pred");
+	print PLOT ("# Name=$sequenceName\n");
+	print PLOT ("# pos  aa    C       S       Y\n");
+    }
+    
+    my %S=(),my %C=(),my %TM=(),my %sec=(),my %aa=();
+		
+
+    my ($Cmax, $Smax, $Ymax,$YTMmax) = (0,0,0,0);
+    my ($Cmaxpos, $Smaxpos, $Ymaxpos,$YTMmaxpos) = (1,1,1,1);
+		
+    my $sequence="";
+    my $length=$big{$type}{length};
+    my $name=$big{$type}{name};
+
+    for (my $i=1;$i<=$length;$i++){
+	$S{$i}=$big{$type}{S}[$i];
+	$C{$i}=$big{$type}{C}[$i];
+	$aa{$i}=$big{$type}{aa}[$i];
+	$sequence .= $aa{$i};
+    }
+		
+    ####### COMPUTATIONS TIME ######## 
+    for (my $i=1-$Drange;$i<=0;$i++){
+	$S{$i} = $S{1};
+    }
+    for (my $i=$length+1; $i<=$length+$Drange;$i++){
+	$S{$i}=$S{$length};
+    }
+
+    my $Y;
+		
+    for (my $i=1;$i<=$length;$i++){
+	my $diff=0;
+							   
+	for (my $j= $i-$Drange; $j<$i; $j++){
+	    $diff += $S{$j};
+	}
+	
+	for (my $j= $i; $j< $i+$Drange; $j++){
+	    $diff -= $S{j} if defined $S{j};
+	}
+	$diff = $diff/$Drange;
+	
+	if ($diff>0){
+	    $Y=sqrt($C{$i}*$diff);
+	}
+	else{
+	    $Y=0;
+	}
+	
+        
+	if (($Y>$Ymax) && ($i>$MINLEN)) { $Ymax=$Y; $Ymaxpos=$i }
+	if ($S{$i}>$Smax) { $Smax=$S{$i}; $Smaxpos=$i }
+	if ($C{$i}>$Cmax) { $Cmax=$C{$i}; $Cmaxpos=$i }
+	
+	if ($Format eq 'long'){
+	    printf LONG ("%5d   %1s   %5.3f   %5.3f   %5.3f\n", $i, substr($sequence,$i-1,1), $C{$i}, $S{$i}, $Y);
+	}
+	if ($plotingEnabled == 1){
+	    printf PLOT ("%5d  %1s   %5.3f   %5.3f   %5.3f\n", $i, substr($sequence,$i-1,1), $C{$i}, $S{$i}, $Y);
+	}
+	
+    }
+	 
+    my $Smean=0;
+    my $start=1;
+    my $Dmax;
+
+    # calculate means of T and S 
+    
+    for (my $i=$start; $i<=$Ymaxpos-1; $i++){
+	$Smean += $S{$i};
+    }
+    
+    if ($Ymaxpos>1){
+	$Smean = $Smean/($Ymaxpos - 1);
+    }
+    else{
+	$Smean = 0;
+    }
+
+    $Dmax = $b*$Ymax + (1-$b)*$Smean;
+    
+    # do printing ...
+    if ($Format eq 'short'){
+	printf "%-25s  ", $name;
+	printf "%5.3f %3d  ", $Cmax, $Cmaxpos;
+	printf "%5.3f %3d  ", $Ymax, $Ymaxpos;
+	printf "%5.3f %3d  ", $Smax, $Smaxpos;
+	printf "%5.3f ", $Smean;
+	printf "%7.3f %1s",$Dmax, ($Dmax>$Dmaxcut) ? "Y" : "N";
+	printf "%7.3f",$Dmaxcut;
+	printf "      %-10s\n",$networks;
+    }
+    
+    if ($plotingEnabled == 1){
+	close(PLOT);
+    }
+		
+    if ($Format ne 'short'){
+	print  SUMMARY "# Measure  Position  Value    Cutoff   signal peptide?\n";
+	printf SUMMARY "  max. C   %3d       %5.3f\n",$Cmaxpos, $Cmax;
+	printf SUMMARY "  max. Y   %3d       %5.3f\n",$Ymaxpos, $Ymax;
+	printf SUMMARY "  max. S   %3d       %5.3f\n",$Smaxpos, $Smax;
+	printf SUMMARY "  mean S     1-%-4d  %5.3f\n",$Ymaxpos-1, $Smean;
+	printf SUMMARY "       D     1-%-4d  %5.3f   %5.3f   %s\n",$Ymaxpos-1, $Dmax, $Dmaxcut, ($Dmax>$Dmaxcut) ? "YES" : "NO";
+	
+	if ($Dmax>=$Dmaxcut){
+	    printf SUMMARY "Name=$name\tSP='YES' Cleavage site between pos. %d and %d: %s-%s D=%5.3f D-cutoff=%5.3f Networks=$networks\n", $Ymaxpos-1, $Ymaxpos,substr($sequence,$Ymaxpos-4,3),substr($sequence,$Ymaxpos-1,2),$Dmax,$Dmaxcut;
+	}
+	else{
+	    printf SUMMARY "Name=$name\tSP='NO' D=%5.3f D-cutoff=%5.3f Networks=$networks\n", $Dmax,$Dmaxcut;
+	}
+	#print SUMMARY "#\n";
+	close(SUMMARY);
+    }
+    if ($Dmax>=$Dmaxcut){$signalPeptides++}
+
+    if ($Format eq 'long'){
+	close(LONG);
+    }
+    if (($wwwmode == 1) || (defined($Getopt::Std::opt_m)) || (defined($Getopt::Std::opt_n))){
+	if ($Dmax>=$Dmaxcut){
+	    $rec{$name}{cleavage}=$Ymaxpos;
+	    $rec{$name}{Dscore}=$Dmax;
+	}
+    }
+    return;
+}
+    
+#
+# if $Format = all, i.e. option -f all
+#
+
+sub printall{
+    my $cs2;
+    my $sp2;
+    my $tm;
+    
+    for (my $i=1;$i<=$big{noTMSP}{length};$i++){
+	
+	my $type='noTMSP';
+	my $aa=$big{$type}{aa}[$i];
+	my $name=$big{$type}{name};
+	my $position=$i;
+	my $cs=$big{$type}{C}[$i];
+	my $sp=$big{$type}{S}[$i];
+	
+	if ($onlySigP == 0){
+	    $type='TMSP';
+	    $cs2=$big{$type}{C}[$i];
+	    $sp2=$big{$type}{S}[$i];
+	    $tm=$big{$type}{T}[$i];
+	}
+
+	if ($position eq '1'){
+	    print "<b>" if ($wwwmode);
+	    print ">$rec{$name}{name} $rec{$name}{desc}\n";
+	    print "</b>" if ($wwwmode);
+	    print ("# Name=$rec{$name}{name}\tLength=$rec{$name}{len}\n");
+	    print "#\t\tSignalP-noTM\tSignalP-TM\n";
+	    print "# pos\taa\tCS\tSP\tCS\tSP\tTM\n";
+	}
+
+	if ($onlySigP == 1){
+	    printf "%-5d\t$aa\t%5.3f\t%5.3f\t-\t-\t-\n",$position,$cs,$sp;
+	}
+	else{
+	    printf "%-5d\t$aa\t%5.3f\t%5.3f\t%5.3f\t%5.3f\t%5.3f\n",$position,$cs,$sp,$cs2,$sp2,$tm;	    
+	}
+    }
+    system("cat $outputDir/file.summary"); 
+}
+
