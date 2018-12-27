@@ -1,6 +1,6 @@
 # run_dbcan 2.0
-###################
-run_dbcan.py Stand Alone Version README
+
+#run_dbcan.py Stand Alone Version2.0 README#
 
 Rewritten by Huang Le in the Zhang Lab at NKU
 
@@ -17,10 +17,15 @@ Optionally predicts CGCs with CGCFinder
 REQUIREMENTS:
 TOOLS:
 DIAMOND					-- https://github.com/bbuchfink/diamond
+
 HMMER					-- hmmer.org
+
 hmmscan-parser				-- http://cys.bios.niu.edu/dbCAN2/download/Tools/
+
 Hotpep-Python				-- http://cys.bios.niu.edu/dbCAN2/download/Tools/
+
 signalp					-- http://www.cbs.dtu.dk/services/SignalP/
+
 Prodigal				-- https://github.com/hyattpd/Prodigal
 FragGeneScan				-- https://github.com/COL-IU/FragGeneScan
 CGCFinder				-- http://cys.bios.niu.edu/dbCAN2/download/Tools/
