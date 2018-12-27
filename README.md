@@ -85,49 +85,53 @@ python run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
 		
 		[--cgc_sig_genes] - optional, allows user to specify CGCFinder Signature Genes. The options are, 'tp': TP and CAZymes, 'tf': TF and CAZymes, and 'all': TF, TP, and CAZymes. Default = 'tp'.
 
-OUTPUT:
+## OUTPUT:
 
-	Several files will be outputted. they are as follows:
+Several files will be outputted. they are as follows:
 	
-		uniInput - The unified input file for the rest of the tools 
+	uniInput - The unified input file for the rest of the tools 
 			(created by prodigal or FragGeneScan if a nucleotide sequence was used)
 			
-		Hotpep.out - the output from the Hotpep run
+	Hotpep.out - the output from the Hotpep run
+	
+	diamond.out - the output from the diamond blast
 		
-		diamond.out - the output from the diamond blast
+	hmmer.out - the output from the hmmer run
 		
-		hmmer.out - the output from the hmmer run
+	tf.out - the output from the diamond blast predicting TF's for CGCFinder
 		
-		tf.out - the output from the diamond blast predicting TF's for CGCFinder
+	tc.out - the output from the diamond blast predicting TC's for CGCFinder
 		
-		tc.out - the output from the diamond blast predicting TC's for CGCFinder
+	cgc.gff - GFF input file for CGCFinder
 		
-		cgc.gff - GFF input file for CGCFinder
-		
-		cgc.out - ouput from the CGCFinder run
+	cgc.out - ouput from the CGCFinder run
 
-EXAMPLE:
+## EXAMPLE:
 
-	An example setup is available in the example directory. Included in 
-	this directory are two FASTA sequences (one protein, one nucleotide).
+An example setup is available in the example directory. Included in this directory are two FASTA sequences (one protein, one nucleotide).
 	
-	To run this example type, run:
-	```
-	python run_dbcan.py EscheriaColiK12MG1655.fna prok
-	```
-	or 
+To run this example type, run:
+
+```
+python run_dbcan.py EscheriaColiK12MG1655.fna prok
+```
+or 
+
+```	
+python run_dbcan.py EscheriaColiK12MG1655.faa protein 
+```
+
+While this example directory contains all the databases you will need (already formatted) and the Hotpep and FragGeneScan programs, you will still need to have the remaining programs installed on your machine (DIAMOND, HMMER, etc.).
 	
-	python run_dbcan.py EscheriaColiK12MG1655.faa protein 
-	
-	While this example directory contains all the databases you will need (already formatted) 
-	and the Hotpep and FragGeneScan programs, you will still need to have the remaining
-	programs installed on your machine (DIAMOND, HMMER, etc.).
-	
-	To run the examples with CGCFinder turned on, run:
-	
-	python run_dbcan.py EscheriaColiK12MG1655.fna prok -c
-	
-	or 
-	python run_dbcan.py EscheriaColiK12MG1655.faa protein -c EscheriaColiK12MG1655.gff
-	Notice that the protein command has a GFF file following the -c option. A GFF or BED format file
-	with gene position information is required to run CGCFinder when using a protein input.
+To run the examples with CGCFinder turned on, run:
+```	
+python run_dbcan.py EscheriaColiK12MG1655.fna prok -c
+```
+
+or 
+
+```
+python run_dbcan.py EscheriaColiK12MG1655.faa protein -c EscheriaColiK12MG1655.gff
+```
+
+Notice that the protein command has a GFF file following the -c option. A GFF or BED format file with gene position information is required to run CGCFinder when using a protein input.
