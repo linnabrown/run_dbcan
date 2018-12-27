@@ -10,9 +10,7 @@ Accepts user input
 Predicts genes if needed
 Runs input against HMMER, DIAMOND, and Hotpep
 Optionally predicts CGCs with CGCFinder
-###################Updated INFO##################
-- pip install natsort
-###################
+
 
 REQUIREMENTS:
 TOOLS:
@@ -42,7 +40,7 @@ DIRECTORY STRUCTURE:
 We recommend that all the databases are put in a seperate directory. This directory can be defined with the --db_dir option. Otherwise, all databases must be in the same directory as run_dbcan.py. The Hotpep directory must also be in the same directory as run_dbcan.py. The "example" directory contains an example of a working directory setup.
 
 INPUT:
-	python run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
+python run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
 		[inputFile] - FASTA format file of either nucleotide or protein sequences
 		[inputType] - protein=proteome, prok=prokaryote, meta=metagenome/mRNA/CDSs/short DNA seqs
 		[--out_dir] - REQUIRED, user specifies an output directory.
