@@ -135,3 +135,5 @@ python run_dbcan.py EscheriaColiK12MG1655.faa protein -c EscheriaColiK12MG1655.g
 ```
 
 Notice that the protein command has a GFF file following the -c option. A GFF or BED format file with gene position information is required to run CGCFinder when using a protein input.
+
+If you have any questions, please feel free to contact with me on issue or Dr. Yin (yyin@niu.edu).
