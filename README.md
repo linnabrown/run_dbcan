@@ -1,5 +1,46 @@
 # run_dbcan 2.0
 
+Please cite us:
+
+*Han Zhang, Tanner Yohe, **Le Huang**, Sarah Entwistle, Peizhi Wu, Zhenglu Yang, Peter K Busk, Ying Xu, Yanbin Yin; 
+dbCAN2: a meta server for automated carbohydrate-active enzyme annotation, Nucleic Acids Research,
+Volume 46, Issue W1, 2 July 2018, Pages W95–W101, https://doi.org/10.1093/nar/gky418*
+```
+@article{doi:10.1093/nar/gky418,
+author = {Zhang, Han and Yohe, Tanner and Huang, Le and Entwistle, Sarah and Wu, Peizhi and Yang, Zhenglu and Busk, Peter K and Xu, Ying and Yin, Yanbin},
+title = {dbCAN2: a meta server for automated carbohydrate-active enzyme annotation},
+journal = {Nucleic Acids Research},
+volume = {46},
+number = {W1},
+pages = {W95-W101},
+year = {2018},
+doi = {10.1093/nar/gky418},
+URL = {http://dx.doi.org/10.1093/nar/gky418},
+eprint = {/oup/backfile/content_public/journal/nar/46/w1/10.1093_nar_gky418/1/gky418.pdf}
+}
+```
+
+If you want to use microbial sequence annotations directly, please cite us:
+
+***Le Huang**, Han Zhang, Peizhi Wu, Sarah Entwistle, Xueqiong Li, Tanner Yohe, Haidong Yi, Zhenglu Yang, Yanbin Yin; 
+dbCAN-seq: a database of carbohydrate-active enzyme (CAZyme) sequence and annotation, Nucleic Acids Research, 
+Volume 46, Issue D1, 4 January 2018, Pages D516–D521, https://doi.org/10.1093/nar/gkx894*
+```
+@article{doi:10.1093/nar/gkx894,
+author = {Huang, Le and Zhang, Han and Wu, Peizhi and Entwistle, Sarah and Li, Xueqiong and Yohe, Tanner and Yi, Haidong and Yang, Zhenglu and Yin, Yanbin},
+title = {dbCAN-seq: a database of carbohydrate-active enzyme (CAZyme) sequence and annotation},
+journal = {Nucleic Acids Research},
+volume = {46},
+number = {D1},
+pages = {D516-D521},
+year = {2018},
+doi = {10.1093/nar/gkx894},
+URL = {http://dx.doi.org/10.1093/nar/gkx894},
+eprint = {/oup/backfile/content_public/journal/nar/46/d1/10.1093_nar_gkx894/2/gkx894.pdf}
+}
+```
+
+
 #run_dbcan.py Stand Alone Version2.0 README#
 
 Rewritten by Huang Le in the Zhang Lab at NKU
