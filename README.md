@@ -15,28 +15,26 @@ Optionally predicts CGCs with CGCFinder
 ###################
 
 REQUIREMENTS:
-	TOOLS:
-		DIAMOND					-- https://github.com/bbuchfink/diamond
-		HMMER					-- hmmer.org
-		hmmscan-parser				-- http://cys.bios.niu.edu/dbCAN2/download/Tools/
-		Hotpep-Python				-- http://cys.bios.niu.edu/dbCAN2/download/Tools/
-		signalp					-- http://www.cbs.dtu.dk/services/SignalP/
-		Prodigal				-- https://github.com/hyattpd/Prodigal
-		FragGeneScan				-- https://github.com/COL-IU/FragGeneScan
-		CGCFinder				-- http://cys.bios.niu.edu/dbCAN2/download/Tools/
-	DATABASES (Available at http://cys.bios.niu.edu/dbCAN2/download/Databases):
-		CAZY.dbCAN2_07202017.fa			-- use diamond makedb
-		PPR					-- included in Hotpep
-		dbCAN-HMMdb-V6.txt			-- use hmmpress
-		tcdb.fa				        -- use "diamond makedb --in <inputFile> -d <dbName>
-		tf.fa					-- use "diamond makedb --in <inputFile> -d <dbName>
-        Python module: natsort                          -- pip install natsort
+TOOLS:
+DIAMOND					-- https://github.com/bbuchfink/diamond
+HMMER					-- hmmer.org
+hmmscan-parser				-- http://cys.bios.niu.edu/dbCAN2/download/Tools/
+Hotpep-Python				-- http://cys.bios.niu.edu/dbCAN2/download/Tools/
+signalp					-- http://www.cbs.dtu.dk/services/SignalP/
+Prodigal				-- https://github.com/hyattpd/Prodigal
+FragGeneScan				-- https://github.com/COL-IU/FragGeneScan
+CGCFinder				-- http://cys.bios.niu.edu/dbCAN2/download/Tools/
+
+DATABASES (Available at http://cys.bios.niu.edu/dbCAN2/download/Databases):
+CAZY.dbCAN2_07202017.fa			-- use diamond makedb
+PPR					-- included in Hotpep
+dbCAN-HMMdb-V6.txt			-- use hmmpress
+tcdb.fa				        -- use "diamond makedb --in <inputFile> -d <dbName>
+tf.fa					-- use "diamond makedb --in <inputFile> -d <dbName>
+Python module: natsort                  -- pip install natsort
 
 DIRECTORY STRUCTURE:
-	We recommend that all the databases are put in a seperate directory. This directory can be
-	defined with the --db_dir option. Otherwise, all databases must be in the same directory as run_dbcan.py.
-	The Hotpep directory must also be in the same directory as run_dbcan.py. The "example" directory contains
-	an example of a working directory setup.
+We recommend that all the databases are put in a seperate directory. This directory can be defined with the --db_dir option. Otherwise, all databases must be in the same directory as run_dbcan.py. The Hotpep directory must also be in the same directory as run_dbcan.py. The "example" directory contains an example of a working directory setup.
 
 INPUT:
 	python run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
