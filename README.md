@@ -93,7 +93,7 @@ Last updated 12/24/18
 	
 #### PYTHON MODULE
 
-	natsort                  -- use `pip install natsort`
+	natsort                  		-- use `pip install natsort`
 
 
 ### DIRECTORY STRUCTURE
@@ -102,7 +102,12 @@ Last updated 12/24/18
 
 - The Hotpep directory must also be in the same directory as run_dbcan.py. 
 
-- When you use **FragGeneScan**, you should download this file, unpress, and add its path to user enviroenment variable. The concrete method is written on [this website(http://www.baidu/com).
+- When you use **FragGeneScan**, you should download this file, unpress, and add its path to user enviroenment variable. The concrete method is written on [this website](http://www.baidu/com). Otherwise, you should put unzip this file in the same directory as run_dbcan.py and revise the code in `run_dbcan.py` like this:
+
+```
+call(['FragGeneScan1.30/run_FragGeneScan.pl', '-genome='+input, '-out=%sfragGeneScan'%outPath, '-complete=1', '-train=complete', '-thread=10'])
+#call(['FragGeneScan', '-s', input, '-o', '%sfragGeneScan'%outPath, '-w 1','-t comlete', '-p 10'])
+```
 
 - The "example" directory contains an example of a working directory setup.
 
