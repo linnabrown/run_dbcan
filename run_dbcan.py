@@ -43,6 +43,16 @@ parser.add_argument('--tools', '-t', nargs='+', choices=['hmmer', 'diamond', 'ho
 
 args = parser.parse_args()
 
+'''
+def some functions
+'''
+def runHmmScan_tf(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name):
+    hmmer = Popen(['hmmscan', '--domtblout', '%sh%s.out' % (outPath, db_name), '--cpu', hmm_cpu, '-o', '/dev/null', '%s%s.hmm' % (dbDir,db_name), '%suniInput' % outPath])
+    hmmer.wait()
+    call('python hmmscan-parser.py %sh%s.out %s %s > %s%s.out'%(outPath, db_name, hmm_eval, hmm_cov, outPath, db_name), shell=True)
+    if os.path.exists('%sh%s.out' % (outPath, db_name)):
+        call(['rm', '%sh%s.out' % (outPath, db_name)])
+
 ####
 #python run_dbcan.py [inputFile] [inputType]
 ####
@@ -53,19 +63,24 @@ args = parser.parse_args()
 dbDir = args.db_dir
 prefix = args.out_pre
 outDir = args.out_dir
-auxFile = ""
-input = args.inputFile
-inputType = args.inputType
-find_clusters = False
-if args.cluster != None:
-    find_clusters = True
-    auxFile = args.cluster
 
 if not dbDir.endswith("/") and len(dbDir) > 0:
     dbDir += "/"
 
 if not outDir.endswith("/") and len(outDir) > 0:
     outDir += "/"
+
+outPath = outDir + prefix
+auxFile = ""
+input = args.inputFile
+inputType = args.inputType
+find_clusters = False
+if args.cluster != None:
+    find_clusters = True
+    if inputType == "protein":
+        auxFile = args.cluster
+    else:
+        auxFile = '%sprodigal.gff'%outPath
 
 if not os.path.isdir(dbDir):
     print(dbDir , "ERROR: The database directory does not exist")
@@ -106,12 +121,13 @@ if args.tools != 'all':
 # End Setup and Input Checks
 #########################
 # Begin Gene Prediction Tools
-outPath = outDir + prefix
+
 
 if inputType == 'prok':
     call(['prodigal', '-i', input, '-a', '%suniInput'%outPath, '-o', '%sprodigal.gff'%outPath, '-f', 'gff', '-q'])
 if inputType == 'meta':
-    call(['FragGeneScan1.30/run_FragGeneScan.pl', '-genome='+input, '-out=%sfragGeneScan'%outPath, '-complete=1', '-train=complete', '-thread=10'])
+    # call(['FragGeneScan1.30/run_FragGeneScan.pl', '-genome='+input, '-out=%sfragGeneScan'%outPath, '-complete=1', '-train=complete', '-thread=10'])
+    call(['FragGeneScan', '-s', input, '-o', '%sfragGeneScan'%outPath, '-w 1','-t comlete', '-p 10'])
 
 #Frag Gene Scan
 if inputType == 'meta':
@@ -217,24 +233,65 @@ if find_clusters:
 
 ########################
 # Begin TF,TP, STP prediction
+    '''
+    previous tf_v1 uses diamond, tf_v2 uses hmmer
+    tf hmmer 
+    '''
+    #call(['diamond', 'blastp', '-d', dbDir+'tf_v1/tf.dmnd', '-e', '1e-10', '-q', '%suniInput' % outPath, '-k', '1', '-p', '1', '-o', outDir+prefix+'tf.out', '-f', '6'])
+    runHmmScan_tf(outPath, str(args.hmm_cpu), dbDir, str(args.hmm_eval), str(args.hmm_cov), "tf-1")
+    runHmmScan_tf(outPath, str(args.hmm_cpu), dbDir, str(args.hmm_eval), str(args.hmm_cov), "tf-2")
+    '''
+    stp
+    '''
 
-    call(['diamond', 'blastp', '-d', dbDir+'tf.dmnd', '-e', '1e-10', '-q', '%suniInput' % outPath, '-k', '1', '-p', '1', '-o', outDir+prefix+'tf.out', '-f', '6'])
-    call(['diamond', 'blastp', '-d', dbDir+'tcdb.dmnd', '-e', '1e-10', '-q', '%suniInput' % outPath, '-k', '1', '-p', '1', '-o', outDir+prefix+'tp.out', '-f', '6'])
+    # call(['hmmscan', '--domtblout', '%shstp.out' % outPath, '--cpu', str(args.hmm_cpu), '-o', '/dev/null', '%sstp.hmm' % dbDir, '%suniInput' % outPath])
+    # call('python hmmscan-parser.py %shstp.out %s %s > %sstp.out'%(outPath, str(args.hmm_eval), str(args.hmm_cov), outPath), shell=True)
+    # if os.path.exists('%shstp.out' % outPath):
+    #     call(['rm', '%shstp.out' % outPath])
+    runHmmScan_tf(outPath, str(args.hmm_cpu), dbDir, str(args.hmm_eval), str(args.hmm_cov), "stp")
     
+    '''
+    tp diamond
+    '''
+    call(['diamond', 'blastp', '-d', dbDir+'tcdb.dmnd', '-e', '1e-10', '-q', '%suniInput' % outPath, '-k', '1', '-p', '1', '-o', outDir+prefix+'tp.out', '-f', '6'])
 
+    
     tp = set()
     tf = set()
+    stp = set()
 
     tp_genes = {}
     tf_genes = {}
-    with open(outDir+prefix+'tf.out') as f:
+    stp_genes = {}
+    # with open(outDir+prefix+'tf.out') as f:
+    #     for line in f:
+    #         row = line.rstrip().split('\t')
+    #         tf.add(row[0])
+    #         if not row[0] in tf_genes:
+    #             tf_genes[row[0]] = row[1]
+    #         else:
+    #             tf_genes[row[0]] += ','+row[1]
+
+    with open("%stf-1.out" % outPath) as f:
         for line in f:
             row = line.rstrip().split('\t')
-            tf.add(row[0])
-            if not row[0] in tf_genes:
-                tf_genes[row[0]] = row[1]
+            tf.add(row[2])
+            row[0] = "DBD-Pfam|" + row[0]
+            if not row[2] in tf_genes:
+                tf_genes[row[2]] = row[0]
             else:
-                tf_genes[row[0]] += ','+row[1]
+                tf_genes[row[2]] += ',' + row[0]
+
+    with open("%stf-2.out" % outPath) as f:
+        for line in f:
+            row = line.rstrip().split('\t')
+            tf.add(row[2])
+            row[0] = "DBD-SUPERFAMILY|" + row[0]
+            if not row[2] in tf_genes:
+                tf_genes[row[2]] = row[0]
+            else:
+                tf_genes[row[2]] += ',' + row[0]
+
     with open(outDir+prefix+'tp.out') as f:
         for line in f:
             row = line.rstrip().split('\t')
@@ -243,6 +300,16 @@ if find_clusters:
                 tp_genes[row[0]] = row[1]
             else:
                 tp_genes[row[0]] += ','+row[1]
+
+    with open("%sstp.out" % outPath) as f:
+        for line in f:
+            row = line.rstrip().split('\t')
+            stp.add(row[2])
+            row[0] = "STP|" + row[0]
+            if not row[2] in stp_genes:
+                stp_genes[row[2]] = row[0]
+            else:
+                stp_genes[row[2]] += ',' + row[0]
 # End TF and TP prediction
 ##########################
 # Begine CAZyme Extraction
@@ -306,6 +373,9 @@ if find_clusters:
                         elif gene in cazyme:
                             row[2] = "CAZyme"
                             row[8] = "DB="+'|'.join(cazyme_genes[gene])
+                        elif gene in stp:
+                            row[2] = "STP"
+                            row[8] = "DB="+stp_genes[gene]
                         row[8] += ";ID="+gene
                         out.write('\t'.join(row)+'\n')
 
@@ -319,10 +389,13 @@ if find_clusters:
                         gene = row[-1].split(";")[0].split("=")[1]
                         if gene in tf:
                             row[2] = "TF"
-                            row.insert(8, "DB="+tf_genes[gene])
+                            row.insert(8, "DB=" + tf_genes[gene])
                         elif gene in tp:
                             row[2] = "TC"
-                            row.insert(8, "DB="+tp_genes[gene])
+                            row.insert(8, "DB=" + tp_genes[gene])
+                        elif gene in stp:
+                            row[2] = "STP"
+                            row.insert(8, "DB=" + stp_genes[gene])
                         elif gene in cazyme:
                             row[2] = "CAZyme"
                             row.insert(8, "DB="+'|'.join(cazyme_genes[gene]))
@@ -363,6 +436,9 @@ if find_clusters:
                                 elif gene in tp:
                                     row[2] = "TC"
                                     row[8] = "DB="+tp_genes[gene]
+                                elif gene in stp:
+                                    row[2] = "STP"
+                                    row[8] = "DB=" + stp_genes[gene]
                                 elif gene in cazyme:
                                     row[2] = "CAZyme"
                                     row[8] = "DB="+'|'.join(cazyme_genes[gene])
@@ -385,6 +461,9 @@ if find_clusters:
                         elif gene in tp:
                             outrow[2] = 'TC'
                             outrow[8] = "DB="+tp_genes[gene]
+                        elif gene in stp:
+                            outrow[2] = 'STP'
+                            outrow[8] = "DB=" + stp_genes[gene]
                         elif gene in cazyme:
                             outrow[2] = 'CAZyme'
                             outrow[8] = "DB="+'|'.join(cazyme_genes[gene])

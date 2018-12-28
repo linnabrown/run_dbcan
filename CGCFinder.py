@@ -73,7 +73,7 @@ def isImportant(gene):
 			return True
 		if gene == 'TF' and (args.siggenes == 'tf' or args.siggenes == 'all' or args.siggenes == 'tp+tf' or args.siggenes == 'tf+stp'):
 			return True
-		if gene == 'STP' and (args.siggenes == 'stp' or args.siggenes == 'all'or args.siggens == 'tp+stp' or args.siggenes == 'tf+stp' ):
+		if gene == 'STP' and (args.siggenes == 'stp' or args.siggenes == 'all'or args.siggenes == 'tp+stp' or args.siggenes == 'tf+stp' ):
 			return True
 	return False
 
