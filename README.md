@@ -55,19 +55,19 @@ Optionally predicts CGCs with CGCFinder
 
 REQUIREMENTS:
 TOOLS:
-DIAMOND					-- https://github.com/bbuchfink/diamond
+[DIAMOND](https://github.com/bbuchfink/diamond)
 
-HMMER					-- hmmer.org
+[HMMER](hmmer.org)
 
-hmmscan-parser				-- http://cys.bios.niu.edu/dbCAN2/download/Tools/
+[hmmscan-parser](http://cys.bios.niu.edu/dbCAN2/download/Tools/)
 
-Hotpep-Python				-- http://cys.bios.niu.edu/dbCAN2/download/Tools/
+[Hotpep-Python](http://cys.bios.niu.edu/dbCAN2/download/Tools/)
 
-signalp					-- http://www.cbs.dtu.dk/services/SignalP/
+[signalp](http://www.cbs.dtu.dk/services/SignalP/)
 
-Prodigal				-- https://github.com/hyattpd/Prodigal
-FragGeneScan				-- https://github.com/COL-IU/FragGeneScan
-CGCFinder				-- http://cys.bios.niu.edu/dbCAN2/download/Tools/
+[Prodigal](https://github.com/hyattpd/Prodigal)
+[FragGeneScan](https://github.com/COL-IU/FragGeneScan)
+[CGCFinder](http://cys.bios.niu.edu/dbCAN2/download/Tools/)
 
 DATABASES (Available at http://cys.bios.niu.edu/dbCAN2/download/Databases):
 
