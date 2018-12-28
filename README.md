@@ -42,7 +42,7 @@ eprint = {/oup/backfile/content_public/journal/nar/46/d1/10.1093_nar_gkx894/2/gk
 
 
 
-**run_dbcan.py Stand Alone Version2.0 User Mannual**
+## run_dbcan.py Stand Alone Version2.0 User Mannual
 
 Rewritten by Huang Le in the Zhang Lab at NKU
 
@@ -52,7 +52,7 @@ Last updated 12/24/18
 - more user friendly
 - added stp signature gene in CGC_Finder.py
 
-**Function**
+### Function
 
 - Accepts user input
 - Predicts genes if needed
@@ -60,8 +60,9 @@ Last updated 12/24/18
 - Optionally predicts CGCs with CGCFinder
 
 
-REQUIREMENTS:
-TOOLS:
+### REQUIREMENTS
+
+#### TOOLS
 [DIAMOND](https://github.com/bbuchfink/diamond)
 
 [HMMER](hmmer.org)
@@ -78,7 +79,7 @@ TOOLS:
 
 [CGCFinder](http://cys.bios.niu.edu/dbCAN2/download/Tools/)
 
-DATABASES Preparation(Available at http://cys.bios.niu.edu/dbCAN2/download/Databases):
+#### DATABASES [Link](http://cys.bios.niu.edu/dbCAN2/download/Databases)
 
 	CAZY.dbCAN2_07202017.fa 		-- diamond makedb
 
@@ -90,15 +91,22 @@ DATABASES Preparation(Available at http://cys.bios.niu.edu/dbCAN2/download/Datab
 	
 	tf.fa					-- use `diamond makedb --in <inputFile> -d <dbName>`
 	
-Python module: 
+#### PYTHON MODULE
 
 	natsort                  -- use `pip install natsort`
 
 
-DIRECTORY STRUCTURE:
-We recommend that all the databases are put in a seperate directory. This directory can be defined with the --db_dir option. Otherwise, all databases must be in the same directory as run_dbcan.py. The Hotpep directory must also be in the same directory as run_dbcan.py. The "example" directory contains an example of a working directory setup.
+### DIRECTORY STRUCTURE
 
-INPUT:
+- We recommend that all the databases are put in a seperate directory. This directory can be defined with the `--db_dir` option or leave it as directory with default name `db`. Otherwise, all databases must be in the same directory as run_dbcan.py.
+
+- The Hotpep directory must also be in the same directory as run_dbcan.py. 
+
+- When you use **FragGeneScan**, you should download this file, unpress, and add its path to user enviroenment variable. The concrete method is written on [this website(http://www.baidu/com).
+
+- The "example" directory contains an example of a working directory setup.
+
+### INPUT
 
 ```
 python run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
@@ -142,7 +150,7 @@ python run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
 
 
 
-## OUTPUT:
+### OUTPUT
 
 Several files will be outputted. they are as follows:
 	
@@ -163,7 +171,7 @@ Several files will be outputted. they are as follows:
 		
 	cgc.out - ouput from the CGCFinder run
 
-## EXAMPLE:
+### EXAMPLE
 
 An example setup is available in the example directory. Included in this directory are two FASTA sequences (one protein, one nucleotide).
 	
