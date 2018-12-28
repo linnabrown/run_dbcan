@@ -41,6 +41,7 @@ eprint = {/oup/backfile/content_public/journal/nar/46/d1/10.1093_nar_gkx894/2/gk
 ```
 
 
+
 **run_dbcan.py Stand Alone Version2.0 User Mannual**
 
 Rewritten by Huang Le in the Zhang Lab at NKU
@@ -57,8 +58,6 @@ Last updated 12/24/18
 - Predicts genes if needed
 - Runs input against HMMER, DIAMOND, and Hotpep
 - Optionally predicts CGCs with CGCFinder
-
-
 
 
 REQUIREMENTS:
@@ -98,6 +97,7 @@ DIRECTORY STRUCTURE:
 We recommend that all the databases are put in a seperate directory. This directory can be defined with the --db_dir option. Otherwise, all databases must be in the same directory as run_dbcan.py. The Hotpep directory must also be in the same directory as run_dbcan.py. The "example" directory contains an example of a working directory setup.
 
 INPUT:
+
 ```
 python run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
 ```
@@ -137,6 +137,8 @@ python run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
 	[--cgc_dis] - optional, allows user to specify CGCFinder Distance value. Allowed values are integers between 0-10. Default = 2.
 		
 	[--cgc_sig_genes] - optional, allows user to specify CGCFinder Signature Genes. The options are, 'tp': TP and CAZymes, 'tf': TF and CAZymes, and 'all': TF, TP, and CAZymes. Default = 'tp'.
+
+
 
 ## OUTPUT:
 
