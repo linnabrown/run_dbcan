@@ -20,7 +20,7 @@ eprint = {/oup/backfile/content_public/journal/nar/46/w1/10.1093_nar_gky418/1/gk
 }
 ```
 
-If you want to use microbial sequence annotations directly, please cite us:
+<!-- If you want to use microbial sequence annotations directly, please cite us:
 
 ***Le Huang**, Han Zhang, Peizhi Wu, Sarah Entwistle, Xueqiong Li, Tanner Yohe, Haidong Yi, Zhenglu Yang, Yanbin Yin; 
 dbCAN-seq: a database of carbohydrate-active enzyme (CAZyme) sequence and annotation, Nucleic Acids Research, 
@@ -38,7 +38,7 @@ doi = {10.1093/nar/gkx894},
 URL = {http://dx.doi.org/10.1093/nar/gkx894},
 eprint = {/oup/backfile/content_public/journal/nar/46/d1/10.1093_nar_gkx894/2/gkx894.pdf}
 }
-```
+``` -->
 
 
 
@@ -50,7 +50,8 @@ Last updated 12/24/18
 
 **update info**
 - more user friendly
-- added stp signature gene in CGC_Finder.py
+- add `stp hmmdb` signature gene in CGC_Finder.py
+- change tfdb from `tfdb` to `tf.hmm`, which is added to `db/` directory
 
 ### Function
 
@@ -83,13 +84,15 @@ Last updated 12/24/18
 
 	CAZY.dbCAN2_07202017.fa 		-- diamond makedb
 
-	PPR					-- included in Hotpep
+	PPR								-- included in Hotpep
 
-	dbCAN-HMMdb-V6.txt			-- use `hmmpress`
+	dbCAN-HMMdb-V6.txt				-- use `hmmpress`
 
-	tcdb.fa				        -- use `diamond makedb --in <inputFile> -d <dbName>`
-	
-	tf.fa					-- use `diamond makedb --in <inputFile> -d <dbName>`
+	tcdb.fa				    	    -- use `diamond makedb --in <inputFile> -d <dbName>`
+
+	tf-1.hmm						-- use `hmmpress` 
+
+	tf-2.hmm						-- use `hmmpress`
 	
 #### PYTHON MODULE
 
@@ -127,29 +130,29 @@ python run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
 	the AuxillaryFile must be a GFF or BED format file containing gene positioning
 	information. Otherwise, the AuxillaryFile may be left blank.
 					
-	[-t Tools] - optional, allows user to select a combination of tools to run. The options are any
+	[-t Tools] 		- optional, allows user to select a combination of tools to run. The options are any
 					combination of 'diamond', 'hmmer', and 'hotpep'. The default value is 'all' which runs all three tools.
-	[--dia_eval] - optional, allows user to set the DIAMOND E Value. Default = 1e-121.
+	[--dia_eval]    - optional, allows user to set the DIAMOND E Value. Default = 1e-121.
 		
-	[--dia_cpu] - optional, allows user to set how many CPU cores DIAMOND can use. Default = 5.
+	[--dia_cpu]     - optional, allows user to set how many CPU cores DIAMOND can use. Default = 5.
 		
-	[--hmm_eval] - optional, allows user to set the HMMER E Value. Default = 1e-35.
+	[--hmm_eval]    - optional, allows user to set the HMMER E Value. Default = 1e-35.
 		
-	[--hmm_cov] - optional, allows user to set the HMMER Coverage value. Default = 0.35.
+	[--hmm_cov]     - optional, allows user to set the HMMER Coverage value. Default = 0.35.
 		
-	[--hmm_cpu] - optional, allows user to set how many CPU cores HMMER can use. Default = 1.
+	[--hmm_cpu]     - optional, allows user to set how many CPU cores HMMER can use. Default = 1.
 		
-	[--hot_hits] - optional, allows user to set the Hotpep Hits value. Default = 4.
+	[--hot_hits]    - optional, allows user to set the Hotpep Hits value. Default = 4.
 		
-	[--hot_freq] - optional, allows user to set the Hotpep Frequency value. Default = 2.0.
+	[--hot_freq]    - optional, allows user to set the Hotpep Frequency value. Default = 2.0.
 		
-	[--hot_cpu] - optional, allows user to set how many CPU cores Hotpep can use. Default = 4.
+	[--hot_cpu]     - optional, allows user to set how many CPU cores Hotpep can use. Default = 4.
 		
-	[--out_pre] - optional, allows user to set a prefix for all output files.
+	[--out_pre]     - optional, allows user to set a prefix for all output files.
 		
-	[--db_dir] - optional, allows user to specify a database directory. Default = db/
+	[--db_dir]      - optional, allows user to specify a database directory. Default = db/
 		
-	[--cgc_dis] - optional, allows user to specify CGCFinder Distance value. Allowed values are integers between 0-10. Default = 2.
+	[--cgc_dis]     - optional, allows user to specify CGCFinder Distance value. Allowed values are integers between 0-10. Default = 2.
 		
 	[--cgc_sig_genes] - optional, allows user to specify CGCFinder Signature Genes. The options are, 'tp': TP and CAZymes, 'tf': TF and CAZymes, and 'all': TF, TP, and CAZymes. Default = 'tp'.
 
@@ -206,4 +209,4 @@ python run_dbcan.py EscheriaColiK12MG1655.faa protein -c EscheriaColiK12MG1655.g
 
 Notice that the protein command has a GFF file following the -c option. A GFF or BED format file with gene position information is required to run CGCFinder when using a protein input.
 
-If you have any questions, please feel free to contact with me on [Issue Dashboard](https://github.com/linnabrown/run_dbcan/issues) or Dr. Yin (yyin@niu.edu).
+If you have any questions, please feel free to contact with Dr. Yin (yyin@niu.edu) or me(Le Huang) on [Issue Dashboard](https://github.com/linnabrown/run_dbcan/issues).
