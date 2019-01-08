@@ -82,13 +82,13 @@ Last updated 12/24/18
 
 #### DATABASES [Link](http://cys.bios.niu.edu/dbCAN2/download/Databases)
 
-	CAZY.dbCAN2_07202017.fa 		-- diamond makedb
+	CAZY.dbCAN2_07202017.fa						-- diamond makedb
 
-	PPR								-- included in Hotpep
+	PPR						-- included in Hotpep
 
-	dbCAN-HMMdb-V6.txt				-- use `hmmpress`
+	dbCAN-HMMdb-V6.txt						-- use `hmmpress`
 
-	tcdb.fa				    	    -- use `diamond makedb --in <inputFile> -d <dbName>`
+	tcdb.fa						 -- use `diamond makedb --in <inputFile> -d <dbName>`
 
 	tf-1.hmm						-- use `hmmpress` 
 
@@ -96,7 +96,7 @@ Last updated 12/24/18
 	
 #### PYTHON MODULE
 
-	natsort                  		-- use `pip install natsort`
+	natsort						-- use `pip install natsort`
 
 
 ### DIRECTORY STRUCTURE
