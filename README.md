@@ -1,5 +1,7 @@
 # run_dbcan 2.0
 
+This is the standalone version of dbCAN annotation tool for automated CAZyme annotation (known as run_dbCAN.py), written by Le Huang and Tanner Yohe.
+
 If you use webserver, please cite us:
 
 *Han Zhang, Tanner Yohe, **Le Huang**, Sarah Entwistle, Peizhi Wu, Zhenglu Yang, Peter K Busk, Ying Xu, Yanbin Yin;
@@ -20,7 +22,7 @@ eprint = {/oup/backfile/content_public/journal/nar/46/w1/10.1093_nar_gky418/1/gk
 }
 ```
 
-If you want to use microbial sequence annotations directly, please cite us:
+If you want to use pre-computed bacterial CAZyme sequences/annotations directly, please go to http://cys.bios.niu.edu/dbCAN_seq/ and cite us:
 
 ***Le Huang**, Han Zhang, Peizhi Wu, Sarah Entwistle, Xueqiong Li, Tanner Yohe, Haidong Yi, Zhenglu Yang, Yanbin Yin;
 dbCAN-seq: a database of carbohydrate-active enzyme (CAZyme) sequence and annotation, Nucleic Acids Research,
@@ -50,12 +52,12 @@ Last updated 12/24/18
 
 **update info**
 - More user friendly
-- Adds `stp hmmdb` signature gene in CGC_Finder.py
-- Changes tfdb from `tfdb` to `tf.hmm`, which is added to `db/` directory
-- Uses newest dbCAN-HMMdb and CAZY.dbCAN2 db
+- Adds `stp hmmdb` signature gene in CGC_Finder.py (stp means signal transduction proteins; the hmmdb was constructed by Catherine Ausland of the Yin lab at NIU)
+- Changes tfdb from `tfdb` to `tf.hmm`, which is added to `db/` directory (tfdb was a fasta format sequence file, which contains just bacterial transcription factor proteins; tf.hmm is a hmmer format file containing hmms downloaded from the Pfam and SUPERFAMILY database according to the DBD database: http://www.transcriptionfactor.org)
+- Uses newest dbCAN-HMM db and CAZy db
 - Fixes bugs in HotPep python version to fit python 3 user.
-### Function
 
+### Function
 - Accepts user input
 - Predicts genes if needed
 - Runs input against HMMER, DIAMOND, and Hotpep
@@ -214,4 +216,4 @@ python run_dbcan.py EscheriaColiK12MG1655.faa protein -c EscheriaColiK12MG1655.g
 
 Notice that the protein command has a GFF file following the -c option. A GFF or BED format file with gene position information is required to run CGCFinder when using a protein input.
 
-If you have any questions, please feel free to contact with Dr. Yin (yyin@niu.edu) or me(Le Huang) on [Issue Dashboard](https://github.com/linnabrown/run_dbcan/issues).
+If you have any questions, please feel free to contact with Dr. Yin (yanbin.yin@gmail.com or yyin@unl.edu) or me (Le Huang) on [Issue Dashboard](https://github.com/linnabrown/run_dbcan/issues).
