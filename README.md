@@ -49,11 +49,11 @@ Rewritten by Huang Le in the Zhang Lab at NKU
 Last updated 12/24/18
 
 **update info**
-- more user friendly
-- add `stp hmmdb` signature gene in CGC_Finder.py
-- change tfdb from `tfdb` to `tf.hmm`, which is added to `db/` directory
-- Using newest dbCAN-HMMdb and CAZY.dbCAN2 db
-- Fix bugs in HotPep python version to fit python 3 user.
+- More user friendly
+- Adds `stp hmmdb` signature gene in CGC_Finder.py
+- Changes tfdb from `tfdb` to `tf.hmm`, which is added to `db/` directory
+- Uses newest dbCAN-HMMdb and CAZY.dbCAN2 db
+- Fixes bugs in HotPep python version to fit python 3 user.
 ### Function
 
 - Accepts user input
@@ -85,7 +85,7 @@ P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-pars
 
 #### DATABASES and Formatting[required!][Link](http://cys.bios.niu.edu/dbCAN2/download/Databases)
 
-[CAZY.dbCAN2_07202017.fa](http://cys.bios.niu.edu/dbCAN2/download/Databases/CAZy.dbCAN2_07202017.fa)--use `diamond makedb`
+[CAZyDB.07312018.fa](http://cys.bios.niu.edu/dbCAN2/download/Databases/CAZyDB.07312018.fa)--use `diamond makedb`
 
 [PPR]:included in Hotpep
 
@@ -117,7 +117,7 @@ call(['FragGeneScan1.30/run_FragGeneScan.pl', '-genome='+input, '-out=%sfragGene
 #call(['FragGeneScan', '-s', input, '-o', '%sfragGeneScan'%outPath, '-w 1','-t comlete', '-p 10'])
 ```
 
-- The "example" directory contains an example of a working directory setup.
+
 
 ### INPUT
 
