@@ -48,7 +48,7 @@ eprint = {/oup/backfile/content_public/journal/nar/46/d1/10.1093_nar_gkx894/2/gk
 
 ## run_dbcan.py Stand Alone Version2.0 User Mannual
 
-Rewritten by Huang Le in the Zhang Lab at NKU
+Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner Yohe of the Yin lab at NIU.
 
 Last updated 12/24/18
 
