@@ -23,9 +23,11 @@ import sys
 
 parser = argparse.ArgumentParser(description='dbCAN2 Driver Script')
 
+
 parser.add_argument('inputFile', help='User input file. Must be in FASTA format.')
 parser.add_argument('inputType', choices=['protein', 'prok', 'meta'], help='Type of sequence input. protein=proteome; prok=prokaryote; meta=metagenome') #protein=proteome, prok=prokaryote nucleotide, meta=metagenome nucleotide
 parser.add_argument('--cluster', '-c', help='Predict CGCs via CGCFinder. This argument requires an auxillary locations file if a protein input is being used')
+parser.add_argument('--dbCANFile',default="dbCAN.txt", help='Indicate the file name of HMM database such as dbCAN.txt, please use the newest one from dbCAN2 website.')
 parser.add_argument('--dia_eval', default=1e-102,type=float, help='DIAMOND E Value')
 parser.add_argument('--dia_cpu', default=5, type=int, help='Number of CPU cores that DIAMOND is allowed to use')
 parser.add_argument('--hmm_eval', default=1e-15, type=float, help='HMMER E Value')
@@ -97,9 +99,9 @@ if not os.path.isfile(dbDir+'CAZy.dmnd'):
     Please make sure that your CAZy DIAMOND databased is named 'CAZy.dmnd' and is located in your database directory")
     exit()
 
-if not os.path.isfile(dbDir+'dbCAN.txt'):
+if not os.path.isfile(dbDir + args.dbCANFile):
     print("ERROR: No dbCAN HMM database found. \
-    Please make sure that your dbCAN HMM database is named 'dbCAN.txt', has been through hmmpress, and is located in your database directory")
+    Please make sure that your dbCAN HMM database is named 'dbCAN-HMMdb-V7.txt' or the newest one, has been through hmmpress, and is located in your database directory")
     exit()
 
 if not os.path.isdir(outDir):
@@ -160,7 +162,7 @@ if tools[0]:
 
 if tools[1]:
     print("***************************2. HMMER start*************************************************\n\n")
-    hmmer = Popen(['hmmscan', '--domtblout', '%sh.out' % outPath, '--cpu', str(args.hmm_cpu), '-o', '/dev/null', '%sdbCAN.txt' % dbDir, '%suniInput' % outPath])
+    hmmer = Popen(['hmmscan', '--domtblout', '%sh.out' % outPath, '--cpu', str(args.hmm_cpu), '-o', '/dev/null', '%s%s' % (dbDir,args.dbCANFile), '%suniInput' % outPath])
 
 if tools[2]:
     count = int(check_output("tr -cd '>' < %suniInput | wc -c" % outPath, shell=True))    #number of genes in input file

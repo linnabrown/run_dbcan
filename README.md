@@ -52,12 +52,13 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 
 Last updated 12/24/18
 
-### update info
+### updating info
 - More user friendly
 - Adds `stp hmmdb` signature gene in CGC_Finder.py (stp means signal transduction proteins; the hmmdb was constructed by Catherine Ausland of the Yin lab at NIU)
 - Changes tfdb from `tfdb` to `tf.hmm`, which is added to `db/` directory (tfdb was a fasta format sequence file, which contains just bacterial transcription factor proteins; tf.hmm is a hmmer format file containing hmms downloaded from the Pfam and SUPERFAMILY database according to the DBD database: http://www.transcriptionfactor.org)
 - Uses newest dbCAN-HMM db and CAZy db
 - Fixes bugs in HotPep python version to fit python 3 user.
+- Added certain codes to make it robust. Thanks to suggestion from [Mick](mick.watson@roslin.ed.ac.uk).
 
 ### Function
 - Accepts user input
@@ -71,13 +72,13 @@ Last updated 12/24/18
 #### TOOLS
 P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-parser` because they are included in run_dbcan V2. If you need to use signalp, Prodigal and FragGeneScan, we recommend you to copy them to `/usr/bin` as system application or add their path into system envrionmental variable.
 
-[DIAMOND](https://github.com/bbuchfink/diamond)-- please install from github as instructions
+[DIAMOND](https://github.com/bbuchfink/diamond)-- please install from github as instructions.
 
-[HMMER](hmmer.org)--use `sudo apt-get install` command
+[HMMER](hmmer.org)--use `sudo apt-get install`
 
 [hmmscan-parser](https://github.com/linnabrown/run_dbcan/blob/master/hmmscan-parser.py)--This is included in dbCAN2.
 
-[Hotpep-Python](https://github.com/linnabrown/run_dbcan/tree/master/Hotpep)--This newest version is included in dbCAN2 project.
+[Hotpep-Python](https://github.com/linnabrown/run_dbcan/tree/master/Hotpep)--This newest version is included in dbCAN2.
 
 [signalp](http://www.cbs.dtu.dk/services/SignalP/)--please download and install if you need.
 
@@ -89,19 +90,19 @@ P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-pars
 
 #### DATABASES and Formatting[required!][Link](http://cys.bios.niu.edu/dbCAN2/download/Databases)
 
-[CAZyDB.07312018.fa](http://cys.bios.niu.edu/dbCAN2/download/Databases/CAZyDB.07312018.fa)--use `diamond makedb`
+[CAZyDB.07312018.fa](http://cys.bios.niu.edu/dbCAN2/download/Databases/CAZyDB.07312018.fa)--use `diamond makedb --in CAZyDB.07312018.fa -d CAZy`
 
 [PPR]:included in Hotpep
 
-[dbCAN-HMMdb-V7.txt](http://cys.bios.niu.edu/dbCAN2/download/Databases/dbCAN-HMMdb-V7.txt)--use `hmmpress`
+[dbCAN-HMMdb-V7.txt](http://cys.bios.niu.edu/dbCAN2/download/Databases/dbCAN-HMMdb-V7.txt)--First use `mv dbCAN-HMMdb-V7.txt dbCAN.txt`, then use `hmmpress dbCAN.txt`
 
-[tcdb.fa](http://cys.bios.niu.edu/dbCAN2/download/Databases/tcdb.fa)--use `diamond makedb --in <inputFile> -d <dbName>`
+[tcdb.fa](http://cys.bios.niu.edu/dbCAN2/download/Databases/tcdb.fa)--use `diamond makedb --in tcdb.fa -d tcdb`
 
-[tf-1.hmm](http://cys.bios.niu.edu/dbCAN2/download/Databases/tf-1.hmm)--use `hmmpress`
+[tf-1.hmm](http://cys.bios.niu.edu/dbCAN2/download/Databases/tf-1.hmm)--use `hmmpress tf-1.hmm`
 
-[tf-2.hmm](http://cys.bios.niu.edu/dbCAN2/download/Databases/tf-2.hmm)--use `hmmpress`
+[tf-2.hmm](http://cys.bios.niu.edu/dbCAN2/download/Databases/tf-2.hmm)--use `hmmpress tf-2.hmm`
 
-[stp.hmm](http://cys.bios.niu.edu/dbCAN2/download/Databases/stp.hmm)--use `hmmpress`
+[stp.hmm](http://cys.bios.niu.edu/dbCAN2/download/Databases/stp.hmm)--use `hmmpress stp.hmm`
 
 #### PYTHON MODULE
 
@@ -143,6 +144,8 @@ python run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
 
 	[-t Tools] 		- optional, allows user to select a combination of tools to run. The options are any
 					combination of 'diamond', 'hmmer', and 'hotpep'. The default value is 'all' which runs all three tools.
+	[--dbCANFile]   - optional, allows user to set the file name of dbCAN HMM Database.
+	
 	[--dia_eval]    - optional, allows user to set the DIAMOND E Value. Default = 1e-121.
 
 	[--dia_cpu]     - optional, allows user to set how many CPU cores DIAMOND can use. Default = 5.
