@@ -561,11 +561,14 @@ for i in range (2,len(arr_sigp)):
 
     row = arr_sigp[i].split()
     sigp_genes[row[0]]=row[2]
+##Catie Ausland edits BEGIN
+if len(hotpep_genes) > 0:
+    if (hotpep_genes[len(hotpep_genes)-1] == None):
+        hotpep_genes.pop()
+        hmmer_genes.pop()
+        diamond_genes.pop()
+## Catie edits END
 
-if (hotpep_genes[len(hotpep_genes)-1] == None):
-    hotpep_genes.pop()
-    hmmer_genes.pop()
-    diamond_genes.pop()
 # remove duplicates from input lists
 diamond_genes = unique(diamond_genes)
 hmmer_genes = unique(hmmer_genes)
