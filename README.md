@@ -189,6 +189,8 @@ Several files will be outputted. they are as follows:
 	cgc.gff - GFF input file for CGCFinder
 
 	cgc.out - ouput from the CGCFinder run
+	
+	overview.txt - Details the CAZyme predictions across the three tools with signalp results
 
 ### EXAMPLE
 
