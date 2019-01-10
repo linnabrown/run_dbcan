@@ -52,7 +52,7 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 
 Last updated 12/24/18
 
-**update info**
+### update info
 - More user friendly
 - Adds `stp hmmdb` signature gene in CGC_Finder.py (stp means signal transduction proteins; the hmmdb was constructed by Catherine Ausland of the Yin lab at NIU)
 - Changes tfdb from `tfdb` to `tf.hmm`, which is added to `db/` directory (tfdb was a fasta format sequence file, which contains just bacterial transcription factor proteins; tf.hmm is a hmmer format file containing hmms downloaded from the Pfam and SUPERFAMILY database according to the DBD database: http://www.transcriptionfactor.org)
@@ -83,7 +83,7 @@ P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-pars
 
 [Prodigal](https://github.com/hyattpd/Prodigal)--please download and install if you need.
 
-[FragGeneScan](https://github.com/gaberoo/FragGeneScan)--please download and install if you need.
+[FragGeneScan](http://omics.informatics.indiana.edu/FragGeneScan/)--please download and install if you need.
 
 [CGCFinder](https://github.com/linnabrown/run_dbcan/blob/master/CGCFinder.py)--This newest version is included in dbCAN2 project.
 
@@ -114,7 +114,7 @@ natsort						-- use `pip install natsort`
 
 - The Hotpep directory must also be in the same directory as run_dbcan.py.
 
-- When you use **FragGeneScan**, you should download this file, unpress, and add its path to user enviroenment variable. The concrete method is written on [this website](https://github.com/gaberoo/FragGeneScan). Otherwise, you should put unzip this file in the same directory as run_dbcan.py and revise the code in `run_dbcan.py` like this:
+- When you use **FragGeneScan**, you should download this file, unpress, and add its path to user enviroenment variable. The concrete method is written on [this website](http://omics.informatics.indiana.edu/FragGeneScan/). Otherwise, you should put unzip this file in the same directory as run_dbcan.py and revise the code in `run_dbcan.py` like this:
 
 ```
 # if you put FragGeneScan' path the same directory as run_dbcan.py, you can use this command.
