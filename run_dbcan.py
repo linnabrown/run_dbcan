@@ -34,6 +34,12 @@ parser.add_argument('--hmm_cpu', default=1, type=int, help='Number of CPU cores 
 parser.add_argument('--hotpep_hits', default=4, type=int, help='Hotpep Hit value')
 parser.add_argument('--hotpep_freq', default=2.0, type=float, help='Hotpep Frequency value')
 parser.add_argument('--hotpep_cpu', default=3, type=int, help='Number of CPU cores that Hotpep is allowed to use')
+parser.add_argument('--tf_eval', default=1e-4, type=float, help='HMMER E Value')
+parser.add_argument('--tf_cov', default=0.35, type=float, help='HMMER Coverage val')
+parser.add_argument('--tf_cpu', default=1, type=int, help='Number of CPU cores that HMMER is allowed to use')
+parser.add_argument('--stp_eval', default=1e-4, type=float, help='HMMER E Value')
+parser.add_argument('--stp_cov', default=0.3, type=float, help='HMMER Coverage val')
+parser.add_argument('--stp_cpu', default=1, type=int, help='Number of CPU cores that HMMER is allowed to use')
 parser.add_argument('--out_pre', default="", help='Output files prefix')
 parser.add_argument('--out_dir', default="output", help='Output directory')
 parser.add_argument('--db_dir', default="db/", help='Database directory')
@@ -46,7 +52,7 @@ args = parser.parse_args()
 '''
 def some functions
 '''
-def runHmmScan_tf(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name):
+def runHmmScan(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name):
     hmmer = Popen(['hmmscan', '--domtblout', '%sh%s.out' % (outPath, db_name), '--cpu', hmm_cpu, '-o', '/dev/null', '%s%s.hmm' % (dbDir,db_name), '%suniInput' % outPath])
     hmmer.wait()
     call('python hmmscan-parser.py %sh%s.out %s %s > %s%s.out'%(outPath, db_name, hmm_eval, hmm_cov, outPath, db_name), shell=True)
@@ -238,8 +244,8 @@ if find_clusters:
     tf hmmer 
     '''
     #call(['diamond', 'blastp', '-d', dbDir+'tf_v1/tf.dmnd', '-e', '1e-10', '-q', '%suniInput' % outPath, '-k', '1', '-p', '1', '-o', outDir+prefix+'tf.out', '-f', '6'])
-    runHmmScan_tf(outPath, str(args.hmm_cpu), dbDir, str(args.hmm_eval), str(args.hmm_cov), "tf-1")
-    runHmmScan_tf(outPath, str(args.hmm_cpu), dbDir, str(args.hmm_eval), str(args.hmm_cov), "tf-2")
+    runHmmScan(outPath, str(args.tf_cpu), dbDir, str(args.tf_eval), str(args.tf_cov), "tf-1")
+    runHmmScan(outPath, str(args.tf_cpu), dbDir, str(args.tf_eval), str(args.tf_cov), "tf-2")
     '''
     stp
     '''
@@ -248,7 +254,7 @@ if find_clusters:
     # call('python hmmscan-parser.py %shstp.out %s %s > %sstp.out'%(outPath, str(args.hmm_eval), str(args.hmm_cov), outPath), shell=True)
     # if os.path.exists('%shstp.out' % outPath):
     #     call(['rm', '%shstp.out' % outPath])
-    runHmmScan_tf(outPath, str(args.hmm_cpu), dbDir, str(args.hmm_eval), str(args.hmm_cov), "stp")
+    runHmmScan(outPath, str(args.stp_cpu), dbDir, str(args.stp_eval), str(args.stp_cov), "stp")
     
     '''
     tp diamond
