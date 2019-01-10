@@ -104,7 +104,7 @@ venv.bak/
 .mypy_cache/
 
 # db
-db/
+db/*
 example/
 
 # signalp, prodigal, FragGeneScan1.30
