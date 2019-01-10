@@ -138,7 +138,7 @@ def startSearch(startRow, contig):
 						pass
 					out.write('\t'.join(row) + '\n')
 				out.write('+++++' + '\n')
-			cluster = [0, 0, 0]
+			cluster = [0, 0, 0, 0]
 			return index
 			
 #define function to find how close important genes are to each other
