@@ -83,7 +83,7 @@ P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-pars
 
 [Prodigal](https://github.com/hyattpd/Prodigal)--please download and install if you need.
 
-[FragGeneScan](https://github.com/COL-IU/FragGeneScan)--please download and install if you need.
+[FragGeneScan](https://github.com/gaberoo/FragGeneScan)--please download and install if you need.
 
 [CGCFinder](https://github.com/linnabrown/run_dbcan/blob/master/CGCFinder.py)--This newest version is included in dbCAN2 project.
 
@@ -114,11 +114,13 @@ natsort						-- use `pip install natsort`
 
 - The Hotpep directory must also be in the same directory as run_dbcan.py.
 
-- When you use **FragGeneScan**, you should download this file, unpress, and add its path to user enviroenment variable. The concrete method is written on [this website](http://www.baidu/com). Otherwise, you should put unzip this file in the same directory as run_dbcan.py and revise the code in `run_dbcan.py` like this:
+- When you use **FragGeneScan**, you should download this file, unpress, and add its path to user enviroenment variable. The concrete method is written on [this website](https://github.com/gaberoo/FragGeneScan). Otherwise, you should put unzip this file in the same directory as run_dbcan.py and revise the code in `run_dbcan.py` like this:
 
 ```
-call(['FragGeneScan1.30/run_FragGeneScan.pl', '-genome='+input, '-out=%sfragGeneScan'%outPath, '-complete=1', '-train=complete', '-thread=10'])
-#call(['FragGeneScan', '-s', input, '-o', '%sfragGeneScan'%outPath, '-w 1','-t comlete', '-p 10'])
+# if you put FragGeneScan' path the same directory as run_dbcan.py, you can use this command.
+#call(['FragGeneScan1.30/run_FragGeneScan.pl', '-genome='+input, '-out=%sfragGeneScan'%outPath, '-complete=1', '-train=complete', '-thread=10'])
+#if you install FragGeneScan and add its path to environmental variable, you should use this command.
+call(['FragGeneScan', '-s', input, '-o', '%sfragGeneScan'%outPath, '-w 1','-t comlete', '-p 10'])
 ```
 
 
