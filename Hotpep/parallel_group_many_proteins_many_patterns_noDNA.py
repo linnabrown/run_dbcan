@@ -90,10 +90,10 @@ if not os.path.exists(output_dir_name):
 	call(["mkdir", output_dir_name])
 for fam in pep_list_array:
 	hit_array = pep_list_hash[fam]
-	if len(hit_array) > 0:
-		fam_file = open(output_dir_name+"/output.txt", "a")
-		hit_array.sort(key= lambda x: (x.group, -x.freq, -x.hits))
-		for p in hit_array:
-			fam_file.write(fam+ '\t' +str(p.group)+"\t"+p.name.split(' ')[0][1:]+"\t"+str(p.freq)+"\t"+str(p.hits)+"\t"+p.peptides+"\n")
-		fam_file.close()
+	#if len(hit_array) > 0:
+	fam_file = open(output_dir_name+"/output.txt", "a")
+	hit_array.sort(key= lambda x: (x.group, -x.freq, -x.hits))
+	for p in hit_array:
+		fam_file.write(fam+ '\t' +str(p.group)+"\t"+p.name.split(' ')[0][1:]+"\t"+str(p.freq)+"\t"+str(p.hits)+"\t"+p.peptides+"\n")
+	fam_file.close()
 
