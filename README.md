@@ -145,7 +145,7 @@ python run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
 	[-t Tools] 		- optional, allows user to select a combination of tools to run. The options are any
 					combination of 'diamond', 'hmmer', and 'hotpep'. The default value is 'all' which runs all three tools.
 	[--dbCANFile]   - optional, allows user to set the file name of dbCAN HMM Database.
-	
+
 	[--dia_eval]    - optional, allows user to set the DIAMOND E Value. Default = 1e-121.
 
 	[--dia_cpu]     - optional, allows user to set how many CPU cores DIAMOND can use. Default = 5.
@@ -214,7 +214,7 @@ While this example directory contains all the databases you will need (already f
 
 To run the examples with CGCFinder turned on, run:
 ```
-python run_dbcan.py EscheriaColiK12MG1655.fna prok -c
+python run_dbcan.py EscheriaColiK12MG1655.fna prok -c cluster
 ```
 
 or
