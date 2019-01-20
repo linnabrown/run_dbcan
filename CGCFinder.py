@@ -1,189 +1,228 @@
-##################################################
-# CGCFinder v4
-#
-# Rewriten for dbCAN2
-#
-# Written by Le Huang under the supervision of
-# Dr. Yin at NIU
-#
-#
-# Last updated 12/24/18
-#-updating info
-#-adding stp
-##################################################
+# run_dbcan 2.0
+
+This is the standalone version of dbCAN annotation tool for automated CAZyme annotation (known as run_dbCAN.py), written by Le Huang and Tanner Yohe.
+
+If you want to use our dbCAN2 webserver, please go to http://cys.bios.niu.edu/dbCAN2/.
+
+If you use dbCAN standalone tool or/and our web server for publication, please cite us:
+
+*Han Zhang, Tanner Yohe, **Le Huang**, Sarah Entwistle, Peizhi Wu, Zhenglu Yang, Peter K Busk, Ying Xu, Yanbin Yin;
+dbCAN2: a meta server for automated carbohydrate-active enzyme annotation, Nucleic Acids Research,
+Volume 46, Issue W1, 2 July 2018, Pages W95–W101, https://doi.org/10.1093/nar/gky418*
+```
+@article{doi:10.1093/nar/gky418,
+author = {Zhang, Han and Yohe, Tanner and Huang, Le and Entwistle, Sarah and Wu, Peizhi and Yang, Zhenglu and Busk, Peter K and Xu, Ying and Yin, Yanbin},
+title = {dbCAN2: a meta server for automated carbohydrate-active enzyme annotation},
+journal = {Nucleic Acids Research},
+volume = {46},
+number = {W1},
+pages = {W95-W101},
+year = {2018},
+doi = {10.1093/nar/gky418},
+URL = {http://dx.doi.org/10.1093/nar/gky418},
+eprint = {/oup/backfile/content_public/journal/nar/46/w1/10.1093_nar_gky418/1/gky418.pdf}
+}
+```
+
+If you want to use pre-computed bacterial CAZyme sequences/annotations directly, please go to http://cys.bios.niu.edu/dbCAN_seq/ and cite us:
+
+***Le Huang**, Han Zhang, Peizhi Wu, Sarah Entwistle, Xueqiong Li, Tanner Yohe, Haidong Yi, Zhenglu Yang, Yanbin Yin;
+dbCAN-seq: a database of carbohydrate-active enzyme (CAZyme) sequence and annotation, Nucleic Acids Research,
+Volume 46, Issue D1, 4 January 2018, Pages D516–D521, https://doi.org/10.1093/nar/gkx894*
+```
+@article{doi:10.1093/nar/gkx894,
+author = {Huang, Le and Zhang, Han and Wu, Peizhi and Entwistle, Sarah and Li, Xueqiong and Yohe, Tanner and Yi, Haidong and Yang, Zhenglu and Yin, Yanbin},
+title = {dbCAN-seq: a database of carbohydrate-active enzyme (CAZyme) sequence and annotation},
+journal = {Nucleic Acids Research},
+volume = {46},
+number = {D1},
+pages = {D516-D521},
+year = {2018},
+doi = {10.1093/nar/gkx894},
+URL = {http://dx.doi.org/10.1093/nar/gkx894},
+eprint = {/oup/backfile/content_public/journal/nar/46/d1/10.1093_nar_gkx894/2/gkx894.pdf}
+}
+```
 
 
-import argparse
-import csv
-import sys
+
+## run_dbcan.py Stand Alone Version2.0 User Mannual
+
+Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner Yohe of the Yin lab at NIU.
+
+Last updated 12/24/18
+
+### updating info
+- More user friendly
+- Adds `stp hmmdb` signature gene in CGC_Finder.py (stp means signal transduction proteins; the hmmdb was constructed by Catherine Ausland of the Yin lab at NIU)
+- Changes tfdb from `tfdb` to `tf.hmm`, which is added to `db/` directory (tfdb was a fasta format sequence file, which contains just bacterial transcription factor proteins; tf.hmm is a hmmer format file containing hmms downloaded from the Pfam and SUPERFAMILY database according to the DBD database: http://www.transcriptionfactor.org)
+- Uses newest dbCAN-HMM db and CAZy db
+- Fixes bugs in HotPep python version to fit python 3 user.
+- Added certain codes to make it robust. Thanks to suggestion from [Mick](mick.watson@roslin.ed.ac.uk).
+
+### Function
+- Accepts user input
+- Predicts genes if needed
+- Runs input against HMMER, DIAMOND, and Hotpep
+- Optionally predicts CGCs with CGCFinder
 
 
-#set up argument parser
-parser = argparse.ArgumentParser(description='CAZyme Gene Cluster Finder')
+### REQUIREMENTS
 
-parser.add_argument('gffFile', help='GFF file containing genome information')
-parser.add_argument('--distance', '-d', type=int, choices=[0,1,2,3,4,5,6,7,8,9,10], default=2, help='The distance allowed between two signature genes')
-parser.add_argument('--siggenes', '-s', choices=['all', 'tp', 'tf','stp','tp+tf','tp+stp','tf+stp'], default='all', help='Signature genes types required. all=CAZymes,TC,TF; tp=CAZymes,TC; tf=CAZymes,TF')
-parser.add_argument('--output', '-o', help='Output file name')
+#### TOOLS
+P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-parser` because they are included in run_dbcan V2. If you need to use signalp, Prodigal and FragGeneScan, we recommend you to copy them to `/usr/bin` as system application or add their path into system envrionmental variable.
 
-args = parser.parse_args()
+[DIAMOND](https://github.com/bbuchfink/diamond)-- please install from github as instructions.
 
+[HMMER](hmmer.org)--use `sudo apt-get install`
 
-#open output file
-out = open(args.output, 'w+')
+[hmmscan-parser](https://github.com/linnabrown/run_dbcan/blob/master/hmmscan-parser.py)--This is included in dbCAN2.
 
-#global vars
-cluster = [0, 0, 0, 0] #cazyme, tp, tf, stp
-num_clusters = 0
+[Hotpep-Python](https://github.com/linnabrown/run_dbcan/tree/master/Hotpep)--This newest version is included in dbCAN2.
 
-#define boolean function to determine if a cluster meets cluster requirements
-def isCluster(): 
-	global cluster
-	if args.siggenes == 'all':
-		if cluster[0] > 0 and cluster[1] > 0 and cluster[2] > 0 and cluster[3]:
-			return True
-	elif args.siggenes == 'tf':
-		if cluster[0] > 0 and cluster[2] > 0:
-			return True
-	elif args.siggenes == 'tp':
-		if cluster[0] > 0 and cluster[1] > 0:
-			return True
-	elif args.siggenes == 'stp':
-		if cluster[0] > 0 and cluster[3] > 0:
-			return True
-	elif args.siggenes == 'tp+tf':
-		if cluster[0] > 0 and cluster[1] > 0 and cluster[2]>0:
-			return True
-	elif args.siggenes == 'tp+stp':
-		if cluster[0] > 0 and cluster[1] > 0 and cluster[3]>0:
-			return True
-	elif args.siggenes == 'tf+stp':
-		if cluster[0] > 0 and cluster[2] > 0 and cluster[3]>0:
-			return True
-	else:
-		print('Warning: invalid siggenes argument')
-	return False
+[signalp](http://www.cbs.dtu.dk/services/SignalP/)--please download and install if you need.
 
-#define boolean function to detemine if a gene is important (a signature gene)
-def isImportant(gene):
-	if gene == 'CAZyme':
-		return True
-	else:
-		if gene == 'TC' and (args.siggenes == 'tp' or args.siggenes == 'all' or args.siggenes == 'tp+tf' or args.siggenes == 'tp+stp'):
-			return True
-		if gene == 'TF' and (args.siggenes == 'tf' or args.siggenes == 'all' or args.siggenes == 'tp+tf' or args.siggenes == 'tf+stp'):
-			return True
-		if gene == 'STP' and (args.siggenes == 'stp' or args.siggenes == 'all'or args.siggenes == 'tp+stp' or args.siggenes == 'tf+stp' ):
-			return True
-	return False
+[Prodigal](https://github.com/hyattpd/Prodigal)--please download and install if you need.
 
-def isSigGene(gene):
-	if gene == 'CAZyme' or gene == 'TC' or gene == 'TF' or gene == 'STP':
-		return True
-	else:
-		return False
-		
-#define function to increase the cluster count
-def increaseClusterCount(gene):
-	global cluster
-	if gene == 'CAZyme':
-		cluster[0] += 1
-	elif gene == 'TC':
-		cluster[1] += 1
-	elif gene == 'TF':
-		cluster[2] += 1
-	elif gene == 'STP':
-		cluster[3] += 1
-	else:
-		print("Warning: increaseClusterCount was called on bad functional domain")
+[FragGeneScan](http://omics.informatics.indiana.edu/FragGeneScan/)--please download and install if you need.
 
-#define function to search for a cluster once an important gene has been found
-#this function also handles output
-def startSearch(startRow, contig):
-	global cluster
-	global num_clusters
-	dis = args.distance
-	index = startRow
-	between = 0
-	lastImportant = 0
-	while index < len(contig):
-		index += 1
-		fd = contig[index][2]
-		if isImportant(fd):
-			increaseClusterCount(fd)
-			lastImportant = index
-			between = 0
-		else:
-			between += 1
-		if between > dis or index >= (len(contig)-1):
-			if isCluster():
-				num_clusters += 1
-				#output file columns
-				#geneNumber type[2] downDis upDis CGC# contig[0] geneStart[3] geneEnd[4] geneID[8,ID] direc[6] note[8]
-				for j in range(startRow, lastImportant + 1):
-					fd = contig[j][2]
-					if isSigGene(fd):
-						upDown = findNear(contig, j)
-						notes = contig[j][8].split(";")
-						ID= ""
-						for note in notes:
-							if "ID" in note:
-								ID = note.split("=")[1]
-						row = [str(j), fd, str(upDown[1]), str(upDown[0]), 'CGC'+str(num_clusters), contig[j][0], contig[j][3], contig[j][4], ID, contig[j][6], contig[j][8]]
-					else:
-						row = [str(j), 'null', 'null', 'null', 'CGC'+str(num_clusters), contig[j][0], contig[j][3], contig[j][4], ID, contig[j][6]]
-					try:
-						row.append(contig[j][8])
-					except:
-						pass
-					out.write('\t'.join(row) + '\n')
-				out.write('+++++' + '\n')
-			cluster = [0, 0, 0, 0]
-			return index
-			
-#define function to find how close important genes are to each other
-def findNear(contig, index):
-	vals = ['null', 'null']
-	k = index - 1
-	l = index + 1
-	while k >= 0:
-		if isImportant(contig[k][2]):
-			vals[0] = index - k - 1
-			break
-		else:
-			k -= 1
-	while l <= len(contig) - 1:
-		if isImportant(contig[l][2]):
-			vals[1] = l - index - 1
-			break
-		else:
-			l += 1
-	return vals
-		
+[CGCFinder](https://github.com/linnabrown/run_dbcan/blob/master/CGCFinder.py)--This newest version is included in dbCAN2 project.
 
-#load contig into an array 
-contigs = {}
-with open(args.gffFile) as f:
-	for line in f:
-		row = line.rstrip().split('\t')
-		if row[0] not in contigs:
-			contigs[row[0]] = []
-		contigs[row[0]].append(row)
+#### DATABASES and Formatting[required!][Link](http://cys.bios.niu.edu/dbCAN2/download/Databases)
+
+[CAZyDB.07312018.fa](http://cys.bios.niu.edu/dbCAN2/download/Databases/CAZyDB.07312018.fa)--use `diamond makedb --in CAZyDB.07312018.fa -d CAZy`
+
+[PPR]:included in Hotpep
+
+[dbCAN-HMMdb-V7.txt](http://cys.bios.niu.edu/dbCAN2/download/Databases/dbCAN-HMMdb-V7.txt)--First use `mv dbCAN-HMMdb-V7.txt dbCAN.txt`, then use `hmmpress dbCAN.txt`
+
+[tcdb.fa](http://cys.bios.niu.edu/dbCAN2/download/Databases/tcdb.fa)--use `diamond makedb --in tcdb.fa -d tcdb`
+
+[tf-1.hmm](http://cys.bios.niu.edu/dbCAN2/download/Databases/tf-1.hmm)--use `hmmpress tf-1.hmm`
+
+[tf-2.hmm](http://cys.bios.niu.edu/dbCAN2/download/Databases/tf-2.hmm)--use `hmmpress tf-2.hmm`
+
+[stp.hmm](http://cys.bios.niu.edu/dbCAN2/download/Databases/stp.hmm)--use `hmmpress stp.hmm`
+
+#### PYTHON MODULE
+
+natsort						-- use `pip install natsort`
 
 
-#loop through contig
-for key in contigs:
-	contig = contigs[key]
-	num_clusters = 0
-	i = 0
-	while i < len(contig) - 1:
-		fd = contig[i][2]
-		if isImportant(fd):
-			increaseClusterCount(fd)
-			i = startSearch(i, contig)
-		else:
-			i += 1
-			
-if args.output != 'none':
-	out.close()
+### DIRECTORY STRUCTURE
 
+- We recommend that all the databases are put in a seperate directory. This directory can be defined with the `--db_dir` option or leave it as directory with default name `db`. Otherwise, all databases must be in the same directory as run_dbcan.py.
+
+- The Hotpep directory must also be in the same directory as run_dbcan.py.
+
+- When you use **FragGeneScan**, you should download this file, unpress, and add its path to user enviroenment variable. The concrete method is written on [this website](http://omics.informatics.indiana.edu/FragGeneScan/). Otherwise, you should put unzip this file in the same directory as run_dbcan.py and revise the code in `run_dbcan.py` like this:
+
+```
+# if you put FragGeneScan' path the same directory as run_dbcan.py, you can use this command.
+#call(['FragGeneScan1.30/run_FragGeneScan.pl', '-genome='+input, '-out=%sfragGeneScan'%outPath, '-complete=1', '-train=complete', '-thread=10'])
+#if you install FragGeneScan and add its path to environmental variable, you should use this command.
+call(['FragGeneScan', '-s', input, '-o', '%sfragGeneScan'%outPath, '-w 1','-t comlete', '-p 10'])
+```
+
+
+
+### INPUT
+
+```
+python run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
+```
+
+	[inputFile] - FASTA format file of either nucleotide or protein sequences
+
+	[inputType] - protein=proteome, prok=prokaryote, meta=metagenome/mRNA/CDSs/short DNA seqs
+
+	[--out_dir] - REQUIRED, user specifies an output directory.
+
+	[-c AuxillaryFile]- optional, include to enable CGCFinder. If using a proteome input,
+	the AuxillaryFile must be a GFF or BED format file containing gene positioning
+	information. Otherwise, the AuxillaryFile may be left blank.
+
+	[-t Tools] 		- optional, allows user to select a combination of tools to run. The options are any
+					combination of 'diamond', 'hmmer', and 'hotpep'. The default value is 'all' which runs all three tools.
+	[--dbCANFile]   - optional, allows user to set the file name of dbCAN HMM Database.
+
+	[--dia_eval]    - optional, allows user to set the DIAMOND E Value. Default = 1e-121.
+
+	[--dia_cpu]     - optional, allows user to set how many CPU cores DIAMOND can use. Default = 5.
+
+	[--hmm_eval]    - optional, allows user to set the HMMER E Value. Default = 1e-35.
+
+	[--hmm_cov]     - optional, allows user to set the HMMER Coverage value. Default = 0.35.
+
+	[--hmm_cpu]     - optional, allows user to set how many CPU cores HMMER can use. Default = 1.
+
+	[--hot_hits]    - optional, allows user to set the Hotpep Hits value. Default = 4.
+
+	[--hot_freq]    - optional, allows user to set the Hotpep Frequency value. Default = 2.0.
+
+	[--hot_cpu]     - optional, allows user to set how many CPU cores Hotpep can use. Default = 4.
+
+	[--out_pre]     - optional, allows user to set a prefix for all output files.
+
+	[--db_dir]      - optional, allows user to specify a database directory. Default = db/
+
+	[--cgc_dis]     - optional, allows user to specify CGCFinder Distance value. Allowed values are integers between 0-10. Default = 2.
+
+	[--cgc_sig_genes] - optional, allows user to specify CGCFinder Signature Genes. The options are, 'tp': TP and CAZymes, 'tf': TF and CAZymes, and 'all': TF, TP, and CAZymes. Default = 'tp'.
+
+
+
+### OUTPUT
+
+Several files will be outputted. they are as follows:
+
+	uniInput - The unified input file for the rest of the tools
+			(created by prodigal or FragGeneScan if a nucleotide sequence was used)
+
+	Hotpep.out - the output from the Hotpep run
+
+	diamond.out - the output from the diamond blast
+
+	hmmer.out - the output from the hmmer run
+
+	tf.out - the output from the diamond blast predicting TF's for CGCFinder
+
+	tc.out - the output from the diamond blast predicting TC's for CGCFinder
+
+	cgc.gff - GFF input file for CGCFinder
+
+	cgc.out - ouput from the CGCFinder run
+	
+	overview.txt - Details the CAZyme predictions across the three tools with signalp results
+
+### EXAMPLE
+
+An example setup is available in the example directory. Included in this directory are two FASTA sequences (one protein, one nucleotide).
+
+To run this example type, run:
+
+```
+python run_dbcan.py EscheriaColiK12MG1655.fna prok
+```
+or
+
+```
+python run_dbcan.py EscheriaColiK12MG1655.faa protein
+```
+
+While this example directory contains all the databases you will need (already formatted) and the Hotpep and FragGeneScan programs, you will still need to have the remaining programs installed on your machine (DIAMOND, HMMER, etc.).
+
+To run the examples with CGCFinder turned on, run:
+```
+python run_dbcan.py EscheriaColiK12MG1655.fna prok -c cluster
+```
+
+or
+
+```
+python run_dbcan.py EscheriaColiK12MG1655.faa protein -c EscheriaColiK12MG1655.gff
+```
+
+Notice that the protein command has a GFF file following the -c option. A GFF or BED format file with gene position information is required to run CGCFinder when using a protein input.
+
+If you have any questions, please feel free to contact with Dr. Yin (yanbin.yin@gmail.com or yyin@unl.edu) or me (Le Huang) on [Issue Dashboard](https://github.com/linnabrown/run_dbcan/issues).
