@@ -71,6 +71,8 @@ Last updated 12/24/18
 
 #### TOOLS
 P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-parser` because they are included in run_dbcan V2. If you need to use signalp, Prodigal and FragGeneScan, we recommend you to copy them to `/usr/bin` as system application or add their path into system envrionmental variable.
+
+
 [Python3]()--Be sure to use python3, not python2
 
 
