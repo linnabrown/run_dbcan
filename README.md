@@ -67,6 +67,106 @@ Last updated 12/24/18
 - Optionally predicts CGCs with CGCFinder
 
 
+### STEP by STEP install
+
+Many people told me they meet a lot of problems during setting up. Therefore, I write a step by step tutorial to install our run_dbcan project. 
+
+Here we go:
+
+Env: Ubuntu-16-04
+
+1. Install python3
+```
+sudo apt-get install python3
+```
+And then install pip
+```
+sudo apt-get install python3-pip
+```
+
+2. Install Diamond
+```
+wget http://github.com/bbuchfink/diamond/releases/download/v0.9.24/diamond-linux64.tar.gz
+
+tar xzf diamond-linux64.tar.gz
+``` 
+ The extracted diamond binary file should be moved to a directory contained in your executable search path (PATH environment variable).
+
+3.  Install hmmer
+```
+sudo apt-get install hmmer
+```
+
+4. Install signalP
+After you download from http://www.cbs.dtu.dk/services/SignalP/
+```
+tar xzf Signalp-4.1.tar.gz
+cd Signalp-4.1
+```
+Edit the paragraph labeled  "GENERAL SETTINGS, CUSTOMIZE ..." in the top of
+   the file 'signalp'. The following twovmandatory variables need to be set:
+   
+   	SIGNALP		full path to the signalp-4.1 directory on your system
+	outputDir	where to store temporary files (writable to all users)
+
+   In addition,  for practical reasons,  it is possible to limit the number of
+   input sequences allowed per run (MAX_ALLOWED_ENTRIES).
+
+Use mine as an example:
+```
+#!/usr/bin/perl
+
+# SignalP 4.1 main script
+# 
+# 2012, May 11
+
+###############################################################################
+#               GENERAL SETTINGS: CUSTOMIZE TO YOUR SITE
+###############################################################################
+
+# full path to the signalp-4.1 directory on your system (mandatory)
+BEGIN {
+    $ENV{SIGNALP} = '/home/huangle/Desktop/run_dbcan/tools/signalp-4.1';
+}
+
+# determine where to store temporary files (must be writable to all users)
+my $outputDir = "/home/huangle/Desktop/run_dbcan/tools/signalp-4.1/output";
+
+# max number of sequences per run (any number can be handled)
+my $MAX_ALLOWED_ENTRIES=100000;
+```
+
+And then, use this command:
+
+```
+sudo cp signalp /usr/bin/signalp
+```
+
+5. install Prodigal
+```
+git clone https://github.com/hyattpd/Prodigal.git
+cd Prodigal
+make install
+prodigal -h
+```
+
+6. install FragGeneScan1.31.tar.gz
+Download FragGeneScan1.31.tar.gz from this website:
+https://sourceforge.net/projects/fraggenescan/files/latest/download
+
+```
+tar xvf FragGeneScan1.31.tar.gz
+cd FragGeneScan1.31
+makefile
+make clean
+make fgs
+
+vim vim ~/.bashrc
+export PATH="<yourpath>/FragGeneScan1.31:$PATH"
+source ~/.bashrc
+```
+
+I know these steps are very complexing, therefore I am going to write a perl script in April to contain the steps above and let it be more user-friendly.
 ### REQUIREMENTS
 
 #### TOOLS
