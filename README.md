@@ -2,7 +2,7 @@
 
 This is the standalone version of dbCAN annotation tool for automated CAZyme annotation (known as run_dbCAN.py), written by Le Huang and Tanner Yohe.
 
-If you want to use our dbCAN2 webserver, please go to http://cys.bios.niu.edu/dbCAN2/.
+If you want to use our dbCAN2 webserver, please go to http://bcb.unl.edu/dbCAN2/.
 
 If you use dbCAN standalone tool or/and our web server for publication, please cite us:
 
@@ -24,7 +24,7 @@ eprint = {/oup/backfile/content_public/journal/nar/46/w1/10.1093_nar_gky418/1/gk
 }
 ```
 
-If you want to use pre-computed bacterial CAZyme sequences/annotations directly, please go to http://cys.bios.niu.edu/dbCAN_seq/ and cite us:
+If you want to use pre-computed bacterial CAZyme sequences/annotations directly, please go to http://bcb.unl.edu/dbCAN_seq/ and cite us:
 
 ***Le Huang**, Han Zhang, Peizhi Wu, Sarah Entwistle, Xueqiong Li, Tanner Yohe, Haidong Yi, Zhenglu Yang, Yanbin Yin;
 dbCAN-seq: a database of carbohydrate-active enzyme (CAZyme) sequence and annotation, Nucleic Acids Research,
@@ -192,21 +192,21 @@ P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-pars
 
 [CGCFinder](https://github.com/linnabrown/run_dbcan/blob/master/CGCFinder.py)--This newest version is included in dbCAN2 project.
 
-#### DATABASES and Formatting[required!][Link](http://cys.bios.niu.edu/dbCAN2/download/Databases)
+#### DATABASES and Formatting[required!][Link](http://bcb.unl.edu/dbCAN2/download/Databases)
 
-[CAZyDB.07312018.fa](http://cys.bios.niu.edu/dbCAN2/download/Databases/CAZyDB.07312018.fa)--use `diamond makedb --in CAZyDB.07312018.fa -d CAZy`
+[CAZyDB.07312018.fa](http://bcb.unl.edu/dbCAN2/download/Databases/CAZyDB.07312018.fa)--use `diamond makedb --in CAZyDB.07312018.fa -d CAZy`
 
 [PPR]:included in Hotpep
 
-[dbCAN-HMMdb-V7.txt](http://cys.bios.niu.edu/dbCAN2/download/Databases/dbCAN-HMMdb-V7.txt)--First use `mv dbCAN-HMMdb-V7.txt dbCAN.txt`, then use `hmmpress dbCAN.txt`
+[dbCAN-HMMdb-V7.txt](http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-HMMdb-V7.txt)--First use `mv dbCAN-HMMdb-V7.txt dbCAN.txt`, then use `hmmpress dbCAN.txt`
 
-[tcdb.fa](http://cys.bios.niu.edu/dbCAN2/download/Databases/tcdb.fa)--use `diamond makedb --in tcdb.fa -d tcdb`
+[tcdb.fa](http://bcb.unl.edu/dbCAN2/download/Databases/tcdb.fa)--use `diamond makedb --in tcdb.fa -d tcdb`
 
-[tf-1.hmm](http://cys.bios.niu.edu/dbCAN2/download/Databases/tf-1.hmm)--use `hmmpress tf-1.hmm`
+[tf-1.hmm](http://bcb.unl.edu/dbCAN2/download/Databases/tf-1.hmm)--use `hmmpress tf-1.hmm`
 
-[tf-2.hmm](http://cys.bios.niu.edu/dbCAN2/download/Databases/tf-2.hmm)--use `hmmpress tf-2.hmm`
+[tf-2.hmm](http://bcb.unl.edu/dbCAN2/download/Databases/tf-2.hmm)--use `hmmpress tf-2.hmm`
 
-[stp.hmm](http://cys.bios.niu.edu/dbCAN2/download/Databases/stp.hmm)--use `hmmpress stp.hmm`
+[stp.hmm](http://bcb.unl.edu/dbCAN2/download/Databases/stp.hmm)--use `hmmpress stp.hmm`
 
 #### PYTHON MODULE
 
