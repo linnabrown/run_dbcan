@@ -307,25 +307,25 @@ An example setup is available in the example directory. Included in this directo
 To run this example type, run:
 
 ```
-python run_dbcan.py EscheriaColiK12MG1655.fna prok
+python run_dbcan.py EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655
 ```
 or
 
 ```
-python run_dbcan.py EscheriaColiK12MG1655.faa protein
+python run_dbcan.py EscheriaColiK12MG1655.faa protein --out_dir output_EscheriaColiK12MG1655
 ```
 
 While this example directory contains all the databases you will need (already formatted) and the Hotpep and FragGeneScan programs, you will still need to have the remaining programs installed on your machine (DIAMOND, HMMER, etc.).
 
 To run the examples with CGCFinder turned on, run:
 ```
-python run_dbcan.py EscheriaColiK12MG1655.fna prok -c cluster
+python run_dbcan.py EscheriaColiK12MG1655.fna prok -c cluster --out_dir output_EscheriaColiK12MG1655
 ```
 
 or
 
 ```
-python run_dbcan.py EscheriaColiK12MG1655.faa protein -c EscheriaColiK12MG1655.gff
+python run_dbcan.py EscheriaColiK12MG1655.faa protein -c EscheriaColiK12MG1655.gff --out_dir output_EscheriaColiK12MG1655
 ```
 
 Notice that the protein command has a GFF file following the -c option. A GFF or BED format file with gene position information is required to run CGCFinder when using a protein input.
