@@ -140,6 +140,7 @@ And then, use this command:
 
 ```
 sudo cp signalp /usr/bin/signalp
+sudo chmod 777 /usr/bin/signalp
 ```
 
 5. install Prodigal
