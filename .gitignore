@@ -107,5 +107,5 @@ venv.bak/
 db/*
 example/
 
-# signalp, prodigal, FragGeneScan1.30
-# tools/
+signalp, prodigal, FragGeneScan1.30
+tools/
