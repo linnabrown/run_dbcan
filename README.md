@@ -158,7 +158,7 @@ https://sourceforge.net/projects/fraggenescan/files/latest/download
 ```
 tar xvf FragGeneScan1.31.tar.gz
 cd FragGeneScan1.31
-makefile
+make
 make clean
 make fgs
 
