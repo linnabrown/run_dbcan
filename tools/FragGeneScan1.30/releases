@@ -1,0 +1,21 @@
+FragGeneScan1.30: Released on April 25, 2016
+    * What's new in this release: fixed a few bugs, and 
+      improved the codes so that FragGeneScan runs a lot faster. 
+    * For gene prediction in short reads (-complete=0), the new version is 
+      about several times faster than the old releases.
+    * For gene prediction in large files of assembly contigs (and whole genomes), 
+      the running time could be reduced from days to a few mins. 
+    * How the speedup was achieved? 
+      the older versions call post_process.pl to refine the start codons, 
+      which could be extremely slow.
+      verion 1.30 removes post_process.pl, and implements this function in the c programs. 
+    * Bugs fixed: the start codons (and Mets) are added to predicted proteins (the ffn & faa files).
+FragGeneScan1.20: Bug fixed by Yu-Wei. The bug may cause inconcistency between the gff and ffn/faa files for -complete=1 mode.
+FragGeneScan1.19: Thread support added. Fixed a few memory leaks. 
+FragGeneScan1.18: Bug fixed by Yu-Wei (/* adjustment based on probability distribution */ for End' State)
+FragGeneScan1.17: Fixed couple of bugs related to the input sequence length. Added script to convert output to gff format. 
+FragGeneScan1.16: add an option for contigs (-complete=1 -train=complete)
+FragGeneScan1.15: fix the problem with lowercase sequence input
+FragGeneScan1.14: fix the problem of 0-length sequences with head in a input file
+FragGeneScan1.10: retrains HMM parameter 
+FragGeneScan1.03: allocates more memory to the predicted genes for reporting. This allows longer genes (upto 300000 bp) to be reported 
