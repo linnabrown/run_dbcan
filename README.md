@@ -162,7 +162,7 @@ make
 make clean
 make fgs
 
-vim vim ~/.bashrc
+vim ~/.bashrc
 export PATH="<yourpath>/FragGeneScan1.31:$PATH"
 source ~/.bashrc
 ```
