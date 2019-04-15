@@ -29,7 +29,7 @@ parser.add_argument('inputType', choices=['protein', 'prok', 'meta'], help='Type
 parser.add_argument('--cluster', '-c', help='Predict CGCs via CGCFinder. This argument requires an auxillary locations file if a protein input is being used')
 parser.add_argument('--dbCANFile',default="dbCAN.txt", help='Indicate the file name of HMM database such as dbCAN.txt, please use the newest one from dbCAN2 website.')
 parser.add_argument('--dia_eval', default=1e-102,type=float, help='DIAMOND E Value')
-parser.add_argument('--dia_cpu', default=5, type=int, help='Number of CPU cores that DIAMOND is allowed to use')
+parser.add_argument('--dia_cpu', default=2, type=int, help='Number of CPU cores that DIAMOND is allowed to use')
 parser.add_argument('--hmm_eval', default=1e-15, type=float, help='HMMER E Value')
 parser.add_argument('--hmm_cov', default=0.35, type=float, help='HMMER Coverage val')
 parser.add_argument('--hmm_cpu', default=1, type=int, help='Number of CPU cores that HMMER is allowed to use')
