@@ -94,8 +94,9 @@ tar xzf diamond-linux64.tar.gz
 
 3.  Install hmmer
 ```
-sudo apt-get install hmmer
+wget http://eddylab.org/software/hmmer/hmmer-3.1b2.tar.gz
 ```
+And add its path to ./bashrc
 
 4. Install signalP
 After you download from http://www.cbs.dtu.dk/services/SignalP/
@@ -179,7 +180,7 @@ P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-pars
 
 [DIAMOND](https://github.com/bbuchfink/diamond)-- please install from github as instructions.
 
-[HMMER](hmmer.org)--use `sudo apt-get install`
+[HMMER](hmmer.org)--Please download 3.1b2version in 2015, the newest version is not suitable `wget http://eddylab.org/software/hmmer/hmmer-3.1b2.tar.gz` and add variable to your environment
 
 [hmmscan-parser](https://github.com/linnabrown/run_dbcan/blob/master/hmmscan-parser.py)--This is included in dbCAN2.
 
