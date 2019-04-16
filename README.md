@@ -53,7 +53,14 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 Last updated 12/24/18
 
 ### updating info
-- ## 15/04/2019 We created a docker which has the same environment as mine. You can keep away from complexing setup process. Why not try this one!
+- ## 15/04/2019 We created a docker which has the same environment as mine. You can keep away from complexing setup process. You can run our program in any system(Windows, Mac OS, Ubuntu, centos).Why not try this one?   ;)
+```
+1. Make sure docker is installed on your computer successfully.
+2. docker pull haidyi/run_dbcan:latest
+3. docker run --name <preferred_name> -v <host-path>:<container-path> -it haidyi/run_dbcan:latest python run_dbcan.py <input_file> [params] --out_dir <output_dir>
+```
+Note: If you want to use your own sequence, mount it and result_dir to the container.
+
 - More user friendly
 - Adds `stp hmmdb` signature gene in CGC_Finder.py (stp means signal transduction proteins; the hmmdb was constructed by Catherine Ausland of the Yin lab at NIU)
 - Changes tfdb from `tfdb` to `tf.hmm`, which is added to `db/` directory (tfdb was a fasta format sequence file, which contains just bacterial transcription factor proteins; tf.hmm is a hmmer format file containing hmms downloaded from the Pfam and SUPERFAMILY database according to the DBD database: http://www.transcriptionfactor.org)
