@@ -169,7 +169,8 @@ if tools[2]:
     # numThreads = args.hotpep_cpu
     numThreads = args.hotpep_cpu if count >= args.hotpep_cpu else count                     #number of cores for Hotpep to use, revised by Le Huang 12/17/2018
     count_per_file = count / numThreads                                                #number of genes per core
-    directory = input.split('.')[0]
+    inter = input.split('/')[-1]
+    directory = inter.split('.')[0]
     if not os.path.exists('Hotpep/%s' % directory):
         call(['mkdir','-m','777','Hotpep/%s' % directory])
     num_files = 1
