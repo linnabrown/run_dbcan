@@ -260,21 +260,33 @@ python run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
 					combination of 'diamond', 'hmmer', and 'hotpep'. The default value is 'all' which runs all three tools.
 	[--dbCANFile]   - optional, allows user to set the file name of dbCAN HMM Database.
 
-	[--dia_eval]    - optional, allows user to set the DIAMOND E Value. Default = 1e-121.
+	[--dia_eval]    - optional, allows user to set the DIAMOND E Value. Default = 1e-102.
 
-	[--dia_cpu]     - optional, allows user to set how many CPU cores DIAMOND can use. Default = 5.
+	[--dia_cpu]     - optional, allows user to set how many CPU cores DIAMOND can use. Default = 2.
 
-	[--hmm_eval]    - optional, allows user to set the HMMER E Value. Default = 1e-35.
+	[--hmm_eval]    - optional, allows user to set the HMMER E Value. Default = 1e-15.
 
 	[--hmm_cov]     - optional, allows user to set the HMMER Coverage value. Default = 0.35.
 
 	[--hmm_cpu]     - optional, allows user to set how many CPU cores HMMER can use. Default = 1.
 
-	[--hot_hits]    - optional, allows user to set the Hotpep Hits value. Default = 4.
+	[--hot_hits]    - optional, allows user to set the Hotpep Hits value. Default = 6.
 
-	[--hot_freq]    - optional, allows user to set the Hotpep Frequency value. Default = 2.0.
+	[--hot_freq]    - optional, allows user to set the Hotpep Frequency value. Default = 2.6.
 
-	[--hot_cpu]     - optional, allows user to set how many CPU cores Hotpep can use. Default = 4.
+	[--hot_cpu]     - optional, allows user to set how many CPU cores Hotpep can use. Default = 3.
+
+	[--tf_eval]     - optional, allows user to set tf.hmm HMMER E Value. Default = 1e-4.
+
+	[--tf_cov]     - optional, allows user to set tf.hmm HMMER Coverage val. Default = 0.35.
+
+	[--tf_cpu]     - optional, allows user to tf.hmm Number of CPU cores that HMMER is allowed to use. Default = 1.
+
+	[--stp_eval]     - optional, allows user to set stp.hmm HMMER E Value. Default = 1e-4.
+
+	[--tf_cov]     - optional, allows user to set stp.hmm HMMER Coverage val. Default = 0.3.
+
+	[--tf_cpu]     - optional, allows user to stp.hmm Number of CPU cores that HMMER is allowed to use. Default = 1.
 
 	[--out_pre]     - optional, allows user to set a prefix for all output files.
 
