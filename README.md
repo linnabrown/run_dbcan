@@ -107,8 +107,9 @@ wget http://eddylab.org/software/hmmer/hmmer-3.1b2.tar.gz
 And add its path to ./bashrc
 
 4. Install signalP
-After you download from http://www.cbs.dtu.dk/services/SignalP/
+Because of academic [license agreement](http://www.cbs.dtu.dk/cgi-bin/sw_request?signalp+4.1) of SignalP, we could not provide you the you need to download SignalP locally (make an request from here http://www.cbs.dtu.dk/cgi-bin/sw_request?signalp+4.1) and move tarball (Signalp-4.1.tar.gz) into `run_dbcan/tools/` by yourself.
 ```
+cd run_dbcan/tools/
 tar xzf Signalp-4.1.tar.gz
 cd Signalp-4.1
 ```
@@ -123,23 +124,17 @@ Edit the paragraph labeled  "GENERAL SETTINGS, CUSTOMIZE ..." in the top of
 
 Use mine as an example:
 ```
-#!/usr/bin/perl
-
-# SignalP 4.1 main script
-# 
-# 2012, May 11
-
 ###############################################################################
 #               GENERAL SETTINGS: CUSTOMIZE TO YOUR SITE
 ###############################################################################
 
 # full path to the signalp-4.1 directory on your system (mandatory)
 BEGIN {
-    $ENV{SIGNALP} = '/home/huangle/Desktop/run_dbcan/tools/signalp-4.1';
+    $ENV{SIGNALP} = '/home/abc/Desktop/run_dbcan/tools/signalp-4.1';
 }
 
 # determine where to store temporary files (must be writable to all users)
-my $outputDir = "/home/huangle/Desktop/run_dbcan/tools/signalp-4.1/output";
+my $outputDir = "/home/abc/Desktop/run_dbcan/tools/signalp-4.1/output";
 
 # max number of sequences per run (any number can be handled)
 my $MAX_ALLOWED_ENTRIES=100000;
@@ -158,6 +153,7 @@ git clone https://github.com/hyattpd/Prodigal.git
 cd Prodigal
 make install
 prodigal -h
+mv /<path>/prodigal run_dbcan/tools/
 ```
 
 6. install FragGeneScan1.31.tar.gz

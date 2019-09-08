@@ -6,7 +6,7 @@
 # Updated by Mohamad Majd Raslan in the Yin Lab at NIU
 # Updated by Wei Li created table
 # Updated by Le Huang at NKU
-# Last updated 12/17/18
+# Last updated 09/08/19
 # updated information[Le Huang]: 1. suitable for python3 users 2. fixed the bugs when the count of sequences is small.
 # Accepts user input
 # Predicts genes if needed
@@ -48,7 +48,7 @@ parser.add_argument('--db_dir', default="db/", help='Database directory')
 parser.add_argument('--cgc_dis', default=2, help='CGCFinder Distance value')
 parser.add_argument('--cgc_sig_genes', default='tp', choices=['tp', 'tf','all'], help='CGCFinder Signature Genes value')
 parser.add_argument('--tools', '-t', nargs='+', choices=['hmmer', 'diamond', 'hotpep', 'all'], default='all', help='Choose a combination of tools to run')
-
+parser.add_argument('--use_signalP', default=False, type=bool, help='Use signalP or not, remember, you need to setup signalP tool first. Because of signalP license, Docker version does not have signalP.')
 args = parser.parse_args()
 
 '''
@@ -148,9 +148,9 @@ if inputType == 'protein':
 # End Gene Prediction Tools
 #######################
 # Begin SignalP
-
-signalpos = Popen('signalp -t gram+ %suniInput > %ssignalp.neg' % (outPath, outPath), shell=True)
-signalpneg = Popen('signalp -t gram- %suniInput > %ssignalp.pos' % (outPath, outPath), shell=True)
+if args.use_signalP==True:
+    signalpos = Popen('signalp -t gram+ %suniInput > %ssignalp.neg' % (outPath, outPath), shell=True)
+    signalpneg = Popen('signalp -t gram- %suniInput > %ssignalp.pos' % (outPath, outPath), shell=True)
 
 # End SignalP
 #######################

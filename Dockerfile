@@ -78,12 +78,12 @@ RUN wget https://downloads.sourceforge.net/project/fraggenescan/FragGeneScan1.31
   && rm ~/FragGeneScan1.31.tar.gz
 ENV PATH=/home/user/FragGeneScan1.31:${PATH}
 
-# Create signalP and run_dbcan2 environment
-RUN git clone https://github.com/linnabrown/run_dbcan.git /app \
-  && cd /app/tools/ && tar -xzvf signalp-4.1.tar.gz \
-  && chmod +x /app/tools/signalp-4.1/signalp \
-  && rm /app/tools/signalp-4.1.tar.gz
-ENV PATH=/app/tools/signalp-4.1:${PATH}
+# Download run_dbcan2, you need to download signalP by yourself because of signalP license.
+RUN git clone https://github.com/linnabrown/run_dbcan.git /app 
+#   && cd /app/tools/ && tar -xzvf signalp-4.1.tar.gz \
+#   && chmod +x /app/tools/signalp-4.1/signalp \
+#   && rm /app/tools/signalp-4.1.tar.gz
+# ENV PATH=/app/tools/signalp-4.1:${PATH}
 
 # Download and make the database for run_dbcan
 RUN mkdir /app/db && cd /app/db \
