@@ -495,28 +495,28 @@ if find_clusters:
 # End CGCFinder
 ####################
 # Begin SignalP combination
-
-print("Waiting on signalP")
-signalpos.wait()
-signalpneg.wait()
-print("SignalP complete")
-with open(outDir+prefix+'temp', 'w') as out:
-    with open(outDir+prefix+'signalp.pos') as f:
-        for line in f:
-            if not line.startswith('#'):
-                row = line.split(' ')
-                row = [x for x in row if x != '']
-                if row[9] == 'Y':
-                    out.write(line)
-    with open(outDir+prefix+'signalp.neg') as f:
-        for line in f:
-            if not line.startswith('#'):
-                row = line.split(' ')
-                row = [x for x in row if x != '']
-                if row[9] == 'Y':
-                    out.write(line)
-call('sort -u '+outDir+prefix+'temp > '+outDir+prefix+'signalp.out', shell=True)
-call(['rm', outDir+prefix+'temp', outDir+prefix+'signalp.pos', outDir+prefix+'signalp.neg'])
+if args.use_signalP=="True":
+    print("Waiting on signalP")
+    signalpos.wait()
+    signalpneg.wait()
+    print("SignalP complete")
+    with open(outDir+prefix+'temp', 'w') as out:
+        with open(outDir+prefix+'signalp.pos') as f:
+            for line in f:
+                if not line.startswith('#'):
+                    row = line.split(' ')
+                    row = [x for x in row if x != '']
+                    if row[9] == 'Y':
+                        out.write(line)
+        with open(outDir+prefix+'signalp.neg') as f:
+            for line in f:
+                if not line.startswith('#'):
+                    row = line.split(' ')
+                    row = [x for x in row if x != '']
+                    if row[9] == 'Y':
+                        out.write(line)
+    call('sort -u '+outDir+prefix+'temp > '+outDir+prefix+'signalp.out', shell=True)
+    call(['rm', outDir+prefix+'temp', outDir+prefix+'signalp.pos', outDir+prefix+'signalp.neg'])
 
 # End SignalP combination
 #######################
