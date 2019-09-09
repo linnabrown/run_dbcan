@@ -53,7 +53,7 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 Last updated 12/24/18
 
 ### updating info
-- ## 15/04/2019 We created a docker which has the same environment as mine. You can keep away from complexing setup process. You can run our program in any system(Windows, Mac OS, Ubuntu, centos).Why not try this one?   ;)
+- ## 15/04/2019 We created a docker which has the same environment as mine. You can keep away from complicated setup process. You can run our program in any system (Windows, Mac OS, Ubuntu, centos). Why not give it a try?
 ```
 1. Make sure docker is installed on your computer successfully.
 2. docker pull haidyi/run_dbcan:latest
@@ -107,7 +107,7 @@ wget http://eddylab.org/software/hmmer/hmmer-3.1b2.tar.gz
 And add its path to ./bashrc
 
 4. Install signalP
-Because of academic [license agreement](http://www.cbs.dtu.dk/cgi-bin/sw_request?signalp+4.1) of SignalP, we could not provide you the you need to download SignalP locally (make an request from here http://www.cbs.dtu.dk/cgi-bin/sw_request?signalp+4.1) and move tarball (Signalp-4.1.tar.gz) into `run_dbcan/tools/` by yourself.
+You have to obtain your own academic [license](http://www.cbs.dtu.dk/cgi-bin/sw_request?signalp+4.1) of SignalP from here http://www.cbs.dtu.dk/cgi-bin/sw_request?signalp+4.1) and move tarball (Signalp-4.1.tar.gz) into `run_dbcan/tools/` by yourself.
 ```
 cd run_dbcan/tools/
 tar xzf Signalp-4.1.tar.gz
@@ -172,7 +172,6 @@ export PATH="<yourpath>/FragGeneScan1.31:$PATH"
 source ~/.bashrc
 ```
 
-I know these steps are very complexing, therefore I am going to write a perl script in April to contain the steps above and let it be more user-friendly.
 ### REQUIREMENTS
 
 #### TOOLS
@@ -200,11 +199,11 @@ P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-pars
 
 #### DATABASES and Formatting[required!][Link](http://bcb.unl.edu/dbCAN2/download/Databases)
 
-[CAZyDB.07312018.fa](http://bcb.unl.edu/dbCAN2/download/Databases/CAZyDB.07312018.fa)--use `diamond makedb --in CAZyDB.07312018.fa -d CAZy`
+[CAZyDB.07312019.fa](http://bcb.unl.edu/dbCAN2/download/Databases/CAZyDB.07312019.fa)--use `diamond makedb --in CAZyDB.07312019.fa -d CAZy`
 
 [PPR]:included in Hotpep
 
-[dbCAN-HMMdb-V7.txt](http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-HMMdb-V7.txt)--First use `mv dbCAN-HMMdb-V7.txt dbCAN.txt`, then use `hmmpress dbCAN.txt`
+[dbCAN-HMMdb-V7.txt](http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-HMMdb-V8.txt)--First use `mv dbCAN-HMMdb-V8.txt dbCAN.txt`, then use `hmmpress dbCAN.txt`
 
 [tcdb.fa](http://bcb.unl.edu/dbCAN2/download/Databases/tcdb.fa)--use `diamond makedb --in tcdb.fa -d tcdb`
 
