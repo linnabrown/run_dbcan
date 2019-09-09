@@ -107,7 +107,7 @@ wget http://eddylab.org/software/hmmer/hmmer-3.1b2.tar.gz
 And add its path to ./bashrc
 
 4. Install signalP
-You have to obtain your own academic [license](http://www.cbs.dtu.dk/cgi-bin/sw_request?signalp+4.1) of SignalP from here http://www.cbs.dtu.dk/cgi-bin/sw_request?signalp+4.1) and move tarball (Signalp-4.1.tar.gz) into `run_dbcan/tools/` by yourself.
+You have to obtain your own academic license of SignalP and download it from [here](http://www.cbs.dtu.dk/cgi-bin/sw_request?signalp+4.1), and then move tarball (Signalp-4.1.tar.gz) into `run_dbcan/tools/` by yourself.
 ```
 cd run_dbcan/tools/
 tar xzf Signalp-4.1.tar.gz
