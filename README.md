@@ -352,18 +352,18 @@ If you have any questions, please feel free to contact with Dr. Yin (yanbin.yin@
 
 #### Q) I use docker and it shows 'mkdir: cannot create directory '/to/any/path/': No such file or directory', what's the issue.
 
-#### A) Please check your input directory and output directory is correct or not. If so and problem still happens, you may not mount a directory to the container. Please use -v command to mount your input sequence and output directory to the container.Please use the command:
+A) Please check your input directory and output directory is correct or not. If so and problem still happens, you may not mount a directory to the container. Please use -v command to mount your input sequence and output directory to the container.Please use the command:
 ```
 docker run --name <preferred_name> -v <host-path>:<container-path> -it haidyi/run_dbcan:latest python run_dbcan.py <input_file> [params] --out_dir <output_dir>
 ```
-#### You need to use `mkdir` to make a new path in your container, for example `mkdir /app/result`, and your local path of result is /to/path/result, the params of `-v` is `-v /to/path/result:/app/result`, and your `--out_dir` path is `--out_dir /app/result`.
+You need to use `mkdir` to make a new path in your container, for example `mkdir /app/result`, and your local path of result is /to/path/result, the params of `-v` is `-v /to/path/result:/app/result`, and your `--out_dir` path is `--out_dir /app/result`.
 
 #### Q) What kind of input file and output directory format is acceptable?
-#### A) ./<gene_name>.faa, /path/to/where/<gene_name>.faa
+A) ./<gene_name>.faa, /path/to/where/<gene_name>.faa
 
 
 #### Q) I have a permission problem using docker
-#### A) Please use the following command, try mine as an example. Use multiple command with `sh -c`. My local directory is `~/dbcan` where I put input file `EscheriaColiK12MG1655.faa` and output directory `output_dir`. And I mount my directory to the path `/app/result` in the container using this command `-v ~/run_dbcan:/app/result`. `python run_dbcan.py XXXX` is like the previous one.
+A) Please use the following command, try mine as an example. Use multiple command with `sh -c`. My local directory is `~/dbcan` where I put input file `EscheriaColiK12MG1655.faa` and output directory `output_dir`. And I mount my directory to the path `/app/result` in the container using this command `-v ~/run_dbcan:/app/result`. `python run_dbcan.py XXXX` is like the previous one.
 ```
 docker run --rm --name test_run_dbcan -v ~/run_dbcan:/app/result -it haidyi/run_dbcan:latest sh -c "sudo chmod -R 755 /app/result  && python run_dbcan.py /app/result/EscheriaColiK12MG1655.faa protein --out_dir /app/result/output_dir"
 
