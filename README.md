@@ -366,8 +366,6 @@ A) ./<gene_name>.faa, /path/to/where/<gene_name>.faa
 A) Please use the following command, try mine as an example. Use multiple command with `sh -c`. My local directory is `~/dbcan` where I put input file `EscheriaColiK12MG1655.faa` and output directory `output_dir`. And I mount my directory to the path `/app/result` in the container using this command `-v ~/run_dbcan:/app/result`. `python run_dbcan.py XXXX` is like the previous one.
 ```
 docker run --rm --name test_run_dbcan -v ~/run_dbcan:/app/result -it haidyi/run_dbcan:latest sh -c "sudo chmod -R 755 /app/result  && python run_dbcan.py /app/result/EscheriaColiK12MG1655.faa protein --out_dir /app/result/output_dir"
-
-
 ```
 
 
