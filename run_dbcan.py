@@ -149,7 +149,8 @@ if inputType == 'protein':
 # End Gene Prediction Tools
 #######################
 # Begin SignalP
-if args.use_signalP==True:
+if args.use_signalP:
+    print("***************************0. SIGNALP start*************************************************\n\n")
     signalpos = Popen('signalp -t gram+ %suniInput > %ssignalp.neg' % (outPath, outPath), shell=True)
     signalpneg = Popen('signalp -t gram- %suniInput > %ssignalp.pos' % (outPath, outPath), shell=True)
 
@@ -496,7 +497,7 @@ if find_clusters:
 # End CGCFinder
 ####################
 # Begin SignalP combination
-if args.use_signalP=="True":
+if args.use_signalP:
     print("Waiting on signalP")
     signalpos.wait()
     signalpneg.wait()
