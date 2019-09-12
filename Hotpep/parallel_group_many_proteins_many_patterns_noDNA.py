@@ -1,13 +1,17 @@
+#!/usr/bin/env python3
 from multiprocessing.dummy import Pool as ThreadPool
 from subprocess import call
 import sys
 import natsort
 import os
+import os.path
 
-protein_dir_name = ("fungus_fungus")
+from Hotpep.hotpep_data import hotpep_data_path
+
+protein_dir_name = hotpep_data_path("fungus_fungus")
 if len(sys.argv) > 2:
 	protein_dir_name = sys.argv[2].replace("?", " ")
-peptide_dir_name = "CAZY_PPR_patterns/GH" 
+peptide_dir_name = hotpep_data_path("CAZY_PPR_patterns/GH")
 if len(sys.argv) > 3:
 	peptide_dir_name = sys.argv[3].replace("?", " ")
 
@@ -49,7 +53,7 @@ var1 = 1
 varlist = " ".join(str(x) for x in variables)
 pool = ThreadPool(threads)
 while var1 <= threads:
-	args_array.append(("python bact_group_many_proteins_many_patterns.py "+ str(var1) + " " + varlist))
+	args_array.append(("bact_group_many_proteins_many_patterns.py "+ str(var1) + " " + varlist))
 	var1 += 1
 pool.map(callCustom, args_array)
 

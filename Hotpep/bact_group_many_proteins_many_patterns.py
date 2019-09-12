@@ -1,12 +1,14 @@
+#!/usr/bin/env python3
 import sys
 import re
 import itertools
 import os
 from subprocess import call
 
+from Hotpep.hotpep_data import hotpep_data_path
 
-protein_dir_name = "fungus_fungus"
-peptide_dir_name = "CAZY_PPR_patterns/GH" 
+protein_dir_name = hotpep_data_path("fungus_fungus")
+peptide_dir_name = hotpep_data_path("CAZY_PPR_patterns/GH")
 thread_no = 1
 peptide_length = 6 #length of conserved peptides
 hit_cut_off = 3 #number of conserved peptides necessary to classify a protein

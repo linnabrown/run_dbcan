@@ -1,7 +1,11 @@
+#!/usr/bin/env python3
 import sys
 import os
+import os.path
 
-protein_collection =  "fungus_fungus/Chaetomium_thermophilum"
+from Hotpep.hotpep_data import hotpep_data_path
+
+protein_collection = hotpep_data_path("fungus_fungus/Chaetomium_thermophilum")
 if len(sys.argv) > 1:
 	protein_collection = sys.argv[1].replace("?", " ")
 cazyme_array = ["AAexp"]

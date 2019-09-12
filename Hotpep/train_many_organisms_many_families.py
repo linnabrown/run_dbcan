@@ -1,13 +1,17 @@
+#!/usr/bin/env python3
 #Runs parallel_group_many_proteins_many_patterns.rb for many organisms and types of proteins
 #####################################
 ##Revised by Le Huang on 12/24/2018##
 #####################################
 from subprocess import call
 import os
+import os.path
 import sys
 
+from Hotpep.hotpep_data import hotpep_data_path
+
 ###
-#python train_many_organisms_many_families.py [inputFolder] [threads] [hits] [freq]
+#train_many_organisms_many_families.py [inputFolder] [threads] [hits] [freq]
 ###
 
 organism_array = ["Chaetomium_globosum_cbs_148_51"]
@@ -42,10 +46,10 @@ for protein_dir_name in organism_array:
 	print("Screening "+protein_dir_name+" for")
 	for cazy_class in cazyme_array:
 		print(cazy_class)
-		peptide_dir_name = "CAZY_PPR_patterns/"+cazy_class
+		peptide_dir_name = hotpep_data_path("CAZY_PPR_patterns", cazy_class)
 		variables =  [threads, protein_dir_name, peptide_dir_name, peptide_length, hit_cut_off, freq_cut_off]
-		call("python parallel_group_many_proteins_many_patterns_noDNA.py "+" ".join(str(x) for x in variables), shell=True)
-		#call(["python", "add_functions_orf.py", protein_dir_name, peptide_dir_name])
+		call("parallel_group_many_proteins_many_patterns_noDNA.py "+" ".join(str(x) for x in variables), shell=True)
+		#call(["add_functions_orf.py", protein_dir_name, peptide_dir_name])
 		var1 = 1
 		while var1 <= threads:
 			try:
@@ -55,6 +59,6 @@ for protein_dir_name in organism_array:
 			var1 += 1
 
 	if list_multidomain_enzymes == "yes":
-		call("python list_multidomain_proteins.py "+protein_dir_name+" "+"_".join(cazyme_array), shell=True)
+		call("list_multidomain_proteins.py "+protein_dir_name+" "+"_".join(cazyme_array), shell=True)
 print("\nScreened\n"+"\n".join(organism_array))
 print("for proteins of the types\n"+", ".join(cazyme_array))
