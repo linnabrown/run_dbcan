@@ -17,7 +17,7 @@ setup(name='dbcan',
       description='Standalone version of dbCAN annotation tool for automated CAZyme annotation',
       long_description=long_description,
       author='Le Huang and Tanner Yohe',
-      author_email='505103350@qq.com',
+      author_email='lehuang@unc.med.edu',
       url='https://github.com/linnabrown/run_dbcan',
       classifiers=[
           'Development Status :: 4 - Beta',

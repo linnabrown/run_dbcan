@@ -534,64 +534,58 @@ def unique(seq):
     exists = set()
     return [x for x in seq if not (x in exists or exists.add(x))]
 
-# check that files exist. if so, read files
+# check that files exist. if so, read files and get the gene numbers
 if(os.path.exists(workdir+"diamond.out")):
     arr_diamond = open(workdir+"diamond.out").readlines()
+    diamond_genes = []
+    for i in range(1,len(arr_diamond)):
+        row = arr_diamond[i].split()
+        diamond_genes.append(row[0])
 
 if(os.path.exists(workdir+"Hotpep.out")):
     arr_hotpep = open(workdir+"Hotpep.out").readlines()
+    hotpep_genes = []
+    for i in range(1,len(arr_hotpep)):
+        row = arr_hotpep[i].split()
+        hotpep_genes.append(row[2])
 
 if(os.path.exists(workdir+"hmmer.out")):
     arr_hmmer = open(workdir+"hmmer.out").readlines()
+    hmmer_genes = []
+    for i in range (1,len(arr_hmmer)):
+        row = arr_hmmer[i].split()
+        hmmer_genes.append(row[2])
 
-arr_sigp = open(workdir+"signalp.out").readlines()
-# get the gene numbers
-diamond_genes = []
-for i in range(1,len(arr_diamond)):
-    row = arr_diamond[i].split()
-    diamond_genes.append(row[0])
+if(os.path.exists(workdir + "signalp.out")):
+    arr_sigp = open(workdir+"signalp.out").readlines()
+    sigp_genes = {}
+    for i in range (2,len(arr_sigp)):
+        row = arr_sigp[i].split()
+        sigp_genes[row[0]]=row[2]
 
-hotpep_genes = []
-for i in range(1,len(arr_hotpep)):
-    row = arr_hotpep[i].split()
-    hotpep_genes.append(row[2])
-
-hmmer_genes = []
-for i in range (1,len(arr_hmmer)):
-    row = arr_hmmer[i].split()
-    hmmer_genes.append(row[2])
-
-sigp_genes = {}
-for i in range (2,len(arr_sigp)):
-
-    row = arr_sigp[i].split()
-    sigp_genes[row[0]]=row[2]
-##Catie Ausland edits BEGIN
+##Catie Ausland edits BEGIN, Le add variable exists or not, remove duplicates from input lists
 if len(hotpep_genes) > 0:
     if (hotpep_genes[len(hotpep_genes)-1] == None):
         hotpep_genes.pop()
-        hmmer_genes.pop()
-        diamond_genes.pop()
-## Catie edits END
+        hotpep_genes = unique(hotpep_genes)
+        if 'hmmer_genes' in locals():
+            hmmer_genes.pop()
+            hmmer_genes = unique(hmmer_genes)
+        if 'diamond_genes' in locals():
+            diamond_genes.pop()
+            diamond_genes = unique(diamond_genes)
+## Catie edits END, Le add variable exists or not, remove duplicates from input lists
 
-# remove duplicates from input lists
-diamond_genes = unique(diamond_genes)
-hmmer_genes = unique(hmmer_genes)
-hotpep_genes = unique(hotpep_genes)
-
-
-
-diamond_fams = {}
-hmmer_fams = {}
-hotpep_fams = {}
 # parse input, stroe needed variables
 if(arr_diamond != None):
+    diamond_fams = {}
     for i in range (1,len(arr_diamond)):
         row = arr_diamond[i].split("\t")
         fam = row[1].split("|")
         diamond_fams[row[0]] = fam[1]
 
 if(arr_hmmer !=None):
+    hmmer_fams = {}
     for i in range (len(arr_hmmer)):
         row = arr_hmmer[i].split("\t")
         fam = row[0].split(".")
@@ -601,8 +595,8 @@ if(arr_hmmer !=None):
 
         hmmer_fams[row[2]].append(fam)
 
-
 if(arr_hotpep != None) :
+    hotpep_fams = {}
     for i in range (1,len(arr_hotpep)):
         row = arr_hotpep[i].split("\t")
         if(row[2] not in hotpep_fams):
@@ -611,6 +605,14 @@ if(arr_hotpep != None) :
         hotpep_fams[row[2]].append(row[0])
 
 #overall table
+if not tools[0]:
+    diamond_genes =[]
+if not tools[1]:
+    hmmer_genes   = []
+if not tools[2]:
+    hotpep_genes  =[]
+    
+
 all_genes = unique(hmmer_genes+hotpep_genes+diamond_genes)
 overall_table = []
 with open(workdir+"overview.txt", 'w+') as fp:
