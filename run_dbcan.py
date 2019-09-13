@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #########################################################
 # dbCAN2 Driver Script (Stand Alone Version)
 #
@@ -57,12 +58,12 @@ def some functions
 def runHmmScan(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name):
     hmmer = Popen(['hmmscan', '--domtblout', '%sh%s.out' % (outPath, db_name), '--cpu', hmm_cpu, '-o', '/dev/null', '%s%s.hmm' % (dbDir,db_name), '%suniInput' % outPath])
     hmmer.wait()
-    call('python hmmscan-parser.py %sh%s.out %s %s > %s%s.out'%(outPath, db_name, hmm_eval, hmm_cov, outPath, db_name), shell=True)
+    call('hmmscan-parser.py %sh%s.out %s %s > %s%s.out'%(outPath, db_name, hmm_eval, hmm_cov, outPath, db_name), shell=True)
     if os.path.exists('%sh%s.out' % (outPath, db_name)):
         call(['rm', '%sh%s.out' % (outPath, db_name)])
 
 ####
-#python run_dbcan.py [inputFile] [inputType]
+#run_dbcan.py [inputFile] [inputType]
 ####
 
 ##########################
@@ -148,7 +149,8 @@ if inputType == 'protein':
 # End Gene Prediction Tools
 #######################
 # Begin SignalP
-if args.use_signalP==True:
+if args.use_signalP:
+    print("***************************0. SIGNALP start*************************************************\n\n")
     signalpos = Popen('signalp -t gram+ %suniInput > %ssignalp.neg' % (outPath, outPath), shell=True)
     signalpneg = Popen('signalp -t gram- %suniInput > %ssignalp.pos' % (outPath, outPath), shell=True)
 
@@ -172,7 +174,7 @@ if tools[2]:
     inter = input.split('/')[-1]
     directory = inter.split('.')[0]
     if not os.path.exists('Hotpep/%s' % directory):
-        call(['mkdir','-m','777','Hotpep/%s' % directory])
+        os.makedirs('Hotpep/%s' % directory)
     num_files = 1
     num_genes = 0
     out = open("Hotpep/%s/orfs%s.txt" % (directory, str(num_files)), 'w')
@@ -189,7 +191,7 @@ if tools[2]:
 
     os.chdir('Hotpep/')
     print("\n***************************3. HotPep start***************************************************\n\n")
-    hotpep = Popen(['python', 'train_many_organisms_many_families.py', directory, str(numThreads), str(args.hotpep_hits), str(args.hotpep_freq)])
+    hotpep = Popen(['train_many_organisms_many_families.py', directory, str(numThreads), str(args.hotpep_hits), str(args.hotpep_freq)])
     os.chdir('../')
 
 if tools[0]:
@@ -198,7 +200,7 @@ if tools[0]:
 if tools[1]:
     hmmer.wait()
     print("***************************2. HMMER end***************************************************")
-    call('python hmmscan-parser.py %sh.out %s %s > %shmmer.out'%(outPath, str(args.hmm_eval), str(args.hmm_cov), outPath), shell=True)
+    call('hmmscan-parser.py %sh.out %s %s > %shmmer.out'%(outPath, str(args.hmm_eval), str(args.hmm_cov), outPath), shell=True)
     if os.path.exists('%sh.out' % outPath):
         call(['rm', '%sh.out' % outPath])
 if tools[2]:
@@ -254,7 +256,7 @@ if find_clusters:
     '''
 
     # call(['hmmscan', '--domtblout', '%shstp.out' % outPath, '--cpu', str(args.hmm_cpu), '-o', '/dev/null', '%sstp.hmm' % dbDir, '%suniInput' % outPath])
-    # call('python hmmscan-parser.py %shstp.out %s %s > %sstp.out'%(outPath, str(args.hmm_eval), str(args.hmm_cov), outPath), shell=True)
+    # call('hmmscan-parser.py %shstp.out %s %s > %sstp.out'%(outPath, str(args.hmm_eval), str(args.hmm_cov), outPath), shell=True)
     # if os.path.exists('%shstp.out' % outPath):
     #     call(['rm', '%shstp.out' % outPath])
     runHmmScan(outPath, str(args.stp_cpu), dbDir, str(args.stp_eval), str(args.stp_cov), "stp")
@@ -488,14 +490,14 @@ if find_clusters:
 ####################
 # Begin CGCFinder call
 
-    call(['python', 'CGCFinder.py', outDir+prefix+'cgc.gff', '-o', outDir+prefix+'cgc.out', '-s', args.cgc_sig_genes, '-d', str(args.cgc_dis)])
+    call(['CGCFinder.py', outDir+prefix+'cgc.gff', '-o', outDir+prefix+'cgc.out', '-s', args.cgc_sig_genes, '-d', str(args.cgc_dis)])
     print("**************************************CGC-Finder end***********************************************")
 
 # End CGCFinder call
 # End CGCFinder
 ####################
 # Begin SignalP combination
-if args.use_signalP=="True":
+if args.use_signalP:
     print("Waiting on signalP")
     signalpos.wait()
     signalpneg.wait()

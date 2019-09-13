@@ -1,15 +1,19 @@
+#!/usr/bin/env python3
 import sys
 import os
+import os.path
 from subprocess import call
 import natsort
 
-protein_dir_name = "fungus_fungus"
+from Hotpep.hotpep_data import hotpep_data_path
+
+protein_dir_name = hotpep_data_path("fungus_fungus")
 if len(sys.argv) > 1:
 	protein_dir_name = sys.argv[1].replace("?", " ")
 function_significance_limit = 2 #Normally 2 for new patterns (no proteins with this function in group) and 10 for old patterns (sum freq conserved peptides for function in group ) 
 score_file = "_group_ec"
 
-peptide_dir_name = "CAZY_PPR_patterns/GH" 
+peptide_dir_name = hotpep_data_path("CAZY_PPR_patterns/GH")
 if len(sys.argv) > 2:
 	peptide_dir_name = sys.argv[2].replace("?", " ")
 	
