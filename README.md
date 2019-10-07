@@ -50,9 +50,28 @@ eprint = {/oup/backfile/content_public/journal/nar/46/d1/10.1093_nar_gkx894/2/gk
 
 Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner Yohe of the Yin lab at NIU.
 
-Last updated 12/24/18
+Last updated 10/07/19
 
 ### updating info
+- ## We created a very convienient bioconda version. Use this following command!
+```
+mkdir -p ~/virtualenvs
+python3 -m venv ~/virtualenvs/run_dbcan
+source ~/virtualenvs/dbcan/bin/activate
+pip install run-dbcan
+# Doanload dependencies from bioconda
+conda install -c bioconda diamond hmmer=3.1b2 prodigal fraggenescan
+
+# Download and make the database for run_dbcan
+test -d db || mkdir db
+cd db \
+    && wget http://bcb.unl.edu/dbCAN2/download/Databases/CAZyDB.07312018.fa && diamond makedb --in CAZyDB.07312018.fa -d CAZy \
+    && wget http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-HMMdb-V7.txt && mv dbCAN-HMMdb-V7.txt dbCAN.txt && hmmpress dbCAN.txt \
+    && wget http://bcb.unl.edu/dbCAN2/download/Databases/tcdb.fa && diamond makedb --in tcdb.fa -d tcdb \
+    && wget http://bcb.unl.edu/dbCAN2/download/Databases/tf-1.hmm && hmmpress tf-1.hmm \
+    && wget http://bcb.unl.edu/dbCAN2/download/Databases/tf-2.hmm && hmmpress tf-2.hmm \
+    && wget http://bcb.unl.edu/dbCAN2/download/Databases/stp.hmm && hmmpress stp.hmm
+```
 - ## 15/04/2019 We created a docker which has the same environment as mine. You can keep away from complicated setup process. You can run our program in any system (Windows, Mac OS, Ubuntu, centos). Why not give it a try?
 ```
 1. Make sure docker is installed on your computer successfully.
