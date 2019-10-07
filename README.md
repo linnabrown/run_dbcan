@@ -53,12 +53,15 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 Last updated 10/07/19
 
 ### updating info
-- ## We created a very convienient bioconda version. Use this following command!
+- ## We create a [python package](https://pypi.org/manage/project/run-dbcan/release/2.0.0/). Use these following command to install.
+You can install Anaconda or Miniconda first, and then use the following commands to install our program one time.
+I strongly recommend you to use virtual environment to keey away from messing your system up. Just 
 ```
+#create virtual environment
 mkdir -p ~/virtualenvs
 python3 -m venv ~/virtualenvs/run_dbcan
-source ~/virtualenvs/dbcan/bin/activate
-pip install run-dbcan
+source ~/virtualenvs/run_dbcan/bin/activate
+pip install run-dbcan==2.0.0
 # Doanload dependencies from bioconda
 conda install -c bioconda diamond hmmer=3.1b2 prodigal fraggenescan
 
@@ -70,9 +73,16 @@ cd db \
     && wget http://bcb.unl.edu/dbCAN2/download/Databases/tcdb.fa && diamond makedb --in tcdb.fa -d tcdb \
     && wget http://bcb.unl.edu/dbCAN2/download/Databases/tf-1.hmm && hmmpress tf-1.hmm \
     && wget http://bcb.unl.edu/dbCAN2/download/Databases/tf-2.hmm && hmmpress tf-2.hmm \
-    && wget http://bcb.unl.edu/dbCAN2/download/Databases/stp.hmm && hmmpress stp.hmm
+    && wget http://bcb.unl.edu/dbCAN2/download/Databases/stp.hmm && hmmpress stp.hmm \
+    && cd ../ && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.fna \
+    && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.faa \
+    && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.gff
+# try this command to see whether this sample can work now
+run_dbcan.py EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655
 ```
-- ## 15/04/2019 We created a docker which has the same environment as mine. You can keep away from complicated setup process. You can run our program in any system (Windows, Mac OS, Ubuntu, centos). Why not give it a try?
+
+- ## 15/04/2019
+We created a docker which has the same environment as mine. You can keep away from complicated setup process. You can run our program in any system (Windows, Mac OS, Ubuntu, centos). Why not give it a try?
 ```
 1. Make sure docker is installed on your computer successfully.
 2. docker pull haidyi/run_dbcan:latest
