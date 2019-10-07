@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# setuptools script for dbcan package
+# distutils setup script for dbcan package
 # also installs the bundled Hotpep scripts and data files
 
 from glob import glob
@@ -8,16 +8,17 @@ from os import listdir
 from os.path import isfile
 from setuptools import setup, find_packages
 
-long_description = """This is the standalone version of dbCAN annotation tool for automated CAZyme annotation (known as run_dbCAN.py), written by Le Huang and Tanner Yohe.
+long_description = """This is the standalone version of dbCAN annotation tool for automated CAZyme annotation (known as run_dbCAN.py), written by Tanner Yohe and Le Huang.
 """
 
-setup(name='dbcan',
-      use_scm_version=True,
+setup(name='run_dbcan',
+      version="2.0.0",
+    #   use_scm_version=True,
       setup_requires=['setuptools_scm', 'setuptools_scm_git_archive'],
       description='Standalone version of dbCAN annotation tool for automated CAZyme annotation',
       long_description=long_description,
-      author='Le Huang and Tanner Yohe',
-      author_email='lehuang@unc.med.edu',
+      author='Tanner Yohe and Le Huang',
+      author_email='lehuang@med.unc.edu',
       url='https://github.com/linnabrown/run_dbcan',
       classifiers=[
           'Development Status :: 4 - Beta',
@@ -29,10 +30,11 @@ setup(name='dbcan',
           'Topic :: Scientific/Engineering :: Bio-Informatics',
       ],
       packages=find_packages(),
+      include_package_data = True,
       package_data={
           'Hotpep': ['*.txt'],
       },
-      include_package_data=True,
+      
       scripts=[
           'CGCFinder.py',
           'hmmscan-parser.py',
@@ -46,7 +48,7 @@ setup(name='dbcan',
       license='GPLv3',
       install_requires=[
           'natsort',
-          'setuptools',
+          'setuptools'
       ],
       python_requires='>=3',
      )
