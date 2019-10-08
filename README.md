@@ -53,9 +53,10 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 Last updated 10/07/19
 
 ### updating info
-- ## We create a [python package](https://pypi.org/project/run-dbcan/#files). 
+- 10/08/2019
+We create a [python package](https://pypi.org/project/run-dbcan/#files). 
 Be sure to install [Anaconda](https://www.anaconda.com/) or Miniconda first, and then use the following commands to install our program one time.
-I strongly recommend you to use virtual environment to keey away from messing your system up.
+I strongly recommend you to use virtual environment to seperate your own system and this executive scripts.
 ```
 #create virtual environment
 mkdir -p ~/virtualenvs
@@ -64,7 +65,6 @@ source ~/virtualenvs/run_dbcan/bin/activate
 pip install run-dbcan==2.0.0
 # Doanload dependencies from bioconda
 conda install -c bioconda diamond hmmer=3.1b2 prodigal fraggenescan
-
 # Download and make the database for run_dbcan
 test -d db || mkdir db
 cd db \
@@ -77,11 +77,13 @@ cd db \
     && cd ../ && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.fna \
     && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.faa \
     && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.gff
-# try this command to see whether this sample can work now
+```    
+try this command to see whether this sample can work now
+```
 run_dbcan.py EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655
 ```
 
-- ## 15/04/2019
+- 15/04/2019
 We created a docker which has the same environment as mine. You can keep away from complicated setup process. You can run our program in any system (Windows, Mac OS, Ubuntu, centos). Why not give it a try?
 ```
 1. Make sure docker is installed on your computer successfully.
