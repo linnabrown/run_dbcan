@@ -53,9 +53,9 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 Last updated 10/07/19
 
 ### updating info
-- ## We create a [python package](https://pypi.org/manage/project/run-dbcan/release/2.0.0/). Use these following command to install.
-You can install Anaconda or Miniconda first, and then use the following commands to install our program one time.
-I strongly recommend you to use virtual environment to keey away from messing your system up. Just 
+- ## We create a [python package](https://pypi.org/project/run-dbcan/#files). 
+Be sure to install [Anaconda](https://www.anaconda.com/) or Miniconda first, and then use the following commands to install our program one time.
+I strongly recommend you to use virtual environment to keey away from messing your system up.
 ```
 #create virtual environment
 mkdir -p ~/virtualenvs
