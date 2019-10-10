@@ -60,26 +60,29 @@ ENV PATH=${CONDA_PREFIX}/bin:${PATH}
 #   && conda clean -ya
 RUN pip install natsort \
   argparse
-
+#download run-dbcan
+RUN pip install run-dbcan
+#download dependencies
+RUN conda install -c bioconda -y diamond hmmer=3.1b2 prodigal fraggenescan 
 # Create diamond environment
-RUN mkdir ~/Diamond && wget http://github.com/bbuchfink/diamond/releases/download/v0.9.24/diamond-linux64.tar.gz -P ~/Diamond \
-  && tar -xzvf ~/Diamond/diamond-linux64.tar.gz -C ~/Diamond && chmod +x ~/Diamond/diamond && rm ~/Diamond/diamond-linux64.tar.gz
-ENV PATH=/home/user/Diamond:${PATH}
+# RUN mkdir ~/Diamond && wget http://github.com/bbuchfink/diamond/releases/download/v0.9.24/diamond-linux64.tar.gz -P ~/Diamond \
+#   && tar -xzvf ~/Diamond/diamond-linux64.tar.gz -C ~/Diamond && chmod +x ~/Diamond/diamond && rm ~/Diamond/diamond-linux64.tar.gz
+# ENV PATH=/home/user/Diamond:${PATH}
 
 # Create Prodigal environment
-RUN mkdir ~/prodigal && git clone https://github.com/hyattpd/Prodigal.git ~/prodigal \
-  && cd ~/prodigal && sudo make install \
-  && rm -r ~/prodigal
+# RUN mkdir ~/prodigal && git clone https://github.com/hyattpd/Prodigal.git ~/prodigal \
+#   && cd ~/prodigal && sudo make install \
+#   && rm -r ~/prodigal
 
 # Create fraggenescan environment
-RUN wget https://downloads.sourceforge.net/project/fraggenescan/FragGeneScan1.31.tar.gz -P ~ \
-  && tar -xzvf ~/FragGeneScan1.31.tar.gz -C ~ && cd ~/FragGeneScan1.31 \
-  && make && make clean && make fgs \
-  && rm ~/FragGeneScan1.31.tar.gz
-ENV PATH=/home/user/FragGeneScan1.31:${PATH}
+# RUN wget https://downloads.sourceforge.net/project/fraggenescan/FragGeneScan1.31.tar.gz -P ~ \
+#   && tar -xzvf ~/FragGeneScan1.31.tar.gz -C ~ && cd ~/FragGeneScan1.31 \
+#   && make && make clean && make fgs \
+#   && rm ~/FragGeneScan1.31.tar.gz
+# ENV PATH=/home/user/FragGeneScan1.31:${PATH}
 
 # Download run_dbcan2, you need to download signalP by yourself because of signalP license.
-RUN git clone https://github.com/linnabrown/run_dbcan.git /app 
+# RUN git clone https://github.com/linnabrown/run_dbcan.git /app 
 #   && cd /app/tools/ && tar -xzvf signalp-4.1.tar.gz \
 #   && chmod +x /app/tools/signalp-4.1/signalp \
 #   && rm /app/tools/signalp-4.1.tar.gz
@@ -88,7 +91,7 @@ RUN git clone https://github.com/linnabrown/run_dbcan.git /app
 # Download and make the database for run_dbcan
 RUN mkdir /app/db && cd /app/db \
   && wget http://bcb.unl.edu/dbCAN2/download/Databases/CAZyDB.07312018.fa && diamond makedb --in CAZyDB.07312018.fa -d CAZy \
-  && wget http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-HMMdb-V7.txt && mv dbCAN-HMMdb-V7.txt dbCAN.txt && hmmpress dbCAN.txt \
+  && wget http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-HMMdb-V7.txt && mv dbCAN-HMMdb-V8.txt dbCAN.txt && hmmpress dbCAN.txt \
   && wget http://bcb.unl.edu/dbCAN2/download/Databases/tcdb.fa && diamond makedb --in tcdb.fa -d tcdb \
   && wget http://bcb.unl.edu/dbCAN2/download/Databases/tf-1.hmm && hmmpress tf-1.hmm \
   && wget http://bcb.unl.edu/dbCAN2/download/Databases/tf-2.hmm && hmmpress tf-2.hmm \

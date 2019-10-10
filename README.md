@@ -1,27 +1,45 @@
-# run_dbcan Stand Alone Version2.0 User Mannual
+
+run_dbcan
+========================
+
+## status
+
+[![GitHub license](https://img.shields.io/badge/license-GUN3.0-blue.svg)](https://github.com/linnabrown/run_dbcan/blob/master/LICENSE)
+
+[![GitHub downloads](https://img.shields.io/pypi/dm/run-dbcan.svg)](https://pypi.org/project/run-dbcan/#files)
+
+[![GitHub versions](https://img.shields.io/pypi/pyversions/run-dbcan.svg)](https://pypi.org/project/run-dbcan/#files)
+
+[![Package version](https://img.shields.io/pypi/v/run-dbcan.svg)](https://pypi.org/project/run-dbcan/#files)
 
 Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner Yohe of the Yin lab at NIU.
 
-Last updated 10/07/19
+Function
+----
+- Accepts user input
+- Predicts genes if needed
+- Runs input against HMMER, DIAMOND, and Hotpep
+- Optionally predicts CGCs with CGCFinder
 
-### updating info
-- 10/08/2019
-We create a [python package](https://pypi.org/project/run-dbcan/#files). 
-Be sure to install [Anaconda](https://www.anaconda.com/) or Miniconda first, and then use the following commands to install our program one time.
-We strongly recommend you to use virtual environment to seperate your own system and this executive scripts. Please make sure to use `conda install -c bioconda diamond hmmer=3.1b2 prodigal fraggenescan` and following database installation script to have the appropriate dependencies and database installed and configured.
+
+Python package Usage
+-----
+1. Please install [Anoconda](https://www.anaconda.com) first.
+
+2. Install this package with pip.
 ```
-#create virtual environment
-mkdir -p ~/virtualenvs
-python3 -m venv ~/virtualenvs/run_dbcan
-source ~/virtualenvs/run_dbcan/bin/activate
-pip install run-dbcan==2.0.0
-# Doanload dependencies from bioconda
+pip install run-dbcan
+```
+3. Install dependencies with conda. 
+```
 conda install -c bioconda diamond hmmer=3.1b2 prodigal fraggenescan
-# database installation: download and make the database for run_dbcan
+```
+4. (optional) install data bundle.
+```
 test -d db || mkdir db
 cd db \
     && wget http://bcb.unl.edu/dbCAN2/download/Databases/CAZyDB.07312018.fa && diamond makedb --in CAZyDB.07312018.fa -d CAZy \
-    && wget http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-HMMdb-V7.txt && mv dbCAN-HMMdb-V8.txt dbCAN.txt && hmmpress dbCAN.txt \
+    && wget http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-HMMdb-V8.txt && mv dbCAN-HMMdb-V8.txt dbCAN.txt && hmmpress dbCAN.txt \
     && wget http://bcb.unl.edu/dbCAN2/download/Databases/tcdb.fa && diamond makedb --in tcdb.fa -d tcdb \
     && wget http://bcb.unl.edu/dbCAN2/download/Databases/tf-1.hmm && hmmpress tf-1.hmm \
     && wget http://bcb.unl.edu/dbCAN2/download/Databases/tf-2.hmm && hmmpress tf-2.hmm \
@@ -29,72 +47,12 @@ cd db \
     && cd ../ && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.fna \
     && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.faa \
     && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.gff
-```    
-try this command to see whether this sample can work now
 ```
-run_dbcan.py EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655
+5. (optional) SignalP installation.
+Our program include Signalp Petitide prediction with SignalP. Make sure to set `use_signalP=True` and *have to* obtain your own academic license of SignalP and download it from [here](http://www.cbs.dtu.dk/cgi-bin/sw_request?signalp+4.1), and then move tarball (Signalp-4.1.tar.gz) into `run_dbcan/tools/` by yourself. Following statement is singalP-4.0 installation instruction.
 ```
-
-- 15/04/2019
-We created a docker which has the same environment as mine. You can keep away from complicated setup process. You can run our program in any system (Windows, Mac OS, Ubuntu, centos). Why not give it a try?
-```
-1. Make sure docker is installed on your computer successfully.
-2. docker pull haidyi/run_dbcan:latest
-3. docker run --name <preferred_name> -v <host-path>:<container-path> -it haidyi/run_dbcan:latest python run_dbcan.py <input_file> [params] --out_dir <output_dir>
-```
-Note: If you want to use your own sequence, mount it and result_dir to the container.
-
-- More user friendly
-- Adds `stp hmmdb` signature gene in CGC_Finder.py (stp means signal transduction proteins; the hmmdb was constructed by Catherine Ausland of the Yin lab at NIU)
-- Changes tfdb from `tfdb` to `tf.hmm`, which is added to `db/` directory (tfdb was a fasta format sequence file, which contains just bacterial transcription factor proteins; tf.hmm is a hmmer format file containing hmms downloaded from the Pfam and SUPERFAMILY database according to the DBD database: http://www.transcriptionfactor.org)
-- Uses newest dbCAN-HMM db and CAZy db
-- Fixes bugs in HotPep python version to fit python 3 user.
-- Added certain codes to make it robust. Thanks to suggestion from [Mick](mick.watson@roslin.ed.ac.uk).
-
-### Function
-- Accepts user input
-- Predicts genes if needed
-- Runs input against HMMER, DIAMOND, and Hotpep
-- Optionally predicts CGCs with CGCFinder
-
-
-### STEP by STEP install
-
-Many people told me they meet a lot of problems during setting up. Therefore, I write a step by step tutorial to install our run_dbcan project. 
-
-Here we go:
-
-Env: Ubuntu-16-04
-
-1. Install python3
-```
-sudo apt-get install python3
-```
-And then install pip
-```
-sudo apt-get install python3-pip
-```
-
-2. Install Diamond
-```
-wget http://github.com/bbuchfink/diamond/releases/download/v0.9.24/diamond-linux64.tar.gz
-
-tar xzf diamond-linux64.tar.gz
-``` 
- The extracted diamond binary file should be moved to a directory contained in your executable search path (PATH environment variable).
-
-3.  Install hmmer
-```
-wget http://eddylab.org/software/hmmer/hmmer-3.1b2.tar.gz
-```
-And add its path to ./bashrc
-
-4. Install signalP
-You have to obtain your own academic license of SignalP and download it from [here](http://www.cbs.dtu.dk/cgi-bin/sw_request?signalp+4.1), and then move tarball (Signalp-4.1.tar.gz) into `run_dbcan/tools/` by yourself.
-```
-cd run_dbcan/tools/
-tar xzf Signalp-4.1.tar.gz
-cd Signalp-4.1
+mkdir -p run_dbcan/tools && run_dbcan/tools/
+tar xzf Signalp-4.1.tar.gz && cd Signalp-4.1
 ```
 Edit the paragraph labeled  "GENERAL SETTINGS, CUSTOMIZE ..." in the top of
    the file 'signalp'. The following twovmandatory variables need to be set:
@@ -103,9 +61,7 @@ Edit the paragraph labeled  "GENERAL SETTINGS, CUSTOMIZE ..." in the top of
 	outputDir	where to store temporary files (writable to all users)
 
    In addition,  for practical reasons,  it is possible to limit the number of
-   input sequences allowed per run (MAX_ALLOWED_ENTRIES).
-
-Use mine as an example:
+   input sequences allowed per run (MAX_ALLOWED_ENTRIES). For example:
 ```
 ###############################################################################
 #               GENERAL SETTINGS: CUSTOMIZE TO YOUR SITE
@@ -127,42 +83,55 @@ And then, use this command:
 
 ```
 sudo cp signalp /usr/bin/signalp
-sudo chmod 777 /usr/bin/signalp
+sudo chmod 755 /usr/bin/signalp
+```
+6. Check run_dbcan.py works or not.
+```
+run_dbcan.py EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655
 ```
 
-5. install Prodigal
+Docker version Usage
+----
+1. Make sure docker is installed on your computer successfully.
+2. Docker pull image
 ```
-git clone https://github.com/hyattpd/Prodigal.git
-cd Prodigal
-make install
-prodigal -h
-mv /<path>/prodigal run_dbcan/tools/
+docker pull haidyi/run_dbcan:latest
 ```
-
-6. install FragGeneScan1.31.tar.gz
-Download FragGeneScan1.31.tar.gz from this website:
-https://sourceforge.net/projects/fraggenescan/files/latest/download
-
+3. Run. Mount `input sequence file` and `output directory` to the container.
 ```
-tar xvf FragGeneScan1.31.tar.gz
-cd FragGeneScan1.31
-make
-make clean
-make fgs
-
-vim ~/.bashrc
-export PATH="<yourpath>/FragGeneScan1.31:$PATH"
-source ~/.bashrc
+docker run --name <preferred_name> -v <host-path>:<container-path> -it haidyi/run_dbcan:latest python run_dbcan.py <input_file> [params] --out_dir <output_dir>
 ```
 
-### REQUIREMENTS
+Update info
+----
+- 08/10/2019
+We create a [python package](https://pypi.org/project/run-dbcan/#files). 
+Be sure to install [Anaconda](https://www.anaconda.com/) or Miniconda first, and then use the following commands to install our program one time.
+We strongly recommend you to use virtual environment to seperate your own system and this executive scripts. Please make sure to use `conda install -c bioconda diamond hmmer=3.1b2 prodigal fraggenescan` and following database installation script to have the appropriate dependencies and database installed and configured.
 
-#### TOOLS
-P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-parser` because they are included in run_dbcan V2. If you need to use signalp, Prodigal and FragGeneScan, we recommend you to copy them to `/usr/bin` as system application or add their path into system envrionmental variable.
+- 15/04/2019
+We created a [docker image](https://hub.docker.com/r/haidyi/run_dbcan) of run_dbcan. Make sure to install docker properly.
+
+- 10/01/2019
+
+1. More user friendly
+2. Adds `stp hmmdb` signature gene in CGC_Finder.py (stp means signal transduction proteins; the hmmdb was constructed by Catherine Ausland of the Yin lab at NIU)
+3. Changes tfdb from `tfdb` to `tf.hmm`, which is added to `db/` directory (tfdb was a fasta format sequence file, which contains just bacterial transcription factor proteins; tf.hmm is a hmmer format file containing hmms downloaded from the Pfam and SUPERFAMILY database according to the DBD database: http://www.transcriptionfactor.org)
+4. Uses newest dbCAN-HMM db(V8) and CAZy db
+5. Fixes bugs in HotPep python version to fit python 3 user.
+6. Added certain codes to make it robust. Thanks to suggestion from [Mick](mick.watson@roslin.ed.ac.uk).
+
+
+REQUIREMENTS
+----
+
+TOOLS
+
+----
+P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-parser` because they are included in run_dbcan V2. If you use python package or docker, you don't need to download Prodigal and FragGeneScan because they includes these denpendencies. Otherwise we recommend you to install and copy them into `/usr/bin` as system application or add their path into system envrionmental profile. 
 
 
 [Python3]--Be sure to use python3, not python2
-
 
 [DIAMOND](https://github.com/bbuchfink/diamond)-- please install from github as instructions.
 
@@ -180,7 +149,10 @@ P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-pars
 
 [CGCFinder](https://github.com/linnabrown/run_dbcan/blob/master/CGCFinder.py)--This newest version is included in dbCAN2 project.
 
-#### DATABASES and Formatting[required!][Link](http://bcb.unl.edu/dbCAN2/download/Databases)
+DATABASES Installation 
+
+----
+[Databse](http://bcb.unl.edu/dbCAN2/download/Databases) -- Database Folder
 
 [CAZyDB.07312019.fa](http://bcb.unl.edu/dbCAN2/download/Databases/CAZyDB.07312019.fa)--use `diamond makedb --in CAZyDB.07312019.fa -d CAZy`
 
@@ -197,10 +169,11 @@ P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-pars
 [stp.hmm](http://bcb.unl.edu/dbCAN2/download/Databases/stp.hmm)--use `hmmpress stp.hmm`
 
 
-### INPUT
+INPUT
+----
 
 ```
-python run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
+run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
 ```
 
 	[inputFile] - FASTA format file of either nucleotide or protein sequences
@@ -253,9 +226,12 @@ python run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
 
 	[--cgc_sig_genes] - optional, allows user to specify CGCFinder Signature Genes. The options are, 'tp': TP and CAZymes, 'tf': TF and CAZymes, and 'all': TF, TP, and CAZymes. Default = 'tp'.
 
+	[use_signalP] - optional, allows user to use signalP or not. If you set True, Setup signalP tool first. Because of signalP license, Our package could not contain signalP on open source. Default=False.
 
 
-### OUTPUT
+
+OUTPUT
+----
 
 Several files will be outputted. they are as follows:
 
@@ -278,7 +254,8 @@ Several files will be outputted. they are as follows:
 	
 	overview.txt - Details the CAZyme predictions across the three tools with signalp results
 
-### EXAMPLE
+EXAMPLE
+----
 
 An example setup is available in the example directory. Included in this directory are two FASTA sequences (one protein, one nucleotide).
 
@@ -311,7 +288,8 @@ Notice that the protein command has a GFF file following the -c option. A GFF or
 If you have any questions, please feel free to contact with Dr. Yin (yanbin.yin@gmail.com or yyin@unl.edu) or me (Le Huang) on [Issue Dashboard](https://github.com/linnabrown/run_dbcan/issues).
 
 
-## Reference
+Reference
+----
 
 This is the standalone version of dbCAN annotation tool for automated CAZyme annotation (known as run_dbCAN.py), written by Le Huang and Tanner Yohe.
 
