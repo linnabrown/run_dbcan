@@ -56,7 +56,7 @@ Last updated 10/07/19
 - 10/08/2019
 We create a [python package](https://pypi.org/project/run-dbcan/#files). 
 Be sure to install [Anaconda](https://www.anaconda.com/) or Miniconda first, and then use the following commands to install our program one time.
-I strongly recommend you to use virtual environment to seperate your own system and this executive scripts.
+We strongly recommend you to use virtual environment to seperate your own system and this executive scripts. Please make sure to use `conda install -c bioconda diamond hmmer=3.1b2 prodigal fraggenescan` and following database installation script to have the appropriate dependencies and database installed and configured.
 ```
 #create virtual environment
 mkdir -p ~/virtualenvs
@@ -65,7 +65,7 @@ source ~/virtualenvs/run_dbcan/bin/activate
 pip install run-dbcan==2.0.0
 # Doanload dependencies from bioconda
 conda install -c bioconda diamond hmmer=3.1b2 prodigal fraggenescan
-# Download and make the database for run_dbcan
+# database installation: download and make the database for run_dbcan
 test -d db || mkdir db
 cd db \
     && wget http://bcb.unl.edu/dbCAN2/download/Databases/CAZyDB.07312018.fa && diamond makedb --in CAZyDB.07312018.fa -d CAZy \
