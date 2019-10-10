@@ -2,14 +2,12 @@
 run_dbcan
 ========================
 
-## status
-
+Status
+----
+[![Package status](https://img.shields.io/pypi/status/run-dbcan.svg)](https://pypi.org/project/run-dbcan/#files)
 [![GitHub license](https://img.shields.io/badge/license-GUN3.0-blue.svg)](https://github.com/linnabrown/run_dbcan/blob/master/LICENSE)
-
 [![GitHub downloads](https://img.shields.io/pypi/dm/run-dbcan.svg)](https://pypi.org/project/run-dbcan/#files)
-
 [![GitHub versions](https://img.shields.io/pypi/pyversions/run-dbcan.svg)](https://pypi.org/project/run-dbcan/#files)
-
 [![Package version](https://img.shields.io/pypi/v/run-dbcan.svg)](https://pypi.org/project/run-dbcan/#files)
 
 Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner Yohe of the Yin lab at NIU.
@@ -22,7 +20,7 @@ Function
 - Optionally predicts CGCs with CGCFinder
 
 
-Python package Usage
+Python Package Usage
 -----
 1. Please install [Anoconda](https://www.anaconda.com) first.
 
@@ -34,7 +32,7 @@ pip install run-dbcan
 ```
 conda install -c bioconda diamond hmmer=3.1b2 prodigal fraggenescan
 ```
-4. (optional) install data bundle.
+4. Database Installation.
 ```
 test -d db || mkdir db
 cd db \
@@ -48,7 +46,7 @@ cd db \
     && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.faa \
     && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.gff
 ```
-5. (optional) SignalP installation.
+5. (Optional) SignalP Installation.
 Our program include Signalp Petitide prediction with SignalP. Make sure to set `use_signalP=True` and *have to* obtain your own academic license of SignalP and download it from [here](http://www.cbs.dtu.dk/cgi-bin/sw_request?signalp+4.1), and then move tarball (Signalp-4.1.tar.gz) into `run_dbcan/tools/` by yourself. Following statement is singalP-4.0 installation instruction.
 ```
 mkdir -p run_dbcan/tools && run_dbcan/tools/
@@ -85,7 +83,7 @@ And then, use this command:
 sudo cp signalp /usr/bin/signalp
 sudo chmod 755 /usr/bin/signalp
 ```
-6. Check run_dbcan.py works or not.
+6. Check Program.
 ```
 run_dbcan.py EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655
 ```
@@ -104,22 +102,16 @@ docker run --name <preferred_name> -v <host-path>:<container-path> -it haidyi/ru
 
 Update info
 ----
-- 08/10/2019
+- 10/08/2019
 We create a [python package](https://pypi.org/project/run-dbcan/#files). 
-Be sure to install [Anaconda](https://www.anaconda.com/) or Miniconda first, and then use the following commands to install our program one time.
-We strongly recommend you to use virtual environment to seperate your own system and this executive scripts. Please make sure to use `conda install -c bioconda diamond hmmer=3.1b2 prodigal fraggenescan` and following database installation script to have the appropriate dependencies and database installed and configured.
+Be sure to install [Anaconda](https://www.anaconda.com/) or Miniconda first, and then use the following commands to install our program one time. 
+We strongly recommend you to use virtual environment to seperate your own system and this executive scripts. Please make sure to use `conda install -c bioconda diamond hmmer=3.1b2 prodigal fraggenescan` and database installation script to have the appropriate dependencies and database installed and configured. Thanks for suggestion and contribution from [tesujimath](https://github.com/tesujimath) .
 
-- 15/04/2019
-We created a [docker image](https://hub.docker.com/r/haidyi/run_dbcan) of run_dbcan. Make sure to install docker properly.
+- 04/15/2019
+We created a [docker image](https://hub.docker.com/r/haidyi/run_dbcan) of run_dbcan. Make sure to install docker properly. Thanks for suggestion and contributions from [Haidyi](https://github.com/HaidYi).
 
-- 10/01/2019
-
-1. More user friendly
-2. Adds `stp hmmdb` signature gene in CGC_Finder.py (stp means signal transduction proteins; the hmmdb was constructed by Catherine Ausland of the Yin lab at NIU)
-3. Changes tfdb from `tfdb` to `tf.hmm`, which is added to `db/` directory (tfdb was a fasta format sequence file, which contains just bacterial transcription factor proteins; tf.hmm is a hmmer format file containing hmms downloaded from the Pfam and SUPERFAMILY database according to the DBD database: http://www.transcriptionfactor.org)
-4. Uses newest dbCAN-HMM db(V8) and CAZy db
-5. Fixes bugs in HotPep python version to fit python 3 user.
-6. Added certain codes to make it robust. Thanks to suggestion from [Mick](mick.watson@roslin.ed.ac.uk).
+- 1/10/2019
+We rewritted program and added `stp hmmdb` signature gene in CGC_Finder.py (stp means signal transduction proteins; the hmmdb was constructed by Catherine Ausland of the Yin lab at NIU). Then Change tfdb from `tfdb` to `tf.hmm`, which is added to `db/` directory (tfdb was a fasta format sequence file, which contains just bacterial transcription factor proteins; tf.hmm is a hmmer format file containing hmms downloaded from the Pfam and SUPERFAMILY database according to the DBD database: http://www.transcriptionfactor.org). Also, our project updates dbCAN-HMM db(V8) and CAZy db. Furthermore, we fixed bugs in HotPep python version to fit python 3 user. Last but not least, we added certain codes to make it robust. Thanks for hmmscan-parser.py suggestion from [Mick](mick.watson@roslin.ed.ac.uk).
 
 
 REQUIREMENTS
