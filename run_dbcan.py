@@ -623,7 +623,7 @@ with open(workdir+"overview.txt", 'w+') as fp:
     for gene in all_genes:
         hits = {"diamond" : "N", "hmmer" : "N", "hotpep" : "N", "tools" : 0}
         if args.use_signalP:
-            hits = ["signalP" : "N"]
+            hits = {"signalP" : "N"}
         csv = ["gene", "N", "N", "N", "N", 0]
         csv[0] = gene
         if(arr_hmmer != None):
