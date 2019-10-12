@@ -1,28 +1,56 @@
 {% set name = "run_dbcan" %}
 {% set version = "2.0.0" %}
+
 package:
-  name:"{{ name|lower }}"
-  version:"{{ version }}"
+  name: {{ name|lower }}
+  version: {{ version }}
 
 source:
-  git_rev:2.0.0
-  git_url:https://github.com/linnabrown/run_dbcan.git
+  url: "https://files.pythonhosted.org/packages/7b/44/035febacc8756fd46ccbfb23ed14fc58153d5a89f95f8db1a756331cdd7a/run_dbcan-2.0.0.tar.gz"
+  fn: {{ name|lower }}-{{ version }}.tar.gz
+  MD5: 9d8eb04bb674ade999ca0002cde59e20
+  sha256: "59bb844912580e91c2dc97d012d0a7a407bfad374280456fa11f521b1d215d2d"
+
+build:
+  number: 1
+  scripts: python -m pip install --no-deps --ignore-installed . -v
+
 
 requirements:
   build:
-    - python
-    - setuptools
     - natsort
-
+    - pip
+    - python >=3
+    - setuptools
+    - fraggenescan
+    - prodigal
+    - diamond
+    - hmmer =3.1b2
   run:
-    - python
+    - python >=3
+    - natsort
+    - setuptools
+    - fraggenescan
+    - prodigal
+    - diamond
+    - hmmer =3.1b2
 
-test:
-  imports:
-    - run_dbcan
-
+  test:
+    imports:
+      - Hotpep
+      - run_dbcan
+    commands:
+     - "run_dbcan.py --help &> /dev/null"
+     - "Prodigal -h &> /dev/null"
+     - "FragGeneScan &> /dev/null || [[ \"$?\" == 1 ]]"
+     
 about:
-  home: https://bcb.unl.edu/dbCAN2
-  license: GUN-3.0
-  license_family: GNU
-  summary: a tool to search CAZyme Family of input gene.
+  home: https://github.com/linnabrown/run_dbcan
+  license: "GNU General Public v3 (GPLv3)"
+  license_family: "GPL3"
+  summary: "Standalone version of dbCAN annotation tool for automated CAZyme annotation"
+
+
+extra:
+  recipe-maintainers:
+    - linnabrown
