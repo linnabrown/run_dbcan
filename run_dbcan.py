@@ -556,7 +556,7 @@ if(os.path.exists(workdir+"hmmer.out")):
         row = arr_hmmer[i].split()
         hmmer_genes.append(row[2])
 
-if(os.path.exists(workdir + "signalp.out")):
+if args.use_signalP and (os.path.exists(workdir + "signalp.out")):
     arr_sigp = open(workdir+"signalp.out").readlines()
     sigp_genes = {}
     for i in range (2,len(arr_sigp)):
@@ -616,9 +616,14 @@ if not tools[2]:
 all_genes = unique(hmmer_genes+hotpep_genes+diamond_genes)
 overall_table = []
 with open(workdir+"overview.txt", 'w+') as fp:
-    fp.write("Gene ID\tHMMER\tHotpep\tDIAMOND\tSignalp\t#ofTools\n")
+    if args.use_signalP:
+        fp.write("Gene ID\tHMMER\tHotpep\tDIAMOND\tSignalp\t#ofTools\n")
+    else:
+        fp.write("Gene ID\tHMMER\tHotpep\tDIAMOND\t#ofTools\n")
     for gene in all_genes:
-        hits = {"diamond" : "N", "hmmer" : "N", "hotpep" : "N", "signalp" : "N", "tools" : 0}
+        hits = {"diamond" : "N", "hmmer" : "N", "hotpep" : "N", "tools" : 0}
+        if args.use_signalP:
+            hits["signalP" : "N"]
         csv = ["gene", "N", "N", "N", "N", 0]
         csv[0] = gene
         if(arr_hmmer != None):
@@ -665,7 +670,7 @@ with open(workdir+"overview.txt", 'w+') as fp:
             csv[3] = "-"
             hits["diamond"] = "-"
 
-        if gene in sigp_genes :
+        if args.use_signalP==True and gene in sigp_genes :
             hits["signalp"] = "Y (1-"+sigp_genes[gene]+")"
             csv[4] = "Y(1-"+sigp_genes[gene]+")"
 
