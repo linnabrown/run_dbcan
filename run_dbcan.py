@@ -563,18 +563,19 @@ if args.use_signalP and (os.path.exists(workdir + "signalp.out")):
         row = arr_sigp[i].split()
         sigp_genes[row[0]]=row[2]
 
-##Catie Ausland edits BEGIN, Le add variable exists or not, remove duplicates from input lists
-if len(hotpep_genes) > 0:
-    if (hotpep_genes[len(hotpep_genes)-1] == None):
-        hotpep_genes.pop()
-        hotpep_genes = unique(hotpep_genes)
-        if 'hmmer_genes' in locals():
-            hmmer_genes.pop()
-            hmmer_genes = unique(hmmer_genes)
-        if 'diamond_genes' in locals():
-            diamond_genes.pop()
-            diamond_genes = unique(diamond_genes)
-## Catie edits END, Le add variable exists or not, remove duplicates from input lists
+#use tool hotpep
+if tools[2]:
+    if len(hotpep_genes) > 0:
+        if (hotpep_genes[len(hotpep_genes)-1] == None):
+            hotpep_genes.pop()
+            hotpep_genes = unique(hotpep_genes)
+            if 'hmmer_genes' in locals():
+                hmmer_genes.pop()
+                hmmer_genes = unique(hmmer_genes)
+            if 'diamond_genes' in locals():
+                diamond_genes.pop()
+                diamond_genes = unique(diamond_genes)
+
 
 # parse input, stroe needed variables
 if(arr_diamond != None):
