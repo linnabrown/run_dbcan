@@ -26,7 +26,7 @@ Python Package Usage
 
 2. Install this package with pip.
 ```
-pip install run-dbcan --user
+pip install run-dbcan==2.0.1 --user
 ```
 3. Install dependencies with conda. 
 ```
