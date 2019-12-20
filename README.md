@@ -90,7 +90,7 @@ sudo chmod 755 /usr/bin/signalp
 run_dbcan.py EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655
 ```
 
-Docker version Usage
+Docker version Usage(Don't Use it, because of revising, Please use Python Package above instead )
 ----
 1. Make sure docker is installed on your computer successfully.
 2. Docker pull image
