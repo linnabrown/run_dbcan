@@ -30,7 +30,7 @@ Python Package Usage
 ```
 pip install run-dbcan==2.0.1 --user
 ```
-3. Install dependencies with conda. 
+3. Install dependencies with conda.
 ```
 conda install -c bioconda diamond hmmer=3.1b2 prodigal fraggenescan
 ```
@@ -56,7 +56,7 @@ tar xzf Signalp-4.1.tar.gz && cd Signalp-4.1
 ```
 Edit the paragraph labeled  "GENERAL SETTINGS, CUSTOMIZE ..." in the top of
    the file 'signalp'. The following twovmandatory variables need to be set:
-   
+
    	SIGNALP		full path to the signalp-4.1 directory on your system
 	outputDir	where to store temporary files (writable to all users)
 
@@ -105,8 +105,8 @@ docker run --name <preferred_name> -v <host-path>:<container-path> -it haidyi/ru
 Update info
 ----
 - 10/08/2019
-We create a [python package](https://pypi.org/project/run-dbcan/#files). 
-Be sure to install [Anaconda](https://www.anaconda.com/) or Miniconda first, and then use the following commands to install our program one time. 
+We create a [python package](https://pypi.org/project/run-dbcan/#files).
+Be sure to install [Anaconda](https://www.anaconda.com/) or Miniconda first, and then use the following commands to install our program one time.
 We strongly recommend you to use virtual environment to seperate your own system and this executive scripts. Please make sure to use `conda install -c bioconda diamond hmmer=3.1b2 prodigal fraggenescan` and database installation script to have the appropriate dependencies and database installed and configured. Thanks for suggestion and contribution from [tesujimath](https://github.com/tesujimath) .
 
 - 04/15/2019
@@ -122,7 +122,7 @@ REQUIREMENTS
 TOOLS
 
 ----
-P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-parser` because they are included in run_dbcan V2. If you use python package or docker, you don't need to download Prodigal and FragGeneScan because they includes these denpendencies. Otherwise we recommend you to install and copy them into `/usr/bin` as system application or add their path into system envrionmental profile. 
+P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-parser` because they are included in run_dbcan V2. If you use python package or docker, you don't need to download Prodigal and FragGeneScan because they includes these denpendencies. Otherwise we recommend you to install and copy them into `/usr/bin` as system application or add their path into system envrionmental profile.
 
 
 [Python3]--Be sure to use python3, not python2
@@ -143,7 +143,7 @@ P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-pars
 
 [CGCFinder](https://github.com/linnabrown/run_dbcan/blob/master/CGCFinder.py)--This newest version is included in dbCAN2 project.
 
-DATABASES Installation 
+DATABASES Installation
 
 ----
 [Databse](http://bcb.unl.edu/dbCAN2/download/Databases) -- Database Folder
@@ -218,9 +218,10 @@ run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
 
 	[--cgc_dis]     - optional, allows user to specify CGCFinder Distance value. Allowed values are integers between 0-10. Default = 2.
 
-	[--cgc_sig_genes] - optional, allows user to specify CGCFinder Signature Genes. The options are, 'tp': TP and CAZymes, 'tf': TF and CAZymes, and 'all': TF, TP, and CAZymes. Default = 'tp'.
+  [--use_signalP] - optional, Use signalP or not, remember, you need to setup signalP tool first. Because of signalP license, python package does not have signalP. If your input is proteome/prokaryote nucleotide, please also certify the "--gram"(in the below). Default = False.
 
-	[use_signalP] - optional, allows user to use signalP or not. If you set True, Setup signalP tool first. Because of signalP license, Our package could not contain signalP on open source. Default=False.
+  [--gram] - optional, Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of SignalP, only if you use SignalP. Only you set use_signalP. The options are: "all"(gram positive + gram negative), "n"(gram negative), "p"(gram positive). Default = "all".
+
 
 
 
@@ -245,7 +246,7 @@ Several files will be outputted. they are as follows:
 	cgc.gff - GFF input file for CGCFinder
 
 	cgc.out - ouput from the CGCFinder run
-	
+
 	overview.txt - Details the CAZyme predictions across the three tools with signalp results
 
 EXAMPLE
