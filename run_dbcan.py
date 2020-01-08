@@ -50,7 +50,7 @@ parser.add_argument('--cgc_dis', default=2, help='CGCFinder Distance value')
 parser.add_argument('--cgc_sig_genes', default='tp', choices=['tp', 'tf','all'], help='CGCFinder Signature Genes value')
 parser.add_argument('--tools', '-t', nargs='+', choices=['hmmer', 'diamond', 'hotpep', 'all'], default='all', help='Choose a combination of tools to run')
 parser.add_argument('--use_signalP', default=False, type=bool, help='Use signalP or not, remember, you need to setup signalP tool first. Because of signalP license, Docker version does not have signalP.')
-parser.add_argument('--gram', '-g', choices=['p','n',"all"], default="all", help="Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of SingalP, only if user use singalP")
+parser.add_argument('--gram', '-g', choices=["p","n","all"], default="all", help="Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of SingalP, only if user use singalP")
 args = parser.parse_args()
 
 '''
@@ -616,37 +616,25 @@ with open(workdir+"overview.txt", 'w+') as fp:
     else:
         fp.write("Gene ID\tHMMER\tHotpep\tDIAMOND\t#ofTools\n")
     for gene in all_genes:
-        if args.use_signalP:
-            hits["signalP" : "N"]
-        csv = ["gene", "N", "N", "N", "N", 0]
-        csv[0] = gene
-        if arr_hmmer != None:
-            if gene in hmmer_genes:
-                csv[5]+=1
-                hits["tools"]+=1
-                csv[1] = "+".join(hmmer_fams[gene])
-            else:
-                csv[1] = "-"
-        if arr_hotpep!= None:
-            if gene in hotpep_genes):
-                csv[5]+=1
-                temp = []
-                if gene in hotpep_fams:
-                    for i in range(len(hotpep_fams[gene])):
-                        temp.append(hotpep_fams[gene][i])
-                    csv[2] = ("+").join(temp)
-            else:
-                csv[2] = "-"
-                hits["hotpep"] = "-"
-        if arr_diamond != None:
-            if gene in diamond_genes:
-                csv[5]+=1
-                csv[3] = "+".join(diamond_fams[gene])
-            else:
-                csv[3] = "-"
-        if args.use_signalP==True:
-            if gene in sigp_genes :
-                csv[4] = "Y(1-"+sigp_genes[gene]+")"
+        csv.append(gene)
+        num_tools = 0
+        if arr_hmmer != None and (gene in hmmer_genes):
+            num_tools += 1
+            csv.append("+".join(hmmer_fams[gene]))
+        else:
+            csv.append("-")
+        if arr_hotpep!= None and (gene in hotpep_genes):
+            num_tools += 1
+            csv.append("+".join(hotpep_fams[gene]))
+        else:
+            csv.append("-")
+        if arr_diamond != None and (gene in diamond_genes):
+            num_tools += 1
+            csv.append("+".join(diamond_fams[gene]))
+        else:
+            csv.append("-")
+        if args.use_signalP and (gene in sigp_genes):
+            csv.append("Y(1-"+sigp_genes[gene]+")")
         temp = "\t".join(csv) + "\n"
         fp.write(temp)
 print ("overview table complete. Saved as "+workdir+"overview.txt")
