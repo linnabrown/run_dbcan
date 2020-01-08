@@ -165,57 +165,57 @@ P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-pars
 
 Params
 ----
-	[inputFile] - FASTA format file of either nucleotide or protein sequences
+[inputFile] - FASTA format file of either nucleotide or protein sequences
 
-	[inputType] - protein=proteome, prok=prokaryote, meta=metagenome/mRNA/CDSs/short DNA seqs
+[inputType] - protein=proteome, prok=prokaryote, meta=metagenome/mRNA/CDSs/short DNA seqs
 
-	[--out_dir] - REQUIRED, user specifies an output directory.
+[--out_dir] - REQUIRED, user specifies an output directory.
 
-	[-c AuxillaryFile]- optional, include to enable CGCFinder. If using a proteome input,
-	the AuxillaryFile must be a GFF or BED format file containing gene positioning
-	information. Otherwise, the AuxillaryFile may be left blank.
+[-c AuxillaryFile]- optional, include to enable CGCFinder. If using a proteome input,
+the AuxillaryFile must be a GFF or BED format file containing gene positioning
+information. Otherwise, the AuxillaryFile may be left blank.
 
-	[-t Tools] 		- optional, allows user to select a combination of tools to run. The options are any
-					combination of 'diamond', 'hmmer', and 'hotpep'. The default value is 'all' which runs all three tools.
-	[--dbCANFile]   - optional, allows user to set the file name of dbCAN HMM Database.
+[-t Tools] 		- optional, allows user to select a combination of tools to run. The options are any combination of 'diamond', 'hmmer', and 'hotpep'. The default value is 'all' which runs all three tools.
 
-	[--dia_eval]    - optional, allows user to set the DIAMOND E Value. Default = 1e-102.
+[--dbCANFile]   - optional, allows user to set the file name of dbCAN HMM Database.
 
-	[--dia_cpu]     - optional, allows user to set how many CPU cores DIAMOND can use. Default = 2.
+[--dia_eval]    - optional, allows user to set the DIAMOND E Value. Default = 1e-102.
 
-	[--hmm_eval]    - optional, allows user to set the HMMER E Value. Default = 1e-15.
+[--dia_cpu]     - optional, allows user to set how many CPU cores DIAMOND can use. Default = 2.
 
-	[--hmm_cov]     - optional, allows user to set the HMMER Coverage value. Default = 0.35.
+[--hmm_eval]    - optional, allows user to set the HMMER E Value. Default = 1e-15.
 
-	[--hmm_cpu]     - optional, allows user to set how many CPU cores HMMER can use. Default = 1.
+[--hmm_cov]     - optional, allows user to set the HMMER Coverage value. Default = 0.35.
 
-	[--hot_hits]    - optional, allows user to set the Hotpep Hits value. Default = 6.
+[--hmm_cpu]     - optional, allows user to set how many CPU cores HMMER can use. Default = 1.
 
-	[--hot_freq]    - optional, allows user to set the Hotpep Frequency value. Default = 2.6.
+[--hot_hits]    - optional, allows user to set the Hotpep Hits value. Default = 6.
 
-	[--hot_cpu]     - optional, allows user to set how many CPU cores Hotpep can use. Default = 3.
+[--hot_freq]    - optional, allows user to set the Hotpep Frequency value. Default = 2.6.
 
-	[--tf_eval]     - optional, allows user to set tf.hmm HMMER E Value. Default = 1e-4.
+[--hot_cpu]     - optional, allows user to set how many CPU cores Hotpep can use. Default = 3.
 
-	[--tf_cov]     - optional, allows user to set tf.hmm HMMER Coverage val. Default = 0.35.
+[--tf_eval]     - optional, allows user to set tf.hmm HMMER E Value. Default = 1e-4.
 
-	[--tf_cpu]     - optional, allows user to tf.hmm Number of CPU cores that HMMER is allowed to use. Default = 1.
+[--tf_cov]     - optional, allows user to set tf.hmm HMMER Coverage val. Default = 0.35.
 
-	[--stp_eval]     - optional, allows user to set stp.hmm HMMER E Value. Default = 1e-4.
+[--tf_cpu]     - optional, allows user to tf.hmm Number of CPU cores that HMMER is allowed to use. Default = 1.
 
-	[--tf_cov]     - optional, allows user to set stp.hmm HMMER Coverage val. Default = 0.3.
+[--stp_eval]     - optional, allows user to set stp.hmm HMMER E Value. Default = 1e-4.
 
-	[--tf_cpu]     - optional, allows user to stp.hmm Number of CPU cores that HMMER is allowed to use. Default = 1.
+[--tf_cov]     - optional, allows user to set stp.hmm HMMER Coverage val. Default = 0.3.
 
-	[--out_pre]     - optional, allows user to set a prefix for all output files.
+[--tf_cpu]     - optional, allows user to stp.hmm Number of CPU cores that HMMER is allowed to use. Default = 1.
 
-	[--db_dir]      - optional, allows user to specify a database directory. Default = db/
+[--out_pre]     - optional, allows user to set a prefix for all output files.
 
-	[--cgc_dis]     - optional, allows user to specify CGCFinder Distance value. Allowed values are integers between 0-10. Default = 2.
+[--db_dir]      - optional, allows user to specify a database directory. Default = db/
 
-  [--use_signalP] - optional, Use signalP or not, remember, you need to setup signalP tool first. Because of signalP license, python package does not have signalP. If your input is proteome/prokaryote nucleotide, please also certify the "--gram"(in the below). Default = False.
+[--cgc_dis]     - optional, allows user to specify CGCFinder Distance value. Allowed values are integers between 0-10. Default = 2.
 
-  [--gram] - optional, Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of SignalP, only if you use SignalP. Only you set use_signalP. The options are: "all"(gram positive + gram negative), "n"(gram negative), "p"(gram positive). Default = "all".
+[--use_signalP] - optional, Use signalP or not, remember, you need to setup signalP tool first. Because of signalP license, python package does not have signalP. If your input is proteome/prokaryote nucleotide, please also certify the "--gram"(in the below). Default = False.
+
+[--gram] - optional, Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of SignalP, only if you use SignalP. Only you set use_signalP. The options are: "all"(gram positive + gram negative), "n"(gram negative), "p"(gram positive). Default = "all".
 
 
 
