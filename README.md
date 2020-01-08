@@ -119,7 +119,7 @@ We rewritted program and added `stp hmmdb` signature gene in CGC_Finder.py (stp 
 REQUIREMENTS
 ----
 
-TOOLS
+**TOOLS**
 
 ----
 P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-parser` because they are included in run_dbcan V2. If you use python package or docker, you don't need to download Prodigal and FragGeneScan because they includes these denpendencies. Otherwise we recommend you to install and copy them into `/usr/bin` as system application or add their path into system envrionmental profile.
@@ -143,7 +143,7 @@ P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-pars
 
 [CGCFinder](https://github.com/linnabrown/run_dbcan/blob/master/CGCFinder.py)--This newest version is included in dbCAN2 project.
 
-DATABASES Installation
+**DATABASES Installation**
 
 ----
 [Databse](http://bcb.unl.edu/dbCAN2/download/Databases) -- Database Folder
@@ -163,13 +163,8 @@ DATABASES Installation
 [stp.hmm](http://bcb.unl.edu/dbCAN2/download/Databases/stp.hmm)--use `hmmpress stp.hmm`
 
 
-INPUT
+Params
 ----
-
-```
-run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
-```
-
 	[inputFile] - FASTA format file of either nucleotide or protein sequences
 
 	[inputType] - protein=proteome, prok=prokaryote, meta=metagenome/mRNA/CDSs/short DNA seqs
@@ -225,10 +220,14 @@ run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
 
 
 
-OUTPUT
+RUN & OUTPUT
 ----
+Use following command to run the program.
+```
+run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
+```
 
-Several files will be outputted. they are as follows:
+Several files will be produced via `run_dbcan.py`. They are as follows:
 
 	uniInput - The unified input file for the rest of the tools
 			(created by prodigal or FragGeneScan if a nucleotide sequence was used)
