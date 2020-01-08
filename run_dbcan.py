@@ -633,8 +633,11 @@ with open(workdir+"overview.txt", 'w+') as fp:
             csv.append("+".join(diamond_fams[gene]))
         else:
             csv.append("-")
-        if args.use_signalP and (gene in sigp_genes):
-            csv.append("Y(1-"+sigp_genes[gene]+")")
+        if args.use_signalP:
+            if (gene in sigp_genes):
+                csv.append("Y(1-"+sigp_genes[gene]+")")
+            else:
+                csv.append("-")
         temp = "\t".join(csv) + "\n"
         fp.write(temp)
 print ("overview table complete. Saved as "+workdir+"overview.txt")
