@@ -50,6 +50,7 @@ parser.add_argument('--cgc_dis', default=2, help='CGCFinder Distance value')
 parser.add_argument('--cgc_sig_genes', default='tp', choices=['tp', 'tf','all'], help='CGCFinder Signature Genes value')
 parser.add_argument('--tools', '-t', nargs='+', choices=['hmmer', 'diamond', 'hotpep', 'all'], default='all', help='Choose a combination of tools to run')
 parser.add_argument('--use_signalP', default=False, type=bool, help='Use signalP or not, remember, you need to setup signalP tool first. Because of signalP license, Docker version does not have signalP.')
+parser.add_argument('--gram', '-g', choices=['p','n',"all"], default="all", help="Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of SingalP, only if user use singalP")
 args = parser.parse_args()
 
 '''
@@ -151,8 +152,10 @@ if inputType == 'protein':
 # Begin SignalP
 if args.use_signalP:
     print("***************************0. SIGNALP start*************************************************\n\n")
-    signalpos = Popen('signalp -t gram+ %suniInput > %ssignalp.neg' % (outPath, outPath), shell=True)
-    signalpneg = Popen('signalp -t gram- %suniInput > %ssignalp.pos' % (outPath, outPath), shell=True)
+    if args.gram == "p" or args.gram=="all":
+        signalpos = Popen('signalp -t gram+ %suniInput > %ssignalp.neg' % (outPath, outPath), shell=True)
+    if args.gram == "n" or args.gram == "all":
+        signalpneg = Popen('signalp -t gram- %suniInput > %ssignalp.pos' % (outPath, outPath), shell=True)
 
 # End SignalP
 #######################
@@ -246,7 +249,7 @@ if find_clusters:
 # Begin TF,TP, STP prediction
     '''
     previous tf_v1 uses diamond, tf_v2 uses hmmer
-    tf hmmer 
+    tf hmmer
     '''
     #call(['diamond', 'blastp', '-d', dbDir+'tf_v1/tf.dmnd', '-e', '1e-10', '-q', '%suniInput' % outPath, '-k', '1', '-p', '1', '-o', outDir+prefix+'tf.out', '-f', '6'])
     runHmmScan(outPath, str(args.tf_cpu), dbDir, str(args.tf_eval), str(args.tf_cov), "tf-1")
@@ -260,13 +263,13 @@ if find_clusters:
     # if os.path.exists('%shstp.out' % outPath):
     #     call(['rm', '%shstp.out' % outPath])
     runHmmScan(outPath, str(args.stp_cpu), dbDir, str(args.stp_eval), str(args.stp_cov), "stp")
-    
+
     '''
     tp diamond
     '''
     call(['diamond', 'blastp', '-d', dbDir+'tcdb.dmnd', '-e', '1e-10', '-q', '%suniInput' % outPath, '-k', '1', '-p', '1', '-o', outDir+prefix+'tp.out', '-f', '6'])
 
-    
+
     tp = set()
     tf = set()
     stp = set()
@@ -499,101 +502,96 @@ if find_clusters:
 # Begin SignalP combination
 if args.use_signalP:
     print("Waiting on signalP")
-    signalpos.wait()
-    signalpneg.wait()
-    print("SignalP complete")
     with open(outDir+prefix+'temp', 'w') as out:
-        with open(outDir+prefix+'signalp.pos') as f:
-            for line in f:
-                if not line.startswith('#'):
-                    row = line.split(' ')
-                    row = [x for x in row if x != '']
-                    if row[9] == 'Y':
-                        out.write(line)
-        with open(outDir+prefix+'signalp.neg') as f:
-            for line in f:
-                if not line.startswith('#'):
-                    row = line.split(' ')
-                    row = [x for x in row if x != '']
-                    if row[9] == 'Y':
-                        out.write(line)
+        if args.gram == "all" or args.gram =="p":
+            signalpos.wait()
+            print("SignalP pos complete")
+
+            with open(outDir+prefix+'signalp.pos') as f:
+                for line in f:
+                    if not line.startswith('#'):
+                        row = line.split(' ')
+                        row = [x for x in row if x != '']
+                        if row[9] == 'Y':
+                            out.write(line)
+            call(['rm', outDir+prefix+'signalp.pos'])
+        if args.gram == "all" or args.gram == "n":
+            signalpneg.wait()
+            print("SignalP neg complete")
+            with open(outDir+prefix+'signalp.neg') as f:
+                for line in f:
+                    if not line.startswith('#'):
+                        row = line.split(' ')
+                        row = [x for x in row if x != '']
+                        if row[9] == 'Y':
+                            out.write(line)
+            call(['rm', outDir+prefix+'signalp.neg'])
     call('sort -u '+outDir+prefix+'temp > '+outDir+prefix+'signalp.out', shell=True)
-    call(['rm', outDir+prefix+'temp', outDir+prefix+'signalp.pos', outDir+prefix+'signalp.neg'])
+    call(['rm', outDir+prefix+'temp'])
 
 # End SignalP combination
 #######################
 #######################
-# Start "blastation.py" to produce overview.txt
+# start Overview
 print ("Preparing overview table from hmmer, hotpep and diamond output...")
 workdir= outDir+prefix
-
-evalue = 1e-2
-
 # a function to remove duplicates from lists while keeping original order
 def unique(seq):
     exists = set()
     return [x for x in seq if not (x in exists or exists.add(x))]
 
-# check that files exist. if so, read files and get the gene numbers
+# check if files exist. if so, read files and get the gene numbers
 if(os.path.exists(workdir+"diamond.out")):
     arr_diamond = open(workdir+"diamond.out").readlines()
-    diamond_genes = []
-    for i in range(1,len(arr_diamond)):
-        row = arr_diamond[i].split()
-        diamond_genes.append(row[0])
+    diamond_genes = [arr_diamond[i].split()[0] for i in range(1, len(arr_diamond))]
 
 if(os.path.exists(workdir+"Hotpep.out")):
     arr_hotpep = open(workdir+"Hotpep.out").readlines()
-    hotpep_genes = []
-    for i in range(1,len(arr_hotpep)):
-        row = arr_hotpep[i].split()
-        hotpep_genes.append(row[2])
+    hotpep_genes = [arr_hotpep[i].split()[2] for i in range(1, len(arr_hotpep))]
 
 if(os.path.exists(workdir+"hmmer.out")):
     arr_hmmer = open(workdir+"hmmer.out").readlines()
-    hmmer_genes = []
-    for i in range (1,len(arr_hmmer)):
-        row = arr_hmmer[i].split()
-        hmmer_genes.append(row[2])
+    hmmer_genes = [arr_hmmer[i].split()[2] for i in range(1, len(arr_hmmer))]
 
 if args.use_signalP and (os.path.exists(workdir + "signalp.out")):
     arr_sigp = open(workdir+"signalp.out").readlines()
     sigp_genes = {}
     for i in range (2,len(arr_sigp)):
         row = arr_sigp[i].split()
-        sigp_genes[row[0]]=row[2]
+        # sigp_genes[row[0]]=row[2]
+        sigp_genes[row[0]] = row[4]
 
-#use tool hotpep
-if tools[2]:
-    if len(hotpep_genes) > 0:
-        if (hotpep_genes[len(hotpep_genes)-1] == None):
-            hotpep_genes.pop()
-            hotpep_genes = unique(hotpep_genes)
-            if 'hmmer_genes' in locals():
-                hmmer_genes.pop()
-                hmmer_genes = unique(hmmer_genes)
-            if 'diamond_genes' in locals():
-                diamond_genes.pop()
-                diamond_genes = unique(diamond_genes)
-
+##Catie Ausland edits BEGIN, Le add variable exists or not, remove duplicates from input lists
+if len(hotpep_genes) > 0:
+    if (hotpep_genes[len(hotpep_genes)-1] == None):
+        hotpep_genes.pop()
+        hotpep_genes = unique(hotpep_genes)
+        if 'hmmer_genes' in locals():
+            hmmer_genes.pop()
+            hmmer_genes = unique(hmmer_genes)
+        if 'diamond_genes' in locals():
+            diamond_genes.pop()
+            diamond_genes = unique(diamond_genes)
+## Catie edits END, Le add variable exists or not, remove duplicates from input lists
 
 # parse input, stroe needed variables
 if(arr_diamond != None):
     diamond_fams = {}
     for i in range (1,len(arr_diamond)):
         row = arr_diamond[i].split("\t")
-        fam = row[1].split("|")
-        diamond_fams[row[0]] = fam[1]
+        fam = row[1].strip("|").split("|")
+        # diamond_fams[row[0]] = fam[1]
+        diamond_fams[row[0]] = fam
+
 
 if(arr_hmmer !=None):
     hmmer_fams = {}
-    for i in range (len(arr_hmmer)):
+    for i in range (1, len(arr_hmmer)):
         row = arr_hmmer[i].split("\t")
         fam = row[0].split(".")
         fam = fam[0]+"("+row[7]+"-"+row[8]+")"
         if(row[2] not in hmmer_fams):
             hmmer_fams[row[2]] = []
-
         hmmer_fams[row[2]].append(fam)
 
 if(arr_hotpep != None) :
@@ -602,8 +600,7 @@ if(arr_hotpep != None) :
         row = arr_hotpep[i].split("\t")
         if(row[2] not in hotpep_fams):
             hotpep_fams[row[2]] = []
-
-        hotpep_fams[row[2]].append(row[0])
+        hotpep_fams[row[2]].append(row[0]+"("+row[1]+")")
 
 #overall table
 if not tools[0]:
@@ -612,79 +609,45 @@ if not tools[1]:
     hmmer_genes   = []
 if not tools[2]:
     hotpep_genes  =[]
-    
-
 all_genes = unique(hmmer_genes+hotpep_genes+diamond_genes)
-overall_table = []
 with open(workdir+"overview.txt", 'w+') as fp:
     if args.use_signalP:
         fp.write("Gene ID\tHMMER\tHotpep\tDIAMOND\tSignalp\t#ofTools\n")
     else:
         fp.write("Gene ID\tHMMER\tHotpep\tDIAMOND\t#ofTools\n")
     for gene in all_genes:
-        hits = {"diamond" : "N", "hmmer" : "N", "hotpep" : "N", "tools" : 0}
         if args.use_signalP:
-            hits["signalP"] = "N"
+            hits["signalP" : "N"]
         csv = ["gene", "N", "N", "N", "N", 0]
         csv[0] = gene
-        if(arr_hmmer != None):
+        if arr_hmmer != None:
             if gene in hmmer_genes:
                 csv[5]+=1
                 hits["tools"]+=1
-                txt = []
-                for i in range(len(hmmer_fams[gene])):
-                    txt.append(hmmer_fams[gene][i])
-                    temp = hmmer_fams[gene][i].split("(")
-                    hmmer_fams[gene][i] = ("(").join(temp)
-                hmmer_fams[gene] = ("+").join(hmmer_fams[gene])
-                hits["hmmer"] = hmmer_fams[gene]
-                csv[1] = ("+").join(txt)
-        else:
-
-            csv[1] = "-"
-            hits["hmmer"] = "-"
-
-        if(arr_hotpep!= None):
-            if( gene in hotpep_genes):
+                csv[1] = "+".join(hmmer_fams[gene])
+            else:
+                csv[1] = "-"
+        if arr_hotpep!= None:
+            if gene in hotpep_genes):
                 csv[5]+=1
-                hits["tools"]+=1
                 temp = []
                 if gene in hotpep_fams:
                     for i in range(len(hotpep_fams[gene])):
                         temp.append(hotpep_fams[gene][i])
-
-                    hits["hotpep"] = ("+").join(hotpep_fams[gene])
                     csv[2] = ("+").join(temp)
-        else:
-            csv[2] = "-"
-            hits["hotpep"] = "-"
-
-        if(arr_diamond != None):
-            if(gene in diamond_genes):
+            else:
+                csv[2] = "-"
+                hits["hotpep"] = "-"
+        if arr_diamond != None:
+            if gene in diamond_genes:
                 csv[5]+=1
-                hits["tools"]+=1
-                fams = diamond_fams[gene].split("+")
-                hits["diamond"] = ""
-                csv[3] = diamond_fams[gene]
-
-        else:
-            csv[3] = "-"
-            hits["diamond"] = "-"
-
-        if args.use_signalP==True and gene in sigp_genes :
-            hits["signalp"] = "Y (1-"+sigp_genes[gene]+")"
-            csv[4] = "Y(1-"+sigp_genes[gene]+")"
-
-
-        else:
-            hits["geneID"] = gene
-        overall_table.append(hits)
-
-
-        temp = "\t".join(str(x) for x in csv) + "\n"
+                csv[3] = "+".join(diamond_fams[gene])
+            else:
+                csv[3] = "-"
+        if args.use_signalP==True:
+            if gene in sigp_genes :
+                csv[4] = "Y(1-"+sigp_genes[gene]+")"
+        temp = "\t".join(csv) + "\n"
         fp.write(temp)
-
 print ("overview table complete. Saved as "+workdir+"overview.txt")
-# End "blastation.py" to produce overview.txt
-# End script
-
+# End overview
