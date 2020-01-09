@@ -21,6 +21,15 @@ import os
 import argparse
 import sys
 
+'''
+def some functions
+'''
+def runHmmScan(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name):
+    hmmer = Popen(['hmmscan', '--domtblout', '%sh%s.out' % (outPath, db_name), '--cpu', hmm_cpu, '-o', '/dev/null', '%s%s.hmm' % (dbDir,db_name), '%suniInput' % outPath])
+    hmmer.wait()
+    call('hmmscan-parser.py %sh%s.out %s %s > %s%s.out'%(outPath, db_name, hmm_eval, hmm_cov, outPath, db_name), shell=True)
+    if os.path.exists('%sh%s.out' % (outPath, db_name)):
+        call(['rm', '%sh%s.out' % (outPath, db_name)])
 
 parser = argparse.ArgumentParser(description='dbCAN2 Driver Script')
 
@@ -53,15 +62,7 @@ parser.add_argument('--use_signalP', default=False, type=bool, help='Use signalP
 parser.add_argument('--gram', '-g', choices=["p","n","all"], default="all", help="Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of SingalP, only if user use singalP")
 args = parser.parse_args()
 
-'''
-def some functions
-'''
-def runHmmScan(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name):
-    hmmer = Popen(['hmmscan', '--domtblout', '%sh%s.out' % (outPath, db_name), '--cpu', hmm_cpu, '-o', '/dev/null', '%s%s.hmm' % (dbDir,db_name), '%suniInput' % outPath])
-    hmmer.wait()
-    call('hmmscan-parser.py %sh%s.out %s %s > %s%s.out'%(outPath, db_name, hmm_eval, hmm_cov, outPath, db_name), shell=True)
-    if os.path.exists('%sh%s.out' % (outPath, db_name)):
-        call(['rm', '%sh%s.out' % (outPath, db_name)])
+
 
 ####
 #run_dbcan.py [inputFile] [inputType]
@@ -130,9 +131,8 @@ if args.tools != 'all':
 
 # End Setup and Input Checks
 #########################
+#########################
 # Begin Gene Prediction Tools
-
-
 if inputType == 'prok':
     call(['prodigal', '-i', input, '-a', '%suniInput'%outPath, '-o', '%sprodigal.gff'%outPath, '-f', 'gff', '-q'])
 if inputType == 'meta':
@@ -248,20 +248,15 @@ if find_clusters:
 ########################
 # Begin TF,TP, STP prediction
     '''
-    previous tf_v1 uses diamond, tf_v2 uses hmmer
+    previous tf uses diamond, Now tf-1 and tf-2 uses hmmer
     tf hmmer
     '''
     #call(['diamond', 'blastp', '-d', dbDir+'tf_v1/tf.dmnd', '-e', '1e-10', '-q', '%suniInput' % outPath, '-k', '1', '-p', '1', '-o', outDir+prefix+'tf.out', '-f', '6'])
     runHmmScan(outPath, str(args.tf_cpu), dbDir, str(args.tf_eval), str(args.tf_cov), "tf-1")
     runHmmScan(outPath, str(args.tf_cpu), dbDir, str(args.tf_eval), str(args.tf_cov), "tf-2")
     '''
-    stp
+    stp hmmer
     '''
-
-    # call(['hmmscan', '--domtblout', '%shstp.out' % outPath, '--cpu', str(args.hmm_cpu), '-o', '/dev/null', '%sstp.hmm' % dbDir, '%suniInput' % outPath])
-    # call('hmmscan-parser.py %shstp.out %s %s > %sstp.out'%(outPath, str(args.hmm_eval), str(args.hmm_cov), outPath), shell=True)
-    # if os.path.exists('%shstp.out' % outPath):
-    #     call(['rm', '%shstp.out' % outPath])
     runHmmScan(outPath, str(args.stp_cpu), dbDir, str(args.stp_eval), str(args.stp_cov), "stp")
 
     '''
@@ -277,14 +272,6 @@ if find_clusters:
     tp_genes = {}
     tf_genes = {}
     stp_genes = {}
-    # with open(outDir+prefix+'tf.out') as f:
-    #     for line in f:
-    #         row = line.rstrip().split('\t')
-    #         tf.add(row[0])
-    #         if not row[0] in tf_genes:
-    #             tf_genes[row[0]] = row[1]
-    #         else:
-    #             tf_genes[row[0]] += ','+row[1]
 
     with open("%stf-1.out" % outPath) as f:
         for line in f:
@@ -489,16 +476,16 @@ if find_clusters:
                         outrow[6] = row[4]
                         outrow[8] += ";ID="+gene
                         out.write('\t'.join(outrow)+'\n')
-# End GFF preperation
-####################
-# Begin CGCFinder call
+    # End GFF preperation
+    ####################
+    # Begin CGCFinder call
 
     call(['CGCFinder.py', outDir+prefix+'cgc.gff', '-o', outDir+prefix+'cgc.out', '-s', args.cgc_sig_genes, '-d', str(args.cgc_dis)])
     print("**************************************CGC-Finder end***********************************************")
 
-# End CGCFinder call
-# End CGCFinder
-####################
+    # End CGCFinder call
+    # End CGCFinder
+    ####################
 # Begin SignalP combination
 if args.use_signalP:
     print("Waiting on signalP")
@@ -541,29 +528,30 @@ def unique(seq):
     return [x for x in seq if not (x in exists or exists.add(x))]
 
 # check if files exist. if so, read files and get the gene numbers
-if(os.path.exists(workdir+"diamond.out")):
+if tools[0]:
     arr_diamond = open(workdir+"diamond.out").readlines()
-    diamond_genes = [arr_diamond[i].split()[0] for i in range(1, len(arr_diamond))]
+    diamond_genes = [arr_diamond[i].split()[0] for i in range(1, len(arr_diamond))] # or diamond_genes = []
 
-if(os.path.exists(workdir+"Hotpep.out")):
-    arr_hotpep = open(workdir+"Hotpep.out").readlines()
-    hotpep_genes = [arr_hotpep[i].split()[2] for i in range(1, len(arr_hotpep))]
-
-if(os.path.exists(workdir+"hmmer.out")):
+if tools[1]:
     arr_hmmer = open(workdir+"hmmer.out").readlines()
-    hmmer_genes = [arr_hmmer[i].split()[2] for i in range(1, len(arr_hmmer))]
+    hmmer_genes = [arr_hmmer[i].split()[2] for i in range(1, len(arr_hmmer))] # or hmmer_genes = []
+
+if tools[2]:
+    arr_hotpep = open(workdir+"Hotpep.out").readlines()
+    hotpep_genes = [arr_hotpep[i].split()[2] for i in range(1, len(arr_hotpep))]# or hotpep_genes = []
+
+
 
 if args.use_signalP and (os.path.exists(workdir + "signalp.out")):
     arr_sigp = open(workdir+"signalp.out").readlines()
     sigp_genes = {}
-    for i in range (2,len(arr_sigp)):
+    for i in range (0,len(arr_sigp)):
         row = arr_sigp[i].split()
-        # sigp_genes[row[0]]=row[2]
-        sigp_genes[row[0]] = row[4]
+        sigp_genes[row[0]] = row[4] #previous one is row[2], use Y-score instead from suggestion of Dongyao Li
 
 ##Catie Ausland edits BEGIN, Le add variable exists or not, remove duplicates from input lists
 if len(hotpep_genes) > 0:
-    if (hotpep_genes[len(hotpep_genes)-1] == None):
+    if (hotpep_genes[-1] == None):
         hotpep_genes.pop()
         hotpep_genes = unique(hotpep_genes)
         if 'hmmer_genes' in locals():
@@ -575,16 +563,15 @@ if len(hotpep_genes) > 0:
 ## Catie edits END, Le add variable exists or not, remove duplicates from input lists
 
 # parse input, stroe needed variables
-if(arr_diamond != None):
+if tools[0] and (len(arr_diamond) > 1):
     diamond_fams = {}
     for i in range (1,len(arr_diamond)):
         row = arr_diamond[i].split("\t")
         fam = row[1].strip("|").split("|")
-        # diamond_fams[row[0]] = fam[1]
         diamond_fams[row[0]] = fam
 
 
-if(arr_hmmer !=None):
+if tools[1] and (len(arr_hmmer) > 1):
     hmmer_fams = {}
     for i in range (1, len(arr_hmmer)):
         row = arr_hmmer[i].split("\t")
@@ -594,7 +581,7 @@ if(arr_hmmer !=None):
             hmmer_fams[row[2]] = []
         hmmer_fams[row[2]].append(fam)
 
-if(arr_hotpep != None) :
+if tools[2] and (len(arr_hotpep) > 1) :
     hotpep_fams = {}
     for i in range (1,len(arr_hotpep)):
         row = arr_hotpep[i].split("\t")
@@ -616,19 +603,19 @@ with open(workdir+"overview.txt", 'w+') as fp:
     else:
         fp.write("Gene ID\tHMMER\tHotpep\tDIAMOND\t#ofTools\n")
     for gene in all_genes:
-        csv.append(gene)
+        csv=[gene]
         num_tools = 0
-        if arr_hmmer != None and (gene in hmmer_genes):
+        if tools[1] and arr_hmmer != None and (gene in hmmer_genes):
             num_tools += 1
             csv.append("+".join(hmmer_fams[gene]))
         else:
             csv.append("-")
-        if arr_hotpep!= None and (gene in hotpep_genes):
+        if tools[2] and arr_hotpep!= None and (gene in hotpep_genes):
             num_tools += 1
             csv.append("+".join(hotpep_fams[gene]))
         else:
             csv.append("-")
-        if arr_diamond != None and (gene in diamond_genes):
+        if tools[0] and arr_diamond != None and (gene in diamond_genes):
             num_tools += 1
             csv.append("+".join(diamond_fams[gene]))
         else:
