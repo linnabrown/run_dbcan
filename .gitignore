@@ -111,4 +111,4 @@ example/
 #tools/
 
 #vscode
-.vscode/
+.vscode/setting.json
