@@ -14,6 +14,10 @@ A standalone tool of http://bcb.unl.edu/dbCAN2/
 
 Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner Yohe of the Yin lab at NIU.
 
+Updated 
+---
+v2.0.2 released on Jan 10, 2020, please use `pip install run-dbcan==2.0.2 --user` for update
+
 Function
 ----
 - Accepts user input
@@ -28,7 +32,7 @@ Python Package Usage
 
 2. Install this package with pip.
 ```
-pip install run-dbcan==2.0.1 --user
+pip install run-dbcan==2.0.2 --user
 ```
 3. Install dependencies with conda.
 ```
