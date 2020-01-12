@@ -326,8 +326,7 @@ if find_clusters:
                 dia.add(row[0])
                 if row[0] not in cazyme_genes:
                     cazyme_genes[row[0]] = set()
-                for dom in row[1].strip("|").split('|')[1:]:
-                    cazyme_genes[row[0]].add(dom)
+                cazyme_genes[row[0]].add(set(row[1].strip("|").split('|')[1:]))
     if tools[1]:
         with open(outDir+prefix+'hmmer.out') as f:
             next(f)
@@ -336,7 +335,7 @@ if find_clusters:
                 hmm.add(row[2])
                 if row[2] not in cazyme_genes:
                     cazyme_genes[row[2]] = set()
-                cazyme_genes[row[2]].add(row[0].split('.')[0])
+                cazyme_genes[row[2]].add(row[0].split('.hmm')[0])
     if tools[2]:
         with open(outDir+prefix+'Hotpep.out') as f:
             next(f)
