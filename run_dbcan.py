@@ -153,9 +153,9 @@ if inputType == 'protein':
 if args.use_signalP:
     print("***************************0. SIGNALP start*************************************************\n\n")
     if args.gram == "p" or args.gram=="all":
-        signalpos = Popen('signalp -t gram+ %suniInput > %ssignalp.neg' % (outPath, outPath), shell=True)
+        signalpos = Popen('signalp -t gram+ %suniInput > %ssignalp.pos' % (outPath, outPath), shell=True)
     if args.gram == "n" or args.gram == "all":
-        signalpneg = Popen('signalp -t gram- %suniInput > %ssignalp.pos' % (outPath, outPath), shell=True)
+        signalpneg = Popen('signalp -t gram- %suniInput > %ssignalp.neg' % (outPath, outPath), shell=True)
 
 # End SignalP
 #######################
@@ -326,7 +326,8 @@ if find_clusters:
                 dia.add(row[0])
                 if row[0] not in cazyme_genes:
                     cazyme_genes[row[0]] = set()
-                cazyme_genes[row[0]].add(row[1].split('|')[1])
+                for dom in row[1].strip("|").split('|')[1:]:
+                    cazyme_genes[row[0]].add(dom)
     if tools[1]:
         with open(outDir+prefix+'hmmer.out') as f:
             next(f)
@@ -568,7 +569,7 @@ if tools[0] and (len(arr_diamond) > 1):
     for i in range (1,len(arr_diamond)):
         row = arr_diamond[i].split("\t")
         fam = row[1].strip("|").split("|")
-        diamond_fams[row[0]] = fam
+        diamond_fams[row[0]] = fam[1:]
 
 
 if tools[1] and (len(arr_hmmer) > 1):
@@ -624,7 +625,8 @@ with open(workdir+"overview.txt", 'w+') as fp:
             if (gene in sigp_genes):
                 csv.append("Y(1-"+sigp_genes[gene]+")")
             else:
-                csv.append("-")
+                csv.append("N")
+        csv.append(str(num_tools))
         temp = "\t".join(csv) + "\n"
         fp.write(temp)
 print ("overview table complete. Saved as "+workdir+"overview.txt")
