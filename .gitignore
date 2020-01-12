@@ -112,3 +112,6 @@ example/
 
 #vscode
 .vscode/setting.json
+
+meta.yaml
+.DS_Store

@@ -63,7 +63,7 @@ RUN pip install natsort \
 #download run-dbcan
 RUN pip install run-dbcan
 #download dependencies
-RUN conda install -c bioconda -y diamond hmmer=3.1b2 prodigal fraggenescan 
+RUN conda install -c bioconda -y diamond hmmer=3.1b2 prodigal fraggenescan
 # Create diamond environment
 # RUN mkdir ~/Diamond && wget http://github.com/bbuchfink/diamond/releases/download/v0.9.24/diamond-linux64.tar.gz -P ~/Diamond \
 #   && tar -xzvf ~/Diamond/diamond-linux64.tar.gz -C ~/Diamond && chmod +x ~/Diamond/diamond && rm ~/Diamond/diamond-linux64.tar.gz
@@ -81,8 +81,8 @@ RUN conda install -c bioconda -y diamond hmmer=3.1b2 prodigal fraggenescan
 #   && rm ~/FragGeneScan1.31.tar.gz
 # ENV PATH=/home/user/FragGeneScan1.31:${PATH}
 
-# Download run_dbcan2, you need to download signalP by yourself because of signalP license.
-# RUN git clone https://github.com/linnabrown/run_dbcan.git /app 
+# Download run_dbcan, you need to download signalP by yourself because of signalP license.
+# RUN git clone https://github.com/linnabrown/run_dbcan.git /app
 #   && cd /app/tools/ && tar -xzvf signalp-4.1.tar.gz \
 #   && chmod +x /app/tools/signalp-4.1/signalp \
 #   && rm /app/tools/signalp-4.1.tar.gz
