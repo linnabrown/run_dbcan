@@ -35,7 +35,8 @@ parser = argparse.ArgumentParser(description='dbCAN2 Driver Script')
 
 
 parser.add_argument('inputFile', help='User input file. Must be in FASTA format.')
-parser.add_argument('inputType', choices=['protein', 'prok', 'meta'], help='Type of sequence input. protein=proteome; prok=prokaryote; meta=metagenome') #protein=proteome, prok=prokaryote nucleotide, meta=metagenome nucleotide
+parser.add_argument('inputType', choices=['protein', 'prok', 'meta'], #protein=proteome, prok=prokaryote nucleotide, meta=metagenome nucleotide
+                    help='Type of sequence input. protein=proteome; prok=prokaryote; meta=metagenome') 
 parser.add_argument('--cluster', '-c', help='Predict CGCs via CGCFinder. This argument requires an auxillary locations file if a protein input is being used')
 parser.add_argument('--dbCANFile',default="dbCAN.txt", help='Indicate the file name of HMM database such as dbCAN.txt, please use the newest one from dbCAN2 website.')
 parser.add_argument('--dia_eval', default=1e-102,type=float, help='DIAMOND E Value')
@@ -137,7 +138,7 @@ if inputType == 'prok':
     call(['prodigal', '-i', input, '-a', '%suniInput'%outPath, '-o', '%sprodigal.gff'%outPath, '-f', 'gff', '-q'])
 if inputType == 'meta':
     # call(['FragGeneScan1.30/run_FragGeneScan.pl', '-genome='+input, '-out=%sfragGeneScan'%outPath, '-complete=1', '-train=complete', '-thread=10'])
-    call(['FragGeneScan', '-s', input, '-o', '%sfragGeneScan'%outPath, '-w 1','-t comlete', '-p 10'])
+    call(['FragGeneScan', '-s', input, '-o', '%sfragGeneScan'%outPath, '-w', '1','-t', 'complete', '-p','10'])
 
 #Frag Gene Scan
 if inputType == 'meta':
@@ -326,7 +327,7 @@ if find_clusters:
                 dia.add(row[0])
                 if row[0] not in cazyme_genes:
                     cazyme_genes[row[0]] = set()
-                cazyme_genes[row[0]].add(set(row[1].strip("|").split('|')[1:]))
+                cazyme_genes[row[0]].update(set(row[1].strip("|").split('|')[1:]))
     if tools[1]:
         with open(outDir+prefix+'hmmer.out') as f:
             next(f)

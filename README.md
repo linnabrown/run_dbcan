@@ -16,7 +16,7 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 
 Updated
 ---
-v2.0.3 released on Jan 12, 2020, please use `pip install run-dbcan==2.0.3 --user` for update
+v2.0.4 released on Feb 17, 2020, please use `pip install run-dbcan==2.0.4 --user` for update
 
 Function
 ----
@@ -32,7 +32,7 @@ Python Package Usage
 
 2. Install this package with pip.
 ```
-pip install run-dbcan==2.0.3 --user
+pip install run-dbcan==2.0.4 --user
 ```
 3. Install dependencies with conda.
 ```
