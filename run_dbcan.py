@@ -40,7 +40,7 @@ parser.add_argument('inputType', choices=['protein', 'prok', 'meta'], #protein=p
 parser.add_argument('--cluster', '-c', help='Predict CGCs via CGCFinder. This argument requires an auxillary locations file if a protein input is being used')
 parser.add_argument('--dbCANFile',default="dbCAN.txt", help='Indicate the file name of HMM database such as dbCAN.txt, please use the newest one from dbCAN2 website.')
 parser.add_argument('--dia_eval', default=1e-102,type=float, help='DIAMOND E Value')
-parser.add_argument('--dia_cpu', default=2, type=int, help='Number of CPU cores that DIAMOND is allowed to use')
+parser.add_argument('--dia_cpu', default=4, type=int, help='Number of CPU cores that DIAMOND is allowed to use')
 parser.add_argument('--hmm_eval', default=1e-15, type=float, help='HMMER E Value')
 parser.add_argument('--hmm_cov', default=0.35, type=float, help='HMMER Coverage val')
 parser.add_argument('--hmm_cpu', default=1, type=int, help='Number of CPU cores that HMMER is allowed to use')
@@ -84,7 +84,7 @@ if not outDir.endswith("/") and len(outDir) > 0:
 
 outPath = outDir + prefix
 auxFile = ""
-input = args.inputFile
+inputFile = args.inputFile
 inputType = args.inputType
 find_clusters = False
 if args.cluster != None:
@@ -135,18 +135,23 @@ if args.tools != 'all':
 #########################
 # Begin Gene Prediction Tools
 if inputType == 'prok':
-    call(['prodigal', '-i', input, '-a', '%suniInput'%outPath, '-o', '%sprodigal.gff'%outPath, '-f', 'gff', '-q'])
+    call(['prodigal', '-i', inputFile, '-a', '%suniInput'%outPath, '-o', '%sprodigal.gff'%outPath, '-f', 'gff', '-q'])
 if inputType == 'meta':
-    # call(['FragGeneScan1.30/run_FragGeneScan.pl', '-genome='+input, '-out=%sfragGeneScan'%outPath, '-complete=1', '-train=complete', '-thread=10'])
-    call(['FragGeneScan', '-s', input, '-o', '%sfragGeneScan'%outPath, '-w', '1','-t', 'complete', '-p','10'])
+    call(['prodigal', '-i', inputFile, '-a', '%suniInput'%outPath, '-o', '%sprodigal.gff'%outPath, '-f', 'gff', '-p', 'meta','-q'])
+    # run_FragGeneScan.pl -genome=EscheriaColiK12MG1655.fna -out=output/kk -complete=1 -train=complete -thread=10
+    # print('run_FragGeneScan.pl -genome=%s -out=%sfragGeneScan -complete=1 -train=complete -thread=10'%(inputFile, outPath))
+    # call(['run_FragGeneScan.pl', '-genome='+inputFile, '-out=%sfragGeneScan'%outPath, '-complete=1', '-train=complete', '-thread=10'])
+    # print('FragGeneScan -s %s -o %sfragGeneScan -w 1 -t complete -p 10'%(input, outPath))
+    # exit(0)
+    # call(['FragGeneScan', '-s', input, '-o', '%sfragGeneScan'%outPath, '-w', '1','-t', 'complete', '-p','10'])
 
 #Frag Gene Scan
-if inputType == 'meta':
-    call(['cp', '%sfragGeneScan.faa'%outPath, '%suniInput'%outPath])
+# if inputType == 'meta':
+#     call(['cp', '%sfragGeneScan.faa'%outPath, '%suniInput'%outPath])
 
 #Proteome
 if inputType == 'protein':
-    call(['cp', input, '%suniInput'%outPath])
+    call(['cp', inputFile, '%suniInput'%outPath])
 
 # End Gene Prediction Tools
 #######################
@@ -163,19 +168,27 @@ if args.use_signalP:
 # Begin Core Tools
 
 if tools[0]:
+    # diamond blastp -d db/CAZy -e 1e-102 -q output_EscheriaColiK12MG1655/uniInput -k 1 -p 2 -o output_EscheriaColiK12MG1655/diamond1.out -f 6
     print("***************************1. DIAMOND start*************************************************\n\n")
-    diamond = Popen(['diamond', 'blastp', '-d', '%sCAZy.dmnd' % dbDir, '-e', str(args.dia_eval), '-q', '%suniInput' % outPath, '-k', '1', '-p', str(args.dia_cpu), '-o', '%sdiamond.out'%outPath, '-f', '6'])
+    os.system('diamond blastp -d %sCAZy -e %s -q %suniInput -k 1 -p %d -o %sdiamond.out -f 6'%(dbDir, str(args.dia_eval), outPath, args.dia_cpu, outPath))
+    # diamond = Popen(['diamond', 'blastp', '-d', '%sCAZy.dmnd' % dbDir, '-e', str(args.dia_eval), '-q', '%suniInput' % outPath, '-k', '1', '-p', str(args.dia_cpu), '-o', '%sdiamond.out'%outPath, '-f', '6'])
+    print("***************************1. DIAMOND end***************************************************")
 
 if tools[1]:
     print("***************************2. HMMER start*************************************************\n\n")
-    hmmer = Popen(['hmmscan', '--domtblout', '%sh.out' % outPath, '--cpu', str(args.hmm_cpu), '-o', '/dev/null', '%s%s' % (dbDir,args.dbCANFile), '%suniInput' % outPath])
+    os.system("hmmscan --domtblout %sh.out --cpu %d -o /dev/null %s%s %suniInput "%(outPath, args.hmm_cpu, dbDir, args.dbCANFile, outPath))
+    print("***************************2. HMMER end***************************************************")
+    call('hmmscan-parser.py %sh.out %s %s > %shmmer.out'%(outPath, str(args.hmm_eval), str(args.hmm_cov), outPath), shell=True)
+    if os.path.exists('%sh.out' % outPath):
+        call(['rm', '%sh.out' % outPath])
+    # hmmer = Popen(['hmmscan', '--domtblout', '%sh.out' % outPath, '--cpu', str(args.hmm_cpu), '-o', '/dev/null', '%s%s' % (dbDir,args.dbCANFile), '%suniInput' % outPath])
 
 if tools[2]:
     count = int(check_output("tr -cd '>' < %suniInput | wc -c" % outPath, shell=True))    #number of genes in input file
     # numThreads = args.hotpep_cpu
     numThreads = args.hotpep_cpu if count >= args.hotpep_cpu else count                     #number of cores for Hotpep to use, revised by Le Huang 12/17/2018
     count_per_file = count / numThreads                                                #number of genes per core
-    inter = input.split('/')[-1]
+    inter = inputFile.split('/')[-1]
     directory = inter.split('.')[0]
     if not os.path.exists('Hotpep/%s' % directory):
         os.makedirs('Hotpep/%s' % directory)
@@ -195,23 +208,27 @@ if tools[2]:
 
     os.chdir('Hotpep/')
     print("\n***************************3. HotPep start***************************************************\n\n")
-    hotpep = Popen(['train_many_organisms_many_families.py', directory, str(numThreads), str(args.hotpep_hits), str(args.hotpep_freq)])
+    os.system('train_many_organisms_many_families.py %s %d %s %s'%(directory, numThreads, str(args.hotpep_hits), str(args.hotpep_freq)))
+    # hotpep = Popen(['train_many_organisms_many_families.py', directory, str(numThreads), str(args.hotpep_hits), str(args.hotpep_freq)])
     os.chdir('../')
-
-if tools[0]:
-    diamond.wait()
-    print("***************************1. DIAMOND end***************************************************")
-if tools[1]:
-    hmmer.wait()
-    print("***************************2. HMMER end***************************************************")
-    call('hmmscan-parser.py %sh.out %s %s > %shmmer.out'%(outPath, str(args.hmm_eval), str(args.hmm_cov), outPath), shell=True)
-    if os.path.exists('%sh.out' % outPath):
-        call(['rm', '%sh.out' % outPath])
-if tools[2]:
-    hotpep.wait()
     print("***************************3. hotPep end***************************************************")
     hotpepDir = 'Hotpep/'+directory
     call(['cp', '%s/Results/output.txt' % hotpepDir, '%sHotpep.out' % outPath])
+
+# if tools[0]:
+#     diamond.wait()
+#     print("***************************1. DIAMOND end***************************************************")
+# if tools[1]:
+#     hmmer.wait()
+#     print("***************************2. HMMER end***************************************************")
+#     call('hmmscan-parser.py %sh.out %s %s > %shmmer.out'%(outPath, str(args.hmm_eval), str(args.hmm_cov), outPath), shell=True)
+#     if os.path.exists('%sh.out' % outPath):
+#         call(['rm', '%sh.out' % outPath])
+# if tools[2]:
+#     hotpep.wait()
+#     print("***************************3. hotPep end***************************************************")
+#     hotpepDir = 'Hotpep/'+directory
+#     call(['cp', '%s/Results/output.txt' % hotpepDir, '%sHotpep.out' % outPath])
 
 # End Core Tools
 ########################
@@ -357,7 +374,7 @@ if find_clusters:
 ######################
 # Begin GFF preperation
 
-    if inputType == "prok":   #use Prodigal GFF output
+    if inputType == "prok" or inputType == "meta":   #use Prodigal GFF output
         with open(outDir+prefix+'prodigal.gff') as f:
             with open(outDir+prefix+'cgc.gff', 'w') as out:
                 for line in f:
@@ -382,29 +399,29 @@ if find_clusters:
                         out.write('\t'.join(row)+'\n')
 
 
-    elif inputType == "meta":  #use FragGeneScan GFF output
-        with open(outDir+prefix+'fragGeneScan.gff') as f:
-            with open(outDir+prefix+'cgc.gff', 'w') as out:
-                for line in f:
-                    if not line.startswith("#"):
-                        row = line.rstrip().split('\t')
-                        gene = row[-1].split(";")[0].split("=")[1]
-                        if gene in tf:
-                            row[2] = "TF"
-                            row.insert(8, "DB=" + tf_genes[gene])
-                        elif gene in tp:
-                            row[2] = "TC"
-                            row.insert(8, "DB=" + tp_genes[gene])
-                        elif gene in stp:
-                            row[2] = "STP"
-                            row.insert(8, "DB=" + stp_genes[gene])
-                        elif gene in cazyme:
-                            row[2] = "CAZyme"
-                            row.insert(8, "DB="+'|'.join(cazyme_genes[gene]))
-                        else:
-                            row.insert(8, "")
-                        row[8] += ";ID="+gene
-                        out.write('\t'.join(row)+'\n')
+    # elif inputType == "meta":  #use FragGeneScan GFF output
+    #     with open(outDir+prefix+'fragGeneScan.gff') as f:
+    #         with open(outDir+prefix+'cgc.gff', 'w') as out:
+    #             for line in f:
+    #                 if not line.startswith("#"):
+    #                     row = line.rstrip().split('\t')
+    #                     gene = row[-1].split(";")[0].split("=")[1]
+    #                     if gene in tf:
+    #                         row[2] = "TF"
+    #                         row.insert(8, "DB=" + tf_genes[gene])
+    #                     elif gene in tp:
+    #                         row[2] = "TC"
+    #                         row.insert(8, "DB=" + tp_genes[gene])
+    #                     elif gene in stp:
+    #                         row[2] = "STP"
+    #                         row.insert(8, "DB=" + stp_genes[gene])
+    #                     elif gene in cazyme:
+    #                         row[2] = "CAZyme"
+    #                         row.insert(8, "DB="+'|'.join(cazyme_genes[gene]))
+    #                     else:
+    #                         row.insert(8, "")
+    #                     row[8] += ";ID="+gene
+    #                     out.write('\t'.join(row)+'\n')
     else:  #user provided GFF/BED file
         gff = False
         with open(auxFile) as f:
@@ -541,8 +558,6 @@ if tools[2]:
     arr_hotpep = open(workdir+"Hotpep.out").readlines()
     hotpep_genes = [arr_hotpep[i].split()[2] for i in range(1, len(arr_hotpep))]# or hotpep_genes = []
 
-
-
 if args.use_signalP and (os.path.exists(workdir + "signalp.out")):
     arr_sigp = open(workdir+"signalp.out").readlines()
     sigp_genes = {}
@@ -551,6 +566,12 @@ if args.use_signalP and (os.path.exists(workdir + "signalp.out")):
         sigp_genes[row[0]] = row[4] #previous one is row[2], use Y-score instead from suggestion of Dongyao Li
 
 ##Catie Ausland edits BEGIN, Le add variable exists or not, remove duplicates from input lists
+if not tools[0]:
+    diamond_genes =[]
+if not tools[1]:
+    hmmer_genes   = []
+if not tools[2]:
+    hotpep_genes  =[]
 if len(hotpep_genes) > 0:
     if (hotpep_genes[-1] == None):
         hotpep_genes.pop()
@@ -591,12 +612,7 @@ if tools[2] and (len(arr_hotpep) > 1) :
         hotpep_fams[row[2]].append(row[0]+"("+row[1]+")")
 
 #overall table
-if not tools[0]:
-    diamond_genes =[]
-if not tools[1]:
-    hmmer_genes   = []
-if not tools[2]:
-    hotpep_genes  =[]
+
 all_genes = unique(hmmer_genes+hotpep_genes+diamond_genes)
 with open(workdir+"overview.txt", 'w+') as fp:
     if args.use_signalP:

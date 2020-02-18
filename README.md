@@ -16,7 +16,8 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 
 Updated
 ---
-v2.0.4 released on Feb 17, 2020, please use `pip install run-dbcan==2.0.4 --user` for update
+v2.0.5 released on Feb 17, 2020, please use `pip install run-dbcan==2.0.5 --user` for update
+We disgard FragGeneScan because this program does not work now. We use Prodigal instead. So, you don't need to use conda install fraggenescan now.
 
 Function
 ----
@@ -32,11 +33,11 @@ Python Package Usage
 
 2. Install this package with pip.
 ```
-pip install run-dbcan==2.0.4 --user
+pip install run-dbcan==2.0.5 --user
 ```
 3. Install dependencies with conda.
 ```
-conda install -c bioconda diamond hmmer=3.1b2 prodigal fraggenescan
+conda install -c bioconda diamond hmmer=3.1b2 prodigal
 ```
 4. Database Installation.
 ```
@@ -111,7 +112,7 @@ Update info
 - 10/08/2019
 We create a [python package](https://pypi.org/project/run-dbcan/#files).
 Be sure to install [Anaconda](https://www.anaconda.com/) or Miniconda first, and then use the following commands to install our program one time.
-We strongly recommend you to use virtual environment to seperate your own system and this executive scripts. Please make sure to use `conda install -c bioconda diamond hmmer=3.1b2 prodigal fraggenescan` and database installation script to have the appropriate dependencies and database installed and configured. Thanks for suggestion and contribution from [tesujimath](https://github.com/tesujimath) .
+We strongly recommend you to use virtual environment to seperate your own system and this executive scripts. Please make sure to use `conda install -c bioconda diamond hmmer=3.1b2 prodigal` and database installation script to have the appropriate dependencies and database installed and configured. Thanks for suggestion and contribution from [tesujimath](https://github.com/tesujimath) .
 
 - 04/15/2019
 We created a [docker image](https://hub.docker.com/r/haidyi/run_dbcan) of run_dbcan. Make sure to install docker properly. Thanks for suggestion and contributions from [Haidyi](https://github.com/HaidYi).
@@ -126,7 +127,7 @@ REQUIREMENTS
 **TOOLS**
 
 ----
-P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-parser` because they are included in run_dbcan V2. If you use python package or docker, you don't need to download Prodigal and FragGeneScan because they includes these denpendencies. Otherwise we recommend you to install and copy them into `/usr/bin` as system application or add their path into system envrionmental profile.
+P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-parser` because they are included in run_dbcan V2. If you use python package or docker, you don't need to download Prodigal because they includes these denpendencies. Otherwise we recommend you to install and copy them into `/usr/bin` as system application or add their path into system envrionmental profile.
 
 
 [Python3]--Be sure to use python3, not python2
@@ -143,7 +144,7 @@ P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-pars
 
 [Prodigal](https://github.com/hyattpd/Prodigal)--please download and install if you need.
 
-[FragGeneScan](http://omics.informatics.indiana.edu/FragGeneScan/)--please download and install if you need.
+[!we no longer use FragGeneScan to predict genes from meta genome, we use Prodigal instead][FragGeneScan](http://omics.informatics.indiana.edu/FragGeneScan/)--please download and install if you need.
 
 [CGCFinder](https://github.com/linnabrown/run_dbcan/blob/master/CGCFinder.py)--This newest version is included in dbCAN2 project.
 
@@ -234,7 +235,7 @@ run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
 Several files will be produced via `run_dbcan.py`. They are as follows:
 
 	uniInput - The unified input file for the rest of the tools
-			(created by prodigal or FragGeneScan if a nucleotide sequence was used)
+			(created by prodigal if a nucleotide sequence was used)
 
 	Hotpep.out - the output from the Hotpep run
 
@@ -268,7 +269,7 @@ or
 run_dbcan.py EscheriaColiK12MG1655.faa protein --out_dir output_EscheriaColiK12MG1655
 ```
 
-While this example directory contains all the databases you will need (already formatted) and the Hotpep and FragGeneScan programs, you will still need to have the remaining programs installed on your machine (DIAMOND, HMMER, etc.).
+While this example directory contains all the databases you will need (already formatted) and the Hotpep and Prodigal programs, you will still need to have the remaining programs installed on your machine (DIAMOND, HMMER, etc.).
 
 To run the examples with CGCFinder turned on, run:
 ```

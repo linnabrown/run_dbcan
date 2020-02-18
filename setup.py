@@ -12,13 +12,13 @@ long_description = """This is the standalone version of dbCAN annotation tool fo
 """
 
 setup(name='run_dbcan',
-      version="2.0.4",
+      version="2.0.5",
     #   use_scm_version=True,
       setup_requires=['setuptools_scm', 'setuptools_scm_git_archive'],
       description='Standalone version of dbCAN annotation tool for automated CAZyme annotation',
       long_description=long_description,
       author='Tanner Yohe and Le Huang',
-      author_email='lehuang@med.unc.edu',
+      author_email='lehuang@unc.edu',
       url='https://github.com/linnabrown/run_dbcan',
       classifiers=[
           'Development Status :: 4 - Beta',
