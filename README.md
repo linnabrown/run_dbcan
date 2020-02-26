@@ -16,7 +16,7 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 
 Updated
 ---
-v2.0.5 released on Feb 17, 2020, please use `pip install run-dbcan==2.0.5 --user` for update
+v2.0.6 released on Feb 17, 2020, please use `pip install run-dbcan==2.0.6 --user` for update
 We disgard FragGeneScan because this program does not work now. We use Prodigal instead. So, you don't need to use conda install fraggenescan now.
 
 Function
@@ -33,7 +33,7 @@ Python Package Usage
 
 2. Install this package with pip.
 ```
-pip install run-dbcan==2.0.5 --user
+pip install run-dbcan==2.0.6 --user
 ```
 3. Install dependencies with conda.
 ```
