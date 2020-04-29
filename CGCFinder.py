@@ -132,6 +132,11 @@ def startSearch(startRow, contig):
 								ID = note.split("=")[1]
 						row = [str(j), fd, str(upDown[1]), str(upDown[0]), 'CGC'+str(num_clusters), contig[j][0], contig[j][3], contig[j][4], ID, contig[j][6], contig[j][8]]
 					else:
+						notes = contig[j][8].split(";")
+						ID= ""
+						for note in notes:
+							if "ID" in note:
+								ID = note.split("=")[1]
 						row = [str(j), 'null', 'null', 'null', 'CGC'+str(num_clusters), contig[j][0], contig[j][3], contig[j][4], ID, contig[j][6]]
 					try:
 						row.append(contig[j][8])
