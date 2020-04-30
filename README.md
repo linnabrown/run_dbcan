@@ -23,6 +23,7 @@ Updated
     3. Revising the output name file in hotpep as random number, to make the program more robust for paralleing running.
     4. Prioritizing the CAZyme prediction over TF/TC/STP prediction when preparing gff input file for CGC-Finder. 
     5. Rewrite the installation steps. Recommend user to use customized virtual environment (use certain python version).
+    6. Fix the duplicate ACC of tf-2.hmm to make it compatiable for the newest hmmer (3.3). Delete version limitatino to hmmer.
 
 - v2.0.6 released on Feb 17, 2020, please use `pip install run-dbcan==2.0.6` for update
 We forgo FragGeneScan because this program does not work now. We use Prodigal instead. So, you don't need to use conda install fraggenescan now.
@@ -47,7 +48,7 @@ Python Package Usage
 2. Create virtual environment with dependencies and activate the virtual environment.
 
 ```
-conda create -n run_dbcan python=3.8 diamond hmmer=3.1b2 prodigal -c conda-forge -c bioconda
+conda create -n run_dbcan python=3.8 diamond hmmer prodigal -c conda-forge -c bioconda
 conda activate run_dbcan
 ```
 
@@ -131,7 +132,7 @@ Update info
 - 10/08/2019
 We create a [python package](https://pypi.org/project/run-dbcan/#files).
 Be sure to install [Anaconda](https://www.anaconda.com/) or Miniconda first, and then use the following commands to install our program one time.
-We strongly recommend you to use virtual environment to seperate your own system and this executive scripts. Please make sure to use `conda install -c bioconda diamond hmmer=3.1b2 prodigal` and database installation script to have the appropriate dependencies and database installed and configured. Thanks for suggestion and contribution from [tesujimath](https://github.com/tesujimath) .
+We strongly recommend you to use virtual environment to seperate your own system and this executive scripts. Please make sure to use `conda install -c bioconda diamond hmmer prodigal` and database installation script to have the appropriate dependencies and database installed and configured. Thanks for suggestion and contribution from [tesujimath](https://github.com/tesujimath) .
 
 - 04/15/2019
 We created a [docker image](https://hub.docker.com/r/haidyi/run_dbcan) of run_dbcan. Make sure to install docker properly. Thanks for suggestion and contributions from [Haidyi](https://github.com/HaidYi).
@@ -153,7 +154,7 @@ P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-pars
 
 [DIAMOND](https://github.com/bbuchfink/diamond)-- please install from github as instructions.
 
-[HMMER](hmmer.org)--Please download 3.1b2version in 2015, the newest version is not suitable `wget http://eddylab.org/software/hmmer/hmmer-3.1b2.tar.gz` and add variable to your environment
+[HMMER](hmmer.org)
 
 [hmmscan-parser](https://github.com/linnabrown/run_dbcan/blob/master/hmmscan-parser.py)--This is included in dbCAN2.
 
