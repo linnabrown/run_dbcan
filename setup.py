@@ -12,7 +12,7 @@ long_description = """This is the standalone version of dbCAN annotation tool fo
 """
 
 setup(name='run_dbcan',
-      version="2.0.8",
+      version="2.0.9",
     #   use_scm_version=True,
       setup_requires=['setuptools_scm', 'setuptools_scm_git_archive'],
       description='Standalone version of dbCAN annotation tool for automated CAZyme annotation',

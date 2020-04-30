@@ -354,15 +354,15 @@ if find_clusters:
                         num = row[-1].split(";")[0].split('_')[-1]
                         gene = row[0] + '_' + num
                         row[8] = ""
-                        if gene in tf:
+                        if gene in cazyme:
+                            row[2] = "CAZyme"
+                            row[8] = "DB="+'|'.join(cazyme_genes[gene])
+                        elif gene in tf:
                             row[2] = "TF"
                             row[8] = "DB="+tf_genes[gene]
                         elif gene in tp:
                             row[2] = "TC"
                             row[8] = "DB="+tp_genes[gene]
-                        elif gene in cazyme:
-                            row[2] = "CAZyme"
-                            row[8] = "DB="+'|'.join(cazyme_genes[gene])
                         elif gene in stp:
                             row[2] = "STP"
                             row[8] = "DB="+stp_genes[gene]
@@ -395,7 +395,11 @@ if find_clusters:
                                     gene = notes["ID"]
                                 else:
                                     continue
-                                if gene in tf:
+                                
+                                if gene in cazyme:
+                                    row[2] = "CAZyme"
+                                    row[8] = "DB="+'|'.join(cazyme_genes[gene])
+                                elif gene in tf:
                                     row[2] = "TF"
                                     row[8] = "DB="+tf_genes[gene]
                                 elif gene in tp:
@@ -404,9 +408,6 @@ if find_clusters:
                                 elif gene in stp:
                                     row[2] = "STP"
                                     row[8] = "DB=" + stp_genes[gene]
-                                elif gene in cazyme:
-                                    row[2] = "CAZyme"
-                                    row[8] = "DB="+'|'.join(cazyme_genes[gene])
                                 else:
                                     row[8] = ""
                                 row[8] += ";ID="+gene
@@ -420,7 +421,10 @@ if find_clusters:
                         row = line.rstrip().split('\t')
                         outrow = ['.','.','.','.','.','.','.','.','']
                         gene = row[1]
-                        if gene in tf:
+                        if gene in cazyme:
+                            outrow[2] = 'CAZyme'
+                            outrow[8] = "DB="+'|'.join(cazyme_genes[gene])
+                        elif gene in tf:
                             outrow[2] = 'TF'
                             outrow[8] =  "DB="+tf_genes[gene]
                         elif gene in tp:
@@ -429,9 +433,6 @@ if find_clusters:
                         elif gene in stp:
                             outrow[2] = 'STP'
                             outrow[8] = "DB=" + stp_genes[gene]
-                        elif gene in cazyme:
-                            outrow[2] = 'CAZyme'
-                            outrow[8] = "DB="+'|'.join(cazyme_genes[gene])
                         else:
                             outrow[2] = 'CDS'
                         outrow[0] = row[0]
