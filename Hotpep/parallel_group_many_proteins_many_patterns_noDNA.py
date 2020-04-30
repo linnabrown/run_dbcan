@@ -90,8 +90,8 @@ while var1 <= threads:
 			p.group = int(f[x+5].rstrip())
 			#add by Le start Feb 19, 2020
 			fam_main = " ".join(re.findall("[a-zA-Z]+", fam))
-			if os.path.exists(f"CAZY_PPR_patterns/{fam_main}/{fam}/{fam}_group_ec.txt"):
-				kk = open(f"CAZY_PPR_patterns/{fam_main}/{fam}/{fam}_group_ec.txt").\
+			if os.path.exists(f"{peptide_dir_name}/{fam}/{fam}_group_ec.txt"):
+				kk = open(f"{peptide_dir_name}/{fam}/{fam}_group_ec.txt").\
 						readlines()[p.group-1].rstrip().split("\t")
 				if len(kk) >1:
 					p.ec = kk[1]

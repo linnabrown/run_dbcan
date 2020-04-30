@@ -17,13 +17,14 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 Updated
 ---
 
-- v2.0.9 please use `pip install run-dbcan==2.0.9 --user` for update
+- v2.0.10 please use `pip install run-dbcan==2.0.10` for update
     1. Add ec number prediction to hotpep result; 
     2. 04/21/2020 dbCAN2 Hotpep PPR patterns updated to most recent release of CAZyDB (2019). Also missing group EC# files for families added in;
     3. Revising the output name file in hotpep as random number, to make the program more robust for paralleing running.
     4. Prioritizing the CAZyme prediction over TF/TC/STP prediction when preparing gff input file for CGC-Finder. 
+    5. Rewrite the installation steps. Recommend user to use customized virtual environment (use certain python version).
 
-- v2.0.6 released on Feb 17, 2020, please use `pip install run-dbcan==2.0.6 --user` for update
+- v2.0.6 released on Feb 17, 2020, please use `pip install run-dbcan==2.0.6` for update
 We forgo FragGeneScan because this program does not work now. We use Prodigal instead. So, you don't need to use conda install fraggenescan now.
 We add extra information `EC number` to the last columns of Hotpep output to make it consistent with previous Hotpep result.
 
@@ -43,16 +44,20 @@ Python Package Usage
 -----
 1. Please install [Anoconda](https://www.anaconda.com) first.
 
-2. Install this package with pip.
+2. Create virtual environment with dependencies and activate the virtual environment.
 
 ```
-pip install run-dbcan==2.0.9 --user
+conda create -n run_dbcan python=3.8 diamond hmmer=3.1b2 prodigal -c conda-forge -c bioconda
+conda activate run_dbcan
 ```
 
-3. Install dependencies with conda.
+3. Install this package with pip.
+
 ```
-conda install -c bioconda diamond hmmer=3.1b2 prodigal
+pip install run-dbcan==2.0.10
 ```
+
+
 4. Database Installation.
 ```
 test -d db || mkdir db

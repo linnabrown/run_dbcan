@@ -152,7 +152,5 @@ with open(outf_name, 'w') as out:
 					out.write(str(group_score_array[-1][1])+'\n')
 					out.write(str(float(str(group_score_array[-1][0])[0:4]))+'\n')
 					out.write(group_score_array[-1][2]+'\n')
-					protein_hits += 1
-					
-call(['cp', outf_name, 'temp'])
+					protein_hits += 1		
 			

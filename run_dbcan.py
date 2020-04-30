@@ -146,7 +146,7 @@ if inputType == 'protein':
 #######################
 # Begin SignalP
 if args.use_signalP:
-    print("***************************0. SIGNALP start*************************************************\n\n")
+    print("\n\n***************************0. SIGNALP start*************************************************\n\n")
     if args.gram == "p" or args.gram=="all":
         signalpos = Popen('signalp -t gram+ %suniInput > %ssignalp.pos' % (outPath, outPath), shell=True)
     if args.gram == "n" or args.gram == "all":
