@@ -16,8 +16,10 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 
 Updated
 ---
-v2.0.5 released on Feb 17, 2020, please use `pip install run-dbcan==2.0.5 --user` for update
-We disgard FragGeneScan because this program does not work now. We use Prodigal instead. So, you don't need to use conda install fraggenescan now.
+v2.0.7 (1)Add ec number prediction to hotpep result; (2) 04/21/2020 dbCAN2 Hotpep PPR patterns updated to most recent release of CAZyDB (2019). Also missing group EC# files for families added in;(3) Revising the output name file in hotpep as random number, to make the program more robust for paralleing running.
+v2.0.6 released on Feb 17, 2020, please use `pip install run-dbcan==2.0.6 --user` for update
+We forgo FragGeneScan because this program does not work now. We use Prodigal instead. So, you don't need to use conda install fraggenescan now.
+We add extra information `EC number` to the last columns of Hotpep output to make it consistent with previous Hotpep result.
 
 Function
 ----
@@ -26,6 +28,9 @@ Function
 - Runs input against HMMER, DIAMOND, and Hotpep
 - Optionally predicts CGCs with CGCFinder
 
+Support Platform
+-----
+Linux(Ubuntu, CentOS), MacOS
 
 Python Package Usage
 -----
@@ -33,7 +38,7 @@ Python Package Usage
 
 2. Install this package with pip.
 ```
-pip install run-dbcan==2.0.5 --user
+pip install run-dbcan==2.0.8 --user
 ```
 3. Install dependencies with conda.
 ```

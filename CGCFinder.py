@@ -171,7 +171,6 @@ with open(args.gffFile) as f:
 			contigs[row[0]] = []
 		contigs[row[0]].append(row)
 
-
 #loop through contig
 for key in contigs:
 	contig = contigs[key]
@@ -179,6 +178,7 @@ for key in contigs:
 	i = 0
 	while i < len(contig) - 1:
 		fd = contig[i][2]
+		
 		if isImportant(fd):
 			increaseClusterCount(fd)
 			i = startSearch(i, contig)

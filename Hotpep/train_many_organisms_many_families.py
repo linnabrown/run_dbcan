@@ -22,7 +22,7 @@ threads = 1
 peptide_length = 6 #length of conserved peptides
 hit_cut_off = 3 #number of conserved peptides necessary to classify a protein
 freq_cut_off = 1.0 #minimum sum of frequencies necessary to classify a protein
-list_multidomain_enzymes = "no"
+list_multidomain_enzymes = "yes"
 
 if len(sys.argv) > 1:
 	organism_array = [sys.argv[1]]

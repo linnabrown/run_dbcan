@@ -5,6 +5,7 @@ import sys
 import natsort
 import os
 import os.path
+import re
 
 from Hotpep.hotpep_data import hotpep_data_path
 
@@ -42,6 +43,7 @@ class Protein:
 		self.subp = None
 		self.accession = None
 		self.neighbour_seqs = None
+		self.ec = None #added by Le Feb 19, 2020
 		
 	
 def callCustom(args):
@@ -86,10 +88,21 @@ while var1 <= threads:
 			p.hits = int(f[x+3].rstrip())
 			p.freq = float(f[x+4].rstrip())
 			p.group = int(f[x+5].rstrip())
+			#add by Le start Feb 19, 2020
+			fam_main = " ".join(re.findall("[a-zA-Z]+", fam))
+			if os.path.exists(f"CAZY_PPR_patterns/{fam_main}/{fam}/{fam}_group_ec.txt"):
+				kk = open(f"CAZY_PPR_patterns/{fam_main}/{fam}/{fam}_group_ec.txt").\
+						readlines()[p.group-1].rstrip().split("\t")
+				if len(kk) >1:
+					p.ec = kk[1]
+				else:
+					p.ec = "NA"
+			else:
+				p.ec = "NA"
+			#add by Le end Feb 19, 2020
 			pep_list_hash[fam].append(p)
-	var1 += 1
-	
-output_dir_name = protein_dir_name+'/Results'
+	var1 += 1		
+output_dir_name = protein_dir_name+"/Results"
 if not os.path.exists(output_dir_name):
 	call(["mkdir", output_dir_name])
 for fam in pep_list_array:
@@ -98,6 +111,8 @@ for fam in pep_list_array:
 	fam_file = open(output_dir_name+"/output.txt", "a")
 	hit_array.sort(key= lambda x: (x.group, -x.freq, -x.hits))
 	for p in hit_array:
-		fam_file.write(fam+ '\t' +str(p.group)+"\t"+p.name.split(' ')[0][1:]+"\t"+str(p.freq)+"\t"+str(p.hits)+"\t"+p.peptides+"\n")
+		#added ec number by Le start
+		fam_file.write(fam+ '\t' +str(p.group)+"\t"+p.name.split(' ')[0][1:]+"\t"+str(p.freq)+"\t"+str(p.hits)+"\t"+p.peptides+"\t"+p.ec+"\n")
+		#added ec number by Le end
 	fam_file.close()
 
