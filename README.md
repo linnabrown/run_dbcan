@@ -17,13 +17,14 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 Updated
 ---
 
-- v2.0.10 please use `pip install run-dbcan==2.0.10` for update
+- v2.0.11 please use `pip install run-dbcan==2.0.11` for update
     1. Add ec number prediction to hotpep result; 
     2. 04/21/2020 dbCAN2 Hotpep PPR patterns updated to most recent release of CAZyDB (2019). Also missing group EC# files for families added in;
     3. Revising the output name file in hotpep as random number, to make the program more robust for paralleing running.
     4. Prioritizing the CAZyme prediction over TF/TC/STP prediction when preparing gff input file for CGC-Finder. 
     5. Rewrite the installation steps. Recommend user to use customized virtual environment (use certain python version).
     6. Fix the duplicate ACC of tf-2.hmm to make it compatiable for the newest hmmer (3.3). Delete version limitatino to hmmer.
+    7. Fix the prodigal predicted gff file end with `";"` problem.
 
 - v2.0.6 released on Feb 17, 2020, please use `pip install run-dbcan==2.0.6` for update
 We forgo FragGeneScan because this program does not work now. We use Prodigal instead. So, you don't need to use conda install fraggenescan now.
@@ -55,7 +56,7 @@ conda activate run_dbcan
 3. Install this package with pip.
 
 ```
-pip install run-dbcan==2.0.10
+pip install run-dbcan==2.0.11
 ```
 
 

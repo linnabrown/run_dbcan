@@ -350,7 +350,7 @@ if find_clusters:
             with open(outDir+prefix+'cgc.gff', 'w') as out:
                 for line in f:
                     if not line.startswith("#"):
-                        row = line.rstrip().split('\t')
+                        row = line.rstrip().rstrip(";").split('\t')
                         num = row[-1].split(";")[0].split('_')[-1]
                         gene = row[0] + '_' + num
                         row[8] = ""
@@ -383,7 +383,7 @@ if find_clusters:
                         if not line.startswith("#"):
                             row = line.rstrip().split('\t')
                             if row[2] == "CDS":
-                                note = row[8].strip().split(";")
+                                note = row[8].strip().rstrip(";").split(";")
                                 gene = ""
                                 notes = {}
                                 for x in note:
@@ -418,7 +418,7 @@ if find_clusters:
                     for line in f:
                         if line.startswith("track"):
                             continue
-                        row = line.rstrip().split('\t')
+                        row = line.rstrip().rstrip(";").split('\t')
                         outrow = ['.','.','.','.','.','.','.','.','']
                         gene = row[1]
                         if gene in cazyme:
