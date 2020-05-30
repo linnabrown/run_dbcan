@@ -64,7 +64,7 @@ pip install run-dbcan==2.0.11
 ```
 test -d db || mkdir db
 cd db \
-    && wget http://bcb.unl.edu/dbCAN2/download/Databases/CAZyDB.07312019.fa && diamond makedb --in CAZyDB.07312019.fa -d CAZy \
+    && wget http://bcb.unl.edu/dbCAN2/download/CAZyDB.07312019.fa.nr && diamond makedb --in CAZyDB.07312019.fa.nr -d CAZy \
     && wget http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-HMMdb-V8.txt && mv dbCAN-HMMdb-V8.txt dbCAN.txt && hmmpress dbCAN.txt \
     && wget http://bcb.unl.edu/dbCAN2/download/Databases/tcdb.fa && diamond makedb --in tcdb.fa -d tcdb \
     && wget http://bcb.unl.edu/dbCAN2/download/Databases/tf-1.hmm && hmmpress tf-1.hmm \
