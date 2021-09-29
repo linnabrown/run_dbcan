@@ -215,11 +215,11 @@ information. Otherwise, the AuxillaryFile may be left blank.
 
 [--hmm_cpu]     - optional, allows user to set how many CPU cores HMMER can use. Default = 1.
 
-[--hot_hits]    - optional, allows user to set the Hotpep Hits value. Default = 6.
+[--hotpep_hits]    - optional, allows user to set the Hotpep Hits value. Default = 6.
 
-[--hot_freq]    - optional, allows user to set the Hotpep Frequency value. Default = 2.6.
+[--hotpep_freq]    - optional, allows user to set the Hotpep Frequency value. Default = 2.6.
 
-[--hot_cpu]     - optional, allows user to set how many CPU cores Hotpep can use. Default = 3.
+[--hotpep_cpu]     - optional, allows user to set how many CPU cores Hotpep can use. Default = 3.
 
 [--tf_eval]     - optional, allows user to set tf.hmm HMMER E Value. Default = 1e-4.
 
