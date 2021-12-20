@@ -182,13 +182,13 @@ P.S.: You do not need to download `CGCFinder` and `hmmscan-parser` because they 
 ----
 [Databse](http://bcb.unl.edu/dbCAN2/download/Databases) -- Database Folder
 
-[CAZyDB.07312019.fa](http://bcb.unl.edu/dbCAN2/download/Databases/CAZyDB.07312019.fa)--use `diamond makedb --in CAZyDB.07312019.fa -d CAZy`
+[CAZy.fa](http://bcb.unl.edu/dbCAN2/download/Databases/CAZyDB.09242021.fa)--use `diamond makedb --in CAZyDB.09242021.fa -d CAZy`
 
 [CAZyme]:included in eCAMI.
 
 [EC]: included in eCAMI.
 
-[dbCAN-HMMdb-V8.txt](http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-HMMdb-V8.txt)--First use `mv dbCAN-HMMdb-V8.txt dbCAN.txt`, then use `hmmpress dbCAN.txt`
+[dbCAN-HMMdb-V10.txt](http://bcb.unl.edu/dbCAN2/download/Databases/V10/dbCAN-HMMdb-V10.txt)--First use `mv dbCAN-HMMdb-V10.txt dbCAN.txt`, then use `hmmpress dbCAN.txt`
 
 [tcdb.fa](http://bcb.unl.edu/dbCAN2/download/Databases/tcdb.fa)--use `diamond makedb --in tcdb.fa -d tcdb`
 
