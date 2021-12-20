@@ -67,6 +67,8 @@ pip install run-dbcan==2.1.0
 
 4. Database Installation.
 ```
+git clone https://github.com/linnabrown/run_dbcan.git
+cd run_dbcan
 test -d db || mkdir db
 cd db \
     && wget http://bcb.unl.edu/dbCAN2/download/CAZyDB.07312019.fa.nr && diamond makedb --in CAZyDB.07312019.fa.nr -d CAZy \
@@ -153,7 +155,7 @@ REQUIREMENTS
 **TOOLS**
 
 ----
-P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-parser` because they are included in run_dbcan V2. If you use python package or docker, you don't need to download Prodigal because they includes these denpendencies. Otherwise we recommend you to install and copy them into `/usr/bin` as system application or add their path into system envrionmental profile.
+P.S.: You do not need to download `CGCFinder` and `hmmscan-parser` because they are included in run_dbcan V2. If you use python package or docker, you don't need to download Prodigal because they includes these denpendencies. Otherwise we recommend you to install and copy them into `/usr/bin` as system application or add their path into system envrionmental profile.
 
 
 [Python3]--Be sure to use python3, not python2
@@ -164,7 +166,7 @@ P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-pars
 
 [hmmscan-parser](https://github.com/linnabrown/run_dbcan/blob/master/hmmscan-parser.py)--This is included in dbCAN2.
 
-[Hotpep-Python](https://github.com/linnabrown/run_dbcan/tree/master/Hotpep)--This newest version is included in dbCAN2.
+[eCAMI-Python](https://github.com/zhanglabNKU/eCAMI.git)--This newest version is included in eCAMI.
 
 [signalp](http://www.cbs.dtu.dk/services/SignalP/)--please download and install if you need.
 
@@ -181,7 +183,9 @@ P.S.: You do not need to download `CGCFinder`, `Hotpep-Python` and `hmmscan-pars
 
 [CAZyDB.07312019.fa](http://bcb.unl.edu/dbCAN2/download/Databases/CAZyDB.07312019.fa)--use `diamond makedb --in CAZyDB.07312019.fa -d CAZy`
 
-[PPR]:included in Hotpep
+[CAZyme]:included in eCAMI.
+
+[EC]: included in eCAMI.
 
 [dbCAN-HMMdb-V8.txt](http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-HMMdb-V8.txt)--First use `mv dbCAN-HMMdb-V8.txt dbCAN.txt`, then use `hmmpress dbCAN.txt`
 
@@ -206,7 +210,7 @@ Params
 the AuxillaryFile must be a GFF or BED format file containing gene positioning
 information. Otherwise, the AuxillaryFile may be left blank.
 
-[-t Tools] 		- optional, allows user to select a combination of tools to run. The options are any combination of 'diamond', 'hmmer', and 'hotpep'. The default value is 'all' which runs all three tools.
+[-t Tools] 		- optional, allows user to select a combination of tools to run. The options are any combination of 'diamond', 'hmmer', and 'eCAMI'. The default value is 'all' which runs all three tools.
 
 [--dbCANFile]   - optional, allows user to set the file name of dbCAN HMM Database.
 
@@ -267,7 +271,7 @@ Several files will be produced via `run_dbcan.py`. They are as follows:
 	uniInput - The unified input file for the rest of the tools
 			(created by prodigal if a nucleotide sequence was used)
 
-	Hotpep.out - the output from the Hotpep run
+	eCAMI.out - the output from the eCAMI run
 
 	diamond.out - the output from the diamond blast
 
@@ -299,7 +303,7 @@ or
 run_dbcan.py EscheriaColiK12MG1655.faa protein --out_dir output_EscheriaColiK12MG1655
 ```
 
-While this example directory contains all the databases you will need (already formatted) and the Hotpep and Prodigal programs, you will still need to have the remaining programs installed on your machine (DIAMOND, HMMER, etc.).
+While this example directory contains all the databases you will need (already formatted) and the eCAMI and Prodigal programs, you will still need to have the remaining programs installed on your machine (DIAMOND, HMMER, etc.).
 
 To run the examples with CGCFinder turned on, run:
 ```

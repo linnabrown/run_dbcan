@@ -126,6 +126,6 @@ meta.yaml
 .DS_Store
 
 #comment Hotpep
-Hotpep/*
+
 Hotpep_bkp*
 
