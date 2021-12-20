@@ -21,6 +21,7 @@ Updated
     2. Changed the format of cgc.out to make it easy to read;
     3. Fix ‘-t all’ will cause the program to generate empty files.
     4. Created the package.
+    5. Updated CAZy db for Diamond and HMMER DB for HMMER.
 
 - v2.0.11 please use `pip install run-dbcan==2.0.11` for update
     1. Add ec number prediction to hotpep result; 
@@ -71,8 +72,8 @@ git clone https://github.com/linnabrown/run_dbcan.git
 cd run_dbcan
 test -d db || mkdir db
 cd db \
-    && wget http://bcb.unl.edu/dbCAN2/download/CAZyDB.07312019.fa.nr && diamond makedb --in CAZyDB.07312019.fa.nr -d CAZy \
-    && wget http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-HMMdb-V8.txt && mv dbCAN-HMMdb-V8.txt dbCAN.txt && hmmpress dbCAN.txt \
+    && wget http://bcb.unl.edu/dbCAN2/download/CAZyDB.09242021.fa && diamond makedb --in CAZyDB.09242021.fa -d CAZy \
+    && wget https://bcb.unl.edu/dbCAN2/download/Databases/V10/dbCAN-HMMdb-V10.txt && mv dbCAN-HMMdb-V10.txt dbCAN.txt && hmmpress dbCAN.txt \
     && wget http://bcb.unl.edu/dbCAN2/download/Databases/tcdb.fa && diamond makedb --in tcdb.fa -d tcdb \
     && wget http://bcb.unl.edu/dbCAN2/download/Databases/tf-1.hmm && hmmpress tf-1.hmm \
     && wget http://bcb.unl.edu/dbCAN2/download/Databases/tf-2.hmm && hmmpress tf-2.hmm \
