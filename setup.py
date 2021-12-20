@@ -12,12 +12,12 @@ long_description = """This is the standalone version of dbCAN annotation tool fo
 """
 
 setup(name='run_dbcan',
-      version="2.1.0",
+      version="3.0.0",
     #   use_scm_version=True,
       setup_requires=['setuptools_scm', 'setuptools_scm_git_archive'],
       description='Standalone version of dbCAN annotation tool for automated CAZyme annotation',
       long_description=long_description,
-      author='Tanner Yohe and Le Huang',
+      author='Tanner Yohe, Le Huang and Qiwei Ge',
       author_email='lehuang@unc.edu',
       url='https://github.com/linnabrown/run_dbcan',
       classifiers=[
@@ -32,9 +32,6 @@ setup(name='run_dbcan',
       packages=find_packages(),
     #   include_package_data = True,
       include_package_data=False,
-    #   package_data={
-    #       'eCAMI':['*.txt']
-    #   },
 
       scripts=[
           'CGCFinder.py',

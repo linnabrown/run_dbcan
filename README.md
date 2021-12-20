@@ -16,7 +16,7 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 
 Updated
 ---
-- V2.1.0 please use `pip install run-dbcan==2.1.0` for update
+- V3.0.0  please use `pip install run-dbcan==3.0.0` for update
     1. Add eCAMI tool, remove Hotpep from run_dbCAN;
     2. Changed the format of cgc.out to make it easy to read;
     3. Fix ‘-t all’ will cause the program to generate empty files.
@@ -61,7 +61,7 @@ conda activate run_dbcan
 3. Install this package with pip.
 
 ```
-pip install run-dbcan==2.1.0
+pip install run-dbcan==3.0.0
 ```
 
 
