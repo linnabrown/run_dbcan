@@ -14,6 +14,7 @@ A standalone tool of http://bcb.unl.edu/dbCAN2/
 
 Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner Yohe of the Yin lab at NIU.
 
+*To old user: We recently replace Hotpep with a better tool eCAMI which has higher accuracy and speed. Please refer this paper https://doi.org/10.6084/m9.figshare.14370836.v1. However, we did not incorporate the eCAMI tool in PYPI package sucessfully so you had to use `git clone https://github.com/linnabrown/run_dbcan.git` to install this eCAMI package. We are sorry for the un-elegant way and we are still trying to compress it to PYPI. If you can incorporate eCAMI into PYPI package we are very welcome your pulled request. Thank you so much and sorry for the incovienience.*
 Updated
 ---
 - V3.0.0  please use `pip install run-dbcan==3.0.0` for update
