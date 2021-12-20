@@ -1,5 +1,5 @@
 
-run_dbcan
+run_dbcan3
 ========================
 
 Status
@@ -16,6 +16,11 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 
 Updated
 ---
+- V2.1.0 please use `pip install run-dbcan==2.1.0` for update
+    1. Add eCAMI tool, remove Hotpep from run_dbCAN;
+    2. Changed the format of cgc.out to make it easy to read;
+    3. Fix ‘-t all’ will cause the program to generate empty files.
+    4. Created the package.
 
 - v2.0.11 please use `pip install run-dbcan==2.0.11` for update
     1. Add ec number prediction to hotpep result; 
@@ -35,7 +40,7 @@ Function
 ----
 - Accepts user input
 - Predicts genes if needed
-- Runs input against HMMER, DIAMOND, and Hotpep
+- Runs input against HMMER, DIAMOND, and eCAMI
 - Optionally predicts CGCs with CGCFinder
 
 Support Platform
@@ -56,7 +61,7 @@ conda activate run_dbcan
 3. Install this package with pip.
 
 ```
-pip install run-dbcan==2.0.11
+pip install run-dbcan==2.1.0
 ```
 
 
@@ -215,11 +220,15 @@ information. Otherwise, the AuxillaryFile may be left blank.
 
 [--hmm_cpu]     - optional, allows user to set how many CPU cores HMMER can use. Default = 1.
 
-[--hotpep_hits]    - optional, allows user to set the Hotpep Hits value. Default = 6.
+[--eCAMI_kmer_db] -optional, allows user to set n_mer directories path for prediction. Default=Cazyme.
 
-[--hotpep_freq]    - optional, allows user to set the Hotpep Frequency value. Default = 2.6.
+[--eCAMI_k_mer] -optional, allows user to set peptide length for prediction. Default=8.
 
-[--hotpep_cpu]     - optional, allows user to set how many CPU cores Hotpep can use. Default = 3.
+[--eCAMI_jobs] -optional, number of jobs for prediction. Default=8.
+
+[--eCAMI_important_k_mer_number] -optional, Minimum number of n_mer for prediction. Default=5.
+
+[--eCAMI_beta] -optional, Minimum sum of percentage of frequency of n_mer for prediction. Default=2.
 
 [--tf_eval]     - optional, allows user to set tf.hmm HMMER E Value. Default = 1e-4.
 

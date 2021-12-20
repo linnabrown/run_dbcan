@@ -9,11 +9,15 @@ __pycache__/
 # Distribution / packaging
 .Python
 build/
+build
+build_bkp
 develop-eggs/
 dist/
+dist
 downloads/
 eggs/
 .eggs/
+.eggs
 lib/
 lib64/
 parts/
@@ -21,6 +25,7 @@ sdist/
 var/
 wheels/
 *.egg-info/
+*.egg-info
 .installed.cfg
 *.egg
 MANIFEST
@@ -108,6 +113,7 @@ venv.bak/
 
 # db
 db/*
+db
 example/
 
 #signalp, prodigal, FragGeneScan1.30
@@ -118,3 +124,8 @@ example/
 
 meta.yaml
 .DS_Store
+
+#comment Hotpep
+Hotpep/*
+Hotpep_bkp*
+

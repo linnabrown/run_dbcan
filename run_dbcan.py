@@ -7,8 +7,9 @@
 # Updated by Mohamad Majd Raslan in the Yin Lab at NIU
 # Updated by Wei Li created table
 # Updated by Le Huang at NKU
-# Last updated 09/08/19
-# updated information[Le Huang]: 1. suitable for python3 users 2. fixed the bugs when the count of sequences is small.
+# Updated by Qiwei Ge in Dr.Yin's Lab at UNL
+# Last updated 10/18/21
+# updated information[Qiwei Ge]: 1. Hotpep has been removed, added eCAMI tool. 2. cgc out reformatting. 3. Fixed issues multiple GT2s.  
 # Accepts user input
 # Predicts genes if needed
 # Runs input against HMMER, DIAMOND, and Hotpep
@@ -20,6 +21,7 @@ from subprocess import Popen, call, check_output
 import os
 import argparse
 import sys
+import simplify_cgc
 
 '''
 def some functions
@@ -44,9 +46,13 @@ parser.add_argument('--dia_cpu', default=4, type=int, help='Number of CPU cores 
 parser.add_argument('--hmm_eval', default=1e-15, type=float, help='HMMER E Value')
 parser.add_argument('--hmm_cov', default=0.35, type=float, help='HMMER Coverage val')
 parser.add_argument('--hmm_cpu', default=4, type=int, help='Number of CPU cores that HMMER is allowed to use')
-parser.add_argument('--hotpep_hits', default=6, type=int, help='Hotpep Hit value')
-parser.add_argument('--hotpep_freq', default=2.6, type=float, help='Hotpep Frequency value')
-parser.add_argument('--hotpep_cpu', default=3, type=int, help='Number of CPU cores that Hotpep is allowed to use')
+# eCAMI
+parser.add_argument('--eCAMI_kmer_db', default="CAZyme",type=str, help="Change n_mer directories path for prediction")
+parser.add_argument('--eCAMI_k_mer', default=8, type=int, help="Peptide length for prediction")
+parser.add_argument('--eCAMI_jobs', default=8, type=int, help='Number of processor for use for prediction')
+parser.add_argument('--eCAMI_important_k_mer_number', default=5, type=int, help="Minimum number of n_mer for prediction")
+parser.add_argument('--eCAMI_beta', default=2, type=float, help="Minimum sum of percentage of frequency of n_mer for prediction")
+# eCAMI
 parser.add_argument('--tf_eval', default=1e-4, type=float, help='tf.hmm HMMER E Value')
 parser.add_argument('--tf_cov', default=0.35, type=float, help='tf.hmm HMMER Coverage val')
 parser.add_argument('--tf_cpu', default=1, type=int, help='tf.hmm Number of CPU cores that HMMER is allowed to use')
@@ -55,10 +61,10 @@ parser.add_argument('--stp_cov', default=0.3, type=float, help='stp.hmm HMMER Co
 parser.add_argument('--stp_cpu', default=1, type=int, help='stp.hmm Number of CPU cores that HMMER is allowed to use')
 parser.add_argument('--out_pre', default="", help='Output files prefix')
 parser.add_argument('--out_dir', default="output", help='Output directory')
-parser.add_argument('--db_dir', default="db/", help='Database directory')
+parser.add_argument('--db_dir', default="db", help='Database directory')
 parser.add_argument('--cgc_dis', default=2, help='CGCFinder Distance value')
 parser.add_argument('--cgc_sig_genes', default='tp', choices=['tp', 'tf','all'], help='CGCFinder Signature Genes value')
-parser.add_argument('--tools', '-t', nargs='+', choices=['hmmer', 'diamond', 'hotpep', 'all'], default='all', help='Choose a combination of tools to run')
+parser.add_argument('--tools', '-t', nargs='+', choices=['hmmer', 'diamond', 'eCAMI', 'all'], default='all', help='Choose a combination of tools to run')
 parser.add_argument('--use_signalP', default=False, type=bool, help='Use signalP or not, remember, you need to setup signalP tool first. Because of signalP license, Docker version does not have signalP.')
 parser.add_argument('--gram', '-g', choices=["p","n","all"], default="all", help="Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of SingalP, only if user use singalP")
 args = parser.parse_args()
@@ -98,12 +104,12 @@ if not os.path.isdir(dbDir):
     print(dbDir , "ERROR: The database directory does not exist")
     exit()
 
-if not os.path.isfile(dbDir+'CAZy.dmnd'):
+if not os.path.isfile(os.path.join(dbDir,'CAZy.dmnd')):
     print("ERROR: No CAZy DIAMOND database found. \
     Please make sure that your CAZy DIAMOND databased is named 'CAZy.dmnd' and is located in your database directory")
     exit()
 
-if not os.path.isfile(dbDir + args.dbCANFile):
+if not os.path.isfile(os.path.join(dbDir, args.dbCANFile)):
     print("ERROR: No dbCAN HMM database found. \
     Please make sure that your dbCAN HMM database is named 'dbCAN-HMMdb-V8.txt' or the newest one, has been through hmmpress, and is located in your database directory")
     exit()
@@ -120,13 +126,13 @@ if find_clusters and inputType == "protein":
     else:
         print("ERROR: Please provide an auxillary input file with the position of each gene. This file can either be in BED or GFF format")
         exit()
-tools = [True, True, True] #DIAMOND, HMMER, Hotpep
-if args.tools != 'all':
+tools = [True, True, True] #DIAMOND, HMMER, eCAMI
+if 'all' not in args.tools:
     if 'diamond' not in args.tools:
         tools[0] = False
     if 'hmmer' not in args.tools:
         tools[1] = False
-    if 'hotpep' not in args.tools:
+    if 'eCAMI' not in args.tools:
         tools[2] = False
 
 
@@ -159,59 +165,53 @@ if args.use_signalP:
 if tools[0]:
     # diamond blastp -d db/CAZy -e 1e-102 -q output_EscheriaColiK12MG1655/uniInput -k 1 -p 2 -o output_EscheriaColiK12MG1655/diamond1.out -f 6
     print("\n\n***************************1. DIAMOND start*************************************************\n\n")
-    os.system('diamond blastp -d %sCAZy -e %s -q %suniInput -k 1 -p %d -o %sdiamond.out -f 6'%(dbDir, str(args.dia_eval), outPath, args.dia_cpu, outPath))
+    os.system('diamond blastp -d %s -e %s -q %suniInput -k 1 -p %d -o %sdiamond.out -f 6'%(os.path.join(dbDir, "CAZy"), str(args.dia_eval), outPath, args.dia_cpu, outPath))
     # diamond = Popen(['diamond', 'blastp', '-d', '%sCAZy.dmnd' % dbDir, '-e', str(args.dia_eval), '-q', '%suniInput' % outPath, '-k', '1', '-p', str(args.dia_cpu), '-o', '%sdiamond.out'%outPath, '-f', '6'])
     print("\n\n***************************1. DIAMOND end***************************************************\n\n")
 
 if tools[1]:
     print("\n\n***************************2. HMMER start*************************************************\n\n")
-    os.system(f"hmmscan --domtblout {outPath}h.out --cpu {args.hmm_cpu} -o /dev/null {dbDir}{args.dbCANFile} {outPath}uniInput ")
+    os.system(f"hmmscan --domtblout {outPath}h.out --cpu {args.hmm_cpu} -o /dev/null {os.path.join(dbDir, args.dbCANFile)} {os.path.join(outPath, "uniInput")} ")
     print("\n\n***************************2. HMMER end***************************************************\n\n")
-    call(f"hmmscan-parser.py {outPath}h.out {str(args.hmm_eval)} {str(args.hmm_cov)} > {outPath}hmmer.out", shell=True)
+    call(f"hmmscan-parser.py {os.path.join(outPath,"h.out")} {str(args.hmm_eval)} {str(args.hmm_cov)} > {os.path.join(outPath, "hmmer.out")}", shell=True)
+    with open(f"{outPath}hmmer.out", "r+") as f:
+        text = f.read()
+        f.close()
+        call(['rm', f"{outPath}hmmer.out"])
+        text = text.split('\n')
+        if '' in text:
+            text.remove('')
+        for i in range(len(text)):
+            if 'GT2_' in text[i]:
+                profile = text[i].split('\t')[0].split('.')[0]
+                text[i] = text[i].replace(profile,'GT2')
+            with open(f"{outPath}hmmer.out", 'a') as f:
+                f.write(text[i]+'\n')
+                f.close()
     if os.path.exists(f"{outPath}h.out"):
         call(['rm', f"{outPath}h.out"])
 
 if tools[2]:
-    count = int(check_output(f"tr -cd '>' < {outPath}uniInput | wc -c" , shell=True))    #number of genes in input file
-    numThreads = args.hotpep_cpu if count >= args.hotpep_cpu else count   #number of cores for Hotpep to use, revised by Le Huang 12/17/2018
-    count_per_file = count / numThreads      #number of genes per core
-    directory = "input_" + str(os.getpid())
-    if not os.path.exists(f"Hotpep/{directory}"):
-        os.makedirs(f"Hotpep/{directory}")
-    num_files = 1
-    num_genes = 0
-    out = open(f"Hotpep/{directory}/orfs{str(num_files)}.txt", "w")
-    with open(f"{outPath}uniInput", "r") as f:
-        for line in f:
-            if line.startswith(">"):
-                num_genes += 1
-                if num_genes > count_per_file and num_files != numThreads:
-                    out.close()
-                    num_files += 1
-                    num_genes = 0
-                    out = open(f"Hotpep/{directory}/orfs{str(num_files)}.txt", "w")
-            out.write(line)
-    out.close()
-    os.chdir("Hotpep/")
-    print("\n\n***************************3. HotPep start***************************************************\n\n")
-    os.system(f"train_many_organisms_many_families.py {directory} {numThreads} {args.hotpep_hits} {args.hotpep_freq}")
-    os.chdir('../')
-    print("\n\n***************************3. hotPep end***************************************************\n\n")
-    os.system(f"cp Hotpep/{directory}/Results/output.txt {outPath}Hotpep.out")
-    os.system(f"rm -r Hotpep/{directory}")
-
+    print("\n\n***************************3. eCAMI start***************************************************\n\n")
+    
+    os.system('python eCAMI/prediction.py -input %suniInput -kmer_db eCAMI/%s -output %seCAMI.out -k_mer %s -jobs %s -important_k_mer_number %s -beta %s' % (outPath, str(args.eCAMI_kmer_db), outPath, str(args.eCAMI_k_mer), str(args.eCAMI_jobs), str(args.eCAMI_important_k_mer_number),str(args.eCAMI_beta)))
+    
+    print("\n\n***************************3. eCAMI end***************************************************\n\n")
 # End Core Tools
 ########################
 # Begin Adding Column Headers
 
 if tools[2]:
-    with open(outPath+'Hotpep.out') as f:
+    with open(outPath+'eCAMI.out') as f:
         with open(outPath+'temp', 'w') as out:
-            out.write('CAZy Family\tPPR Subfamily\tGene ID\tFrequency\tHits\tSignature Peptides\tEC number\n')
-            for line in f:
-                more_information = line.split("\t")
-                out.write(line)
-    call(['mv', outPath+'temp', outPath+'Hotpep.out'])
+            out.write('protein_name\tfam_name:group_number\tsubfam_name_of_the_group:subfam_name_count\n')
+            # for line in f:
+            for count, line in enumerate(f):
+                if count % 2 == 0:
+                    more_information = line.split(">")
+                    out.write(more_information[1])
+    call(['mv', outPath+'temp', outPath+'eCAMI.out'])
+
 if tools[1]:
     with open(outDir+prefix+'hmmer.out') as f:
         with open(outDir+prefix+'temp', 'w') as out:
@@ -219,6 +219,7 @@ if tools[1]:
             for line in f:
                 out.write(line)
     call(['mv', outDir+prefix+'temp', outDir+prefix+'hmmer.out'])
+
 if tools[0]:
     with open(outDir+prefix+'diamond.out') as f:
         with open(outDir+prefix+'temp', 'w') as out:
@@ -305,8 +306,9 @@ if find_clusters:
 # Begine CAZyme Extraction
     cazyme_genes = {}
     dia = set()
-    hot = set()
+    # hot = set()
     hmm = set()
+    eca = set()
     if tools[0]:
         with open(outDir+prefix+'diamond.out') as f:
             next(f)
@@ -326,21 +328,29 @@ if find_clusters:
                     cazyme_genes[row[2]] = set()
                 cazyme_genes[row[2]].add(row[0].split('.hmm')[0])
     if tools[2]:
-        with open(outDir+prefix+'Hotpep.out') as f:
+        with open(outDir+prefix+'eCAMI.out') as f:
             next(f)
             for line in f:
-                row = line.rstrip().split('\t')
-                hot.add(row[2])
-                if row[2] not in cazyme_genes:
-                    cazyme_genes[row[2]] = set()
-                cazyme_genes[row[2]].add(row[0])
+                row_ori = line.rstrip().split('\t')
+                if ' ' in row_ori[0]:
+                    fams_ID = row_ori[0].split(' ')[0]        
+                else:
+                    fams_ID = row_ori[0]
+                eca.add(fams_ID)
+                if fams_ID not in cazyme_genes:
+                    cazyme_genes[fams_ID] = set()
+                cazyme_genes[fams_ID].add(row_ori[1].split(':')[0])
+            
     if tools.count(True) > 1:
-        temp1 = hmm.intersection(hot)
+        temp1 = hmm.intersection(eca)
+        # print(hmm, 'This intersection  hmm')
         temp2 = hmm.intersection(dia)
-        temp3 = dia.intersection(hot)
+        # print(dia, 'This intersection  dia')
+        temp3 = dia.intersection(eca)
+        # print(eca, 'This intersection  eca')
         cazyme = temp1.union(temp2, temp3)
     else:
-        cazyme = hmm.union(dia, hot)
+        cazyme = hmm.union(dia, eca)
 # End CAZyme Extraction
 ######################
 # Begin GFF preperation
@@ -446,8 +456,8 @@ if find_clusters:
     # Begin CGCFinder call
 
     call(['CGCFinder.py', outDir+prefix+'cgc.gff', '-o', outDir+prefix+'cgc.out', '-s', args.cgc_sig_genes, '-d', str(args.cgc_dis)])
+    simplify_cgc.simplify_output('cgc.out')
     print("**************************************CGC-Finder end***********************************************")
-
     # End CGCFinder call
     # End CGCFinder
     ####################
@@ -485,7 +495,7 @@ if args.use_signalP:
 #######################
 #######################
 # start Overview
-print ("Preparing overview table from hmmer, hotpep and diamond output...")
+print ("Preparing overview table from hmmer, eCAMI and diamond output...")
 workdir= outDir+prefix
 # a function to remove duplicates from lists while keeping original order
 def unique(seq):
@@ -502,8 +512,8 @@ if tools[1]:
     hmmer_genes = [arr_hmmer[i].split()[2] for i in range(1, len(arr_hmmer))] # or hmmer_genes = []
 
 if tools[2]:
-    arr_hotpep = open(workdir+"Hotpep.out").readlines()
-    hotpep_genes = [arr_hotpep[i].split()[2] for i in range(1, len(arr_hotpep))]# or hotpep_genes = []
+    arr_eCAMI = open(workdir+"eCAMI.out").readlines()
+    eCAMI_genes = [arr_eCAMI[i].split()[0] for i in range(1, len(arr_eCAMI))]# or eCAMI_genes = []
 
 if args.use_signalP and (os.path.exists(workdir + "signalp.out")):
     arr_sigp = open(workdir+"signalp.out").readlines()
@@ -518,11 +528,13 @@ if not tools[0]:
 if not tools[1]:
     hmmer_genes   = []
 if not tools[2]:
-    hotpep_genes  =[]
-if len(hotpep_genes) > 0:
-    if (hotpep_genes[-1] == None):
-        hotpep_genes.pop()
-        hotpep_genes = unique(hotpep_genes)
+    eCAMI_genes  =[]
+
+if len(eCAMI_genes) > 0:
+    if (eCAMI_genes[-1] == None):
+        #print('I am in &&&&&&&&&&&&&&&&&&&&&&')
+        eCAMI_genes.pop()
+        eCAMI_genes = unique(eCAMI_genes)
         if 'hmmer_genes' in locals():
             hmmer_genes.pop()
             hmmer_genes = unique(hmmer_genes)
@@ -539,7 +551,6 @@ if tools[0] and (len(arr_diamond) > 1):
         fam = row[1].strip("|").split("|")
         diamond_fams[row[0]] = fam[1:]
 
-
 if tools[1] and (len(arr_hmmer) > 1):
     hmmer_fams = {}
     for i in range (1, len(arr_hmmer)):
@@ -550,35 +561,64 @@ if tools[1] and (len(arr_hmmer) > 1):
             hmmer_fams[row[2]] = []
         hmmer_fams[row[2]].append(fam)
 
-if tools[2] and (len(arr_hotpep) > 1) :
-    hotpep_fams = {}
-    for i in range (1,len(arr_hotpep)):
-        row = arr_hotpep[i].split("\t")
-        if(row[2] not in hotpep_fams):
-            hotpep_fams[row[2]] = []
-        hotpep_fams[row[2]].append(row[0]+"("+row[1]+")")
+
+if tools[2] and (len(arr_eCAMI) > 1) :
+    eCAMI_fams = {}
+    for i in range (1,len(arr_eCAMI)):
+        row_ori = arr_eCAMI[i].split("\t")
+        subfam_names = row_ori[2].split('|')
+        fam = row_ori[1].split(':')
+        if ' ' in row_ori[0]:
+            fams_ID = row_ori[0].split(' ')[0]
+        else:
+            fams_ID = row_ori[0]
+
+        diam_name = []
+        for name in subfam_names:
+            if '.' in name:
+                diam_name.append(name.split(":")[0])
+
+        if(fams_ID not in eCAMI_fams):
+            eCAMI_fams[fams_ID] = {}
+            eCAMI_fams[fams_ID]["fam_name"] = []
+            eCAMI_fams[fams_ID]["ec_num"] = []
+        
+        eCAMI_fams[fams_ID]["fam_name"].append(fam[0])
+        eCAMI_fams[fams_ID]["ec_num"] = diam_name
 
 #overall table
 
-all_genes = unique(hmmer_genes+hotpep_genes+diamond_genes)
+all_genes = unique(hmmer_genes+eCAMI_genes+diamond_genes)
+
 with open(workdir+"overview.txt", 'w+') as fp:
     if args.use_signalP:
-        fp.write("Gene ID\tHMMER\tHotpep\tDIAMOND\tSignalp\t#ofTools\n")
+        fp.write("Gene ID\tEC#\tHMMER\teCAMI\tDIAMOND\tSignalp\t#ofTools\n")
     else:
-        fp.write("Gene ID\tHMMER\tHotpep\tDIAMOND\t#ofTools\n")
+        fp.write("Gene ID\tEC#\tHMMER\teCAMI\tDIAMOND\t#ofTools\n")
     for gene in all_genes:
         csv=[gene]
         num_tools = 0
+
+        if arr_eCAMI != None and (gene in eCAMI_genes):
+            if eCAMI_fams[gene]["ec_num"] == []:
+                csv.append("-")
+            else:
+                csv.append("|".join(eCAMI_fams[gene]["ec_num"]))
+        else:
+            csv.append("-")
+       
         if tools[1] and arr_hmmer != None and (gene in hmmer_genes):
             num_tools += 1
             csv.append("+".join(hmmer_fams[gene]))
         else:
             csv.append("-")
-        if tools[2] and arr_hotpep!= None and (gene in hotpep_genes):
+
+        if tools[2] and arr_eCAMI != None and (gene in eCAMI_genes):
             num_tools += 1
-            csv.append("+".join(hotpep_fams[gene]))
+            csv.append("+".join(eCAMI_fams[gene]["fam_name"]))
         else:
             csv.append("-")
+
         if tools[0] and arr_diamond != None and (gene in diamond_genes):
             num_tools += 1
             csv.append("+".join(diamond_fams[gene]))

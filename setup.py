@@ -12,7 +12,7 @@ long_description = """This is the standalone version of dbCAN annotation tool fo
 """
 
 setup(name='run_dbcan',
-      version="2.0.11",
+      version="2.1.0",
     #   use_scm_version=True,
       setup_requires=['setuptools_scm', 'setuptools_scm_git_archive'],
       description='Standalone version of dbCAN annotation tool for automated CAZyme annotation',
@@ -30,25 +30,28 @@ setup(name='run_dbcan',
           'Topic :: Scientific/Engineering :: Bio-Informatics',
       ],
       packages=find_packages(),
-      include_package_data = True,
-      package_data={
-          'Hotpep': ['*.txt'],
-      },
+    #   include_package_data = True,
+      include_package_data=False,
+    #   package_data={
+    #       'eCAMI':['*.txt']
+    #   },
 
       scripts=[
           'CGCFinder.py',
           'hmmscan-parser.py',
           'run_dbcan.py',
-          'Hotpep/add_functions_orf.py',
-          'Hotpep/bact_group_many_proteins_many_patterns.py',
-          'Hotpep/list_multidomain_proteins.py',
-          'Hotpep/parallel_group_many_proteins_many_patterns_noDNA.py',
-          'Hotpep/train_many_organisms_many_families.py',
+          'simplify_cgc.py',
+          #'eCAMI/clustering.py',
+          #'eCAMI/prediction.py',
+          #'eCAMI/eCAMI_data.py'
       ],
       license='GPLv3',
       install_requires=[
           'natsort',
-          'setuptools'
+          'setuptools',
+          'scipy',
+          'psutil',
+          'numpy'
       ],
       python_requires='>=3',
      )
