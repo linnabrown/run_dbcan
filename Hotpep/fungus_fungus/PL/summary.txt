@@ -1,2 +1,0 @@
-Family	proteins
-PL1	1

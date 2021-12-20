@@ -1,2 +1,0 @@
-Family	proteins
-AA1	1
