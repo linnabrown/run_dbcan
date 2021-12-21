@@ -15,8 +15,7 @@ A standalone tool of http://bcb.unl.edu/dbCAN2/
 
 Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner Yohe of the Yin lab at NIU.
 
-<!-- *To old user: We recently replace Hotpep with a better tool eCAMI which has higher accuracy and speed. Please refer this paper https://doi.org/10.6084/m9.figshare.14370836.v1. However, we did not incorporate the eCAMI tool in PYPI package sucessfully so you had to use `git clone https://github.com/linnabrown/run_dbcan.git` to install this eCAMI package. We are sorry for the un-elegant way and we are still trying to compress it to PYPI. If you can incorporate eCAMI into PYPI package we are very welcome your pulled request. Thank you so much and sorry for the incovienience.* -->
-Updated
+Update Info
 ---
 - V3.0.1  please use `pip install dbcan==3.0.1` for update
     1. Added eCAMI tool, remove Hotpep from run_dbCAN;
@@ -25,6 +24,7 @@ Updated
     4. Updated CAZy db for Diamond and HMMER DB for HMMER.
     5. Re-arranged the code. The command line is `run_dbcan` without the suffix `.py`. Please check the command lines below.
     6. The database files under `db` folder is now hosted through `Git-LFS`. To download the complete db files, please use the command `git lfs pull` (Note: To use git lfs, please check the installation guide at [https://git-lfs.github.com/](https://git-lfs.github.com/)).
+    7. Docker file is updated and we simplify the installation step.
 
 - v2.0.11 please use `pip install run-dbcan==2.0.11` for update
     1. Add ec number prediction to hotpep result; 
@@ -39,6 +39,16 @@ Updated
 We forgo FragGeneScan because this program does not work now. We use Prodigal instead. So, you don't need to use conda install fraggenescan now.
 We add extra information `EC number` to the last columns of Hotpep output to make it consistent with previous Hotpep result.
 
+- 10/08/2019
+We create a [python package](https://pypi.org/project/run-dbcan/#files).
+Be sure to install [Anaconda](https://www.anaconda.com/) or Miniconda first, and then use the following commands to install our program one time.
+We strongly recommend you to use virtual environment to seperate your own system and this executive scripts. Please make sure to use `conda install -c bioconda diamond hmmer prodigal` and database installation script to have the appropriate dependencies and database installed and configured. Thanks for suggestion and contribution from [tesujimath](https://github.com/tesujimath) .
+
+- 04/15/2019
+We created a [docker image](https://hub.docker.com/r/haidyi/run_dbcan) of run_dbcan. Make sure to install docker properly. Thanks for suggestion and contributions from [Haidyi](https://github.com/HaidYi).
+
+- 1/10/2019
+We rewritted program and added `stp hmmdb` signature gene in CGC_Finder.py (stp means signal transduction proteins; the hmmdb was constructed by Catherine Ausland of the Yin lab at NIU). Then Change tfdb from `tfdb` to `tf.hmm`, which is added to `db/` directory (tfdb was a fasta format sequence file, which contains just bacterial transcription factor proteins; tf.hmm is a hmmer format file containing hmms downloaded from the Pfam and SUPERFAMILY database according to the DBD database: http://www.transcriptionfactor.org). Also, our project updates dbCAN-HMM db(V8) and CAZy db. Furthermore, we fixed bugs in HotPep python version to fit python 3 user. Last but not least, we added certain codes to make it robust. Thanks for hmmscan-parser.py suggestion from [Mick](mick.watson@roslin.ed.ac.uk).
 
 Function
 ----
@@ -127,7 +137,7 @@ sudo chmod 755 /usr/bin/signalp
 run_dbcan EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655
 ```
 
-Docker version Usage(Don't Use it, because of revising, Please use Python Package above instead )
+Docker version Usage
 ----
 1. Make sure docker is installed on your computer successfully.
 2. Docker pull image
@@ -136,21 +146,9 @@ docker pull haidyi/run_dbcan:latest
 ```
 3. Run. Mount `input sequence file` and `output directory` to the container.
 ```
-docker run --name <preferred_name> -v <host-path>:<container-path> -it haidyi/run_dbcan:latest python run_dbcan.py <input_file> [params] --out_dir <output_dir>
+docker run --name <preferred_name> -v <host-path>:<container-path> -it haidyi/run_dbcan:latest run_dbcan <input_file> [params] --out_dir <output_dir>
 ```
 
-Update info
-----
-- 10/08/2019
-We create a [python package](https://pypi.org/project/run-dbcan/#files).
-Be sure to install [Anaconda](https://www.anaconda.com/) or Miniconda first, and then use the following commands to install our program one time.
-We strongly recommend you to use virtual environment to seperate your own system and this executive scripts. Please make sure to use `conda install -c bioconda diamond hmmer prodigal` and database installation script to have the appropriate dependencies and database installed and configured. Thanks for suggestion and contribution from [tesujimath](https://github.com/tesujimath) .
-
-- 04/15/2019
-We created a [docker image](https://hub.docker.com/r/haidyi/run_dbcan) of run_dbcan. Make sure to install docker properly. Thanks for suggestion and contributions from [Haidyi](https://github.com/HaidYi).
-
-- 1/10/2019
-We rewritted program and added `stp hmmdb` signature gene in CGC_Finder.py (stp means signal transduction proteins; the hmmdb was constructed by Catherine Ausland of the Yin lab at NIU). Then Change tfdb from `tfdb` to `tf.hmm`, which is added to `db/` directory (tfdb was a fasta format sequence file, which contains just bacterial transcription factor proteins; tf.hmm is a hmmer format file containing hmms downloaded from the Pfam and SUPERFAMILY database according to the DBD database: http://www.transcriptionfactor.org). Also, our project updates dbCAN-HMM db(V8) and CAZy db. Furthermore, we fixed bugs in HotPep python version to fit python 3 user. Last but not least, we added certain codes to make it robust. Thanks for hmmscan-parser.py suggestion from [Mick](mick.watson@roslin.ed.ac.uk).
 
 
 REQUIREMENTS
