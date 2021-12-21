@@ -29,7 +29,6 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
-db/
 output*
 .vscode/
 
@@ -111,9 +110,6 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# db
-db/*
-db
 
 #signalp, prodigal, FragGeneScan1.30
 #tools/
