@@ -32,12 +32,16 @@ setup(name='dbcan',
           "db",
           "db.*"
         ]
-      ),
+      ) + ['dbcan_cli'],
       include_package_data=True,
       scripts=[
-          'dbcan_cli/hmmscan-parser.py',
-          'dbcan_cli/run_dbcan.py',
+          'dbcan_cli/hmmscan-parser.py'
       ],
+      entry_points={
+        "console_scripts":[
+          "run_dbcan = dbcan_cli.run_dbcan:cli_main",
+        ]
+      },
       license='GPLv3',
       install_requires=[
           'natsort',
