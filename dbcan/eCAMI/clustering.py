@@ -7,7 +7,7 @@ Created on Thu Mar 21 20:57:51 2019
 """
 
 
-import psutil,argparse,sys
+import argparse,sys
 
 import numpy as np
 import linecache
@@ -408,24 +408,6 @@ def arg_parser(args):
     args = parser.parse_args(args)
 
     return (args)
-
-
-
-
-def ram():
-    '''
-    Determine the current RAM usage by the process
-    '''
-    py = psutil.Process(os.getpid())
-    return round(py.memory_info()[0]/2.**30,2)
-
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
