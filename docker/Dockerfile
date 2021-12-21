@@ -3,7 +3,7 @@ FROM conda/miniconda3
 # install conda packages
 RUN conda install -c anaconda conda-build \
   && conda install wget \
-  && conda install -c bioconda -y diamond hmmer=3.1b2 prodigal fraggenescan \
+  && conda install -c bioconda -y diamond hmmer prodigal \
   && conda clean -a
 
 # install dbcan via pip
