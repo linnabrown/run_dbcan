@@ -11,10 +11,8 @@ from setuptools import setup, find_packages
 long_description = """This is the standalone version of dbCAN annotation tool for automated CAZyme annotation (known as run_dbCAN.py), written by Tanner Yohe and Le Huang.
 """
 
-setup(name='run_dbcan',
-      version="3.0.0",
-    #   use_scm_version=True,
-      setup_requires=['setuptools_scm', 'setuptools_scm_git_archive'],
+setup(name='dbcan',
+      version="3.0.1",
       description='Standalone version of dbCAN annotation tool for automated CAZyme annotation',
       long_description=long_description,
       author='Tanner Yohe, Le Huang and Qiwei Ge',
@@ -29,19 +27,21 @@ setup(name='run_dbcan',
           'Programming Language :: Python :: 3',
           'Topic :: Scientific/Engineering :: Bio-Informatics',
       ],
-      packages=find_packages(),
-    #   include_package_data = True,
-      include_package_data=False,
-
+      packages=find_packages(
+        exclude=[
+          "db",
+          "db.*"
+        ]
+      ) + ['dbcan_cli'],
+      include_package_data=True,
       scripts=[
-          'CGCFinder.py',
-          'hmmscan-parser.py',
-          'run_dbcan.py',
-          'simplify_cgc.py',
-          #'eCAMI/clustering.py',
-          #'eCAMI/prediction.py',
-          #'eCAMI/eCAMI_data.py'
+          'dbcan_cli/hmmscan-parser.py'
       ],
+      entry_points={
+        "console_scripts":[
+          "run_dbcan = dbcan_cli.run_dbcan:cli_main",
+        ]
+      },
       license='GPLv3',
       install_requires=[
           'natsort',
@@ -50,5 +50,6 @@ setup(name='run_dbcan',
           'psutil',
           'numpy'
       ],
-      python_requires='>=3',
+      python_requires='>=3.5',
+      zip_safe=False
      )

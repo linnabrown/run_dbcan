@@ -14,15 +14,16 @@ A standalone tool of http://bcb.unl.edu/dbCAN2/
 
 Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner Yohe of the Yin lab at NIU.
 
-*To old user: We recently replace Hotpep with a better tool eCAMI which has higher accuracy and speed. Please refer this paper https://doi.org/10.6084/m9.figshare.14370836.v1. However, we did not incorporate the eCAMI tool in PYPI package sucessfully so you had to use `git clone https://github.com/linnabrown/run_dbcan.git` to install this eCAMI package. We are sorry for the un-elegant way and we are still trying to compress it to PYPI. If you can incorporate eCAMI into PYPI package we are very welcome your pulled request. Thank you so much and sorry for the incovienience.*
+<!-- *To old user: We recently replace Hotpep with a better tool eCAMI which has higher accuracy and speed. Please refer this paper https://doi.org/10.6084/m9.figshare.14370836.v1. However, we did not incorporate the eCAMI tool in PYPI package sucessfully so you had to use `git clone https://github.com/linnabrown/run_dbcan.git` to install this eCAMI package. We are sorry for the un-elegant way and we are still trying to compress it to PYPI. If you can incorporate eCAMI into PYPI package we are very welcome your pulled request. Thank you so much and sorry for the incovienience.* -->
 Updated
 ---
-- V3.0.0  please use `pip install run-dbcan==3.0.0` for update
-    1. Add eCAMI tool, remove Hotpep from run_dbCAN;
+- V3.0.1  please use `pip install dbcan==3.0.1` for update
+    1. Added eCAMI tool, remove Hotpep from run_dbCAN;
     2. Changed the format of cgc.out to make it easy to read;
-    3. Fix ‘-t all’ will cause the program to generate empty files.
-    4. Created the package.
-    5. Updated CAZy db for Diamond and HMMER DB for HMMER.
+    3. Fixed ‘-t all’ will cause the program to generate empty files.
+    4. Updated CAZy db for Diamond and HMMER DB for HMMER.
+    5. Re-arranged the code. The command line is `run_dbcan` without the suffix `.py`. Please check the command lines below.
+    6. The database files under `db` folder is now hosted through `Git-LFS`. To download the complete db files, please use the command `git lfs pull` (Note: To use git lfs, please check the installation guide at [https://git-lfs.github.com/](https://git-lfs.github.com/)).
 
 - v2.0.11 please use `pip install run-dbcan==2.0.11` for update
     1. Add ec number prediction to hotpep result; 
@@ -63,7 +64,7 @@ conda activate run_dbcan
 3. Install this package with pip.
 
 ```
-pip install run-dbcan==3.0.0
+pip install dbcan==3.0.1
 ```
 
 
@@ -122,7 +123,7 @@ sudo chmod 755 /usr/bin/signalp
 ```
 6. Check Program.
 ```
-run_dbcan.py EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655
+run_dbcan EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655
 ```
 
 Docker version Usage(Don't Use it, because of revising, Please use Python Package above instead )
@@ -265,10 +266,10 @@ RUN & OUTPUT
 ----
 Use following command to run the program.
 ```
-run_dbcan.py [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
+run_dbcan [inputFile] [inputType] [-c AuxillaryFile] [-t Tools] etc.
 ```
 
-Several files will be produced via `run_dbcan.py`. They are as follows:
+Several files will be produced via `run_dbcan`. They are as follows:
 
 	uniInput - The unified input file for the rest of the tools
 			(created by prodigal if a nucleotide sequence was used)
@@ -297,25 +298,25 @@ An example setup is available in the example directory. Included in this directo
 To run this example type, run:
 
 ```
-run_dbcan.py EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655
+run_dbcan EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655
 ```
 or
 
 ```
-run_dbcan.py EscheriaColiK12MG1655.faa protein --out_dir output_EscheriaColiK12MG1655
+run_dbcan EscheriaColiK12MG1655.faa protein --out_dir output_EscheriaColiK12MG1655
 ```
 
 While this example directory contains all the databases you will need (already formatted) and the eCAMI and Prodigal programs, you will still need to have the remaining programs installed on your machine (DIAMOND, HMMER, etc.).
 
 To run the examples with CGCFinder turned on, run:
 ```
-run_dbcan.py EscheriaColiK12MG1655.fna prok -c cluster --out_dir output_EscheriaColiK12MG1655
+run_dbcan EscheriaColiK12MG1655.fna prok -c cluster --out_dir output_EscheriaColiK12MG1655
 ```
 
 or
 
 ```
-run_dbcan.py EscheriaColiK12MG1655.faa protein -c EscheriaColiK12MG1655.gff --out_dir output_EscheriaColiK12MG1655
+run_dbcan EscheriaColiK12MG1655.faa protein -c EscheriaColiK12MG1655.gff --out_dir output_EscheriaColiK12MG1655
 ```
 
 Notice that the protein command has a GFF file following the -c option. A GFF or BED format file with gene position information is required to run CGCFinder when using a protein input.
@@ -326,7 +327,7 @@ If you have any questions, please feel free to contact with Dr. Yin (yanbin.yin@
 Reference
 ----
 
-This is the standalone version of dbCAN annotation tool for automated CAZyme annotation (known as run_dbCAN.py), written by Le Huang and Tanner Yohe.
+This is the standalone version of dbCAN annotation tool for automated CAZyme annotation (known as run_dbCAN), written by Le Huang and Tanner Yohe.
 
 If you want to use our dbCAN2 webserver, please go to http://bcb.unl.edu/dbCAN2/.
 

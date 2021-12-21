@@ -2,29 +2,35 @@ import os
 import sys
 
 
-def read_file(input_file):
-	dir = 'output/'
-	if os.path.exists(dir+'update_cgc.out'):
-		os.remove(dir+'update_cgc.out')
-	try:
-		f = open(dir+input_file, 'r')
-	except:
-		print('fail to open')
-		exit(-1)
-	try:
-		text = f.read()
-	except:
-		print('fail to read')
-		exit(-1)
-	finally:
-		f.close()
-		text = text.split('\n')
-	return text,dir
+# def read_file(input_file):
+# 	dir = os.path.dirname(input_file)
+# 	update_cgc = os.path.join(dir, 'update_cgc.out')
+# 	if os.path.exists(update_cgc):
+# 		os.remove(update_cgc)
+# 	try:
+# 		f = open(dir+input_file, 'r')
+# 	except:
+# 		print('fail to open')
+# 		exit(-1)
+# 	try:
+# 		text = f.read()
+# 	except:
+# 		print('fail to read')
+# 		exit(-1)
+# 	finally:
+# 		f.close()
+# 		text = text.split('\n')
+# 	return text,dir
 
-def simplify_output(input_list):
-	text = read_file(input_list)[0]
-	dir = read_file(input_list)[1]
-	os.remove(dir+'cgc.out')
+def simplify_output(inFile):
+	try:
+		text = open(inFile).readlines()
+		text = [line.strip() for line in text]
+	except:
+		print("fail to read")
+		exit(-1)
+	dir = os.path.dirname(inFile)
+	# os.remove(dir+'cgc.out')
 	annotation = ''
 	if '' in text:
 		text.remove('')
@@ -94,7 +100,7 @@ def simplify_output(input_list):
 				simplified_line.append(annotation)
 			simplified_line = '\t'.join(simplified_line)
 
-			with open(dir + 'cgc.out', 'a') as f:
+			with open(inFile, 'a') as f:
 				f.write(simplified_line+'\n')
 				f.close()
 		else:

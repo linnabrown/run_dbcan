@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Apr  3 20:08:33 2019
-
+Revised on Nov 11, 2021 by Le Huang
 @author: joy1314bubian
 """
 
@@ -241,57 +241,66 @@ def get_validation_results(input_fasta_file,database_dir,output_dir,output_file_
 
 
 
-def arg_parser(args): 
-    '''
-    Process command-line user arguments and prepare for further directories
-    '''
+# def arg_parser(args): 
+#     '''
+#     Process command-line user arguments and prepare for further directories
+#     '''
 
-    ####################################
-    #Folders and files:
-    parser = argparse.ArgumentParser(description='The input parameters for the identification technology')
+#     ####################################
+#     #Folders and files:
+#     parser = argparse.ArgumentParser(description='The input parameters for the identification technology')
 
-    parser.add_argument('-kmer_db',     default="CAZyme",type=str,        help="Change n_mer directories path for prediction")
-    parser.add_argument('-output',     default="examples/prediction/output/test_pred_cluster_labels.txt",type=str,        help="file name for prediction results saving")
-    parser.add_argument('-input',     default="examples/prediction/input/test.faa",type=str,        help="Define the fasta file name")
-    parser.add_argument('-k_mer',           default=8,         type=int,                 help="Peptide length for prediction")
-    parser.add_argument('-jobs',            default=8,         type=int,                 help='Number of processor for use for prediction')
-    parser.add_argument('-important_k_mer_number',        default=5,      type=int,               help="Minimum number of n_mer for prediction")
-    parser.add_argument('-beta',        default=2,      type=float,               help="Minimum sum of percentage of frequency of n_mer for prediction")
-
-
-    args = parser.parse_args(args)
-
-    return (args)
+#     parser.add_argument('-kmer_db',     default="CAZyme",type=str,        help="Change n_mer directories path for prediction")
+#     parser.add_argument('-output',     default="examples/prediction/output/test_pred_cluster_labels.txt",type=str,        help="file name for prediction results saving")
+#     parser.add_argument('-input',     default="examples/prediction/input/test.faa",type=str,        help="Define the fasta file name")
+#     parser.add_argument('-k_mer',           default=8,         type=int,                 help="Peptide length for prediction")
+#     parser.add_argument('-jobs',            default=8,         type=int,                 help='Number of processor for use for prediction')
+#     parser.add_argument('-important_k_mer_number',        default=5,      type=int,               help="Minimum number of n_mer for prediction")
+#     parser.add_argument('-beta',        default=2,      type=float,               help="Minimum sum of percentage of frequency of n_mer for prediction")
 
 
+#     args = parser.parse_args(args)
+
+#     return (args)
 
 
+class eCAMI_config(object):
+    def __init__(
+        self,
+        db_type = 'Cazyme',
+        output = 'examples/prediction/output/test_pred_cluster_labels.txt',
+        input = 'examples/prediction/input/test.faa',
+        k_mer = 8,
+        jobs = 8,
+        important_k_mer_number = 5,
+        beta = 2.0
+    ) -> None:
+        if db_type == 'CAZyme':
+            self.kmer_db = f'{os.path.dirname(__file__)}/CAZyme'
+        else:
+            # print(__file__)
+            self.kmer_db = f'{os.path.dirname(__file__)}/EC'
+        # print(self.kmer_db)
+        self.output = output
+        self.input = input
+        self.k_mer = k_mer
+        self.jobs = jobs
+        self.important_k_mer_number = important_k_mer_number
+        self.beta = beta
 
 
-
-            
-if __name__ == "__main__":
+def eCAMI_main(args):
     starttime = datetime.datetime.now()
-    args = arg_parser(sys.argv[1:])
-
-    inputs=args.input
-    inputs=inputs.split('/')
-    database_dir='/'.join(inputs[0:len(inputs)-1])
-    input_fasta_file=inputs[-1]
-    outputs=args.output
-    outputs=outputs.split('/')
+    # args = arg_parser(sys.argv[1:])
     
-    output_dir='/'.join(outputs[0:len(outputs)-1])
-    output_file_name=outputs[-1]
-
+    database_dir=os.path.dirname(args.input)
+    input_fasta_file = os.path.basename(args.input)
+    
+    output_dir=os.path.dirname(args.output)
+    output_file_name = os.path.basename(args.output)
+    
     n_mer=args.k_mer
     n_mer_dir_path=args.kmer_db
-
-    n_mer_dir_path=n_mer_dir_path.split('/')
-    while '' in n_mer_dir_path:
-        n_mer_dir_path.remove('')
-    n_mer_dir_path='/'.join(n_mer_dir_path)
-    # n_mer_dir_path = eCAMI_data_path(n_mer_dir_path)   #CAZyme or EC 
 
 
     important_n_mer_number=args.important_k_mer_number
