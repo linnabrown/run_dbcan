@@ -7,7 +7,7 @@ Status
 [![dbcan](https://github.com/linnabrown/run_dbcan/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/linnabrown/run_dbcan/actions/workflows/ci.yml)
 [![Package status](https://img.shields.io/pypi/status/dbcan.svg)](https://pypi.org/project/dbcan/#files)
 [![GitHub license](https://img.shields.io/badge/license-GUN3.0-blue.svg)](https://github.com/linnabrown/run_dbcan/blob/master/LICENSE)
-[![GitHub downloads](https://img.shields.io/pypi/dm/dbcan.svg)](https://pypi.org/project/dbcan/#files)
+[![GitHub downloads](https://img.shields.io/pypi/dm/run-dbcan.svg)](https://pypi.org/project/dbcan/#files)
 [![GitHub versions](https://img.shields.io/pypi/pyversions/dbcan.svg)](https://pypi.org/project/dbcan/#files)
 [![Package version](https://img.shields.io/pypi/v/dbcan.svg)](https://pypi.org/project/dbcan/#files)
 
