@@ -114,7 +114,6 @@ venv.bak/
 # db
 db/*
 db
-example/
 
 #signalp, prodigal, FragGeneScan1.30
 #tools/

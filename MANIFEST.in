@@ -1,1 +1,1 @@
-#recursive-include eCAMI/ *
+recursive-include dbcan *
