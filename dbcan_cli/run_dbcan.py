@@ -171,9 +171,9 @@ def cli_main():
 
     if tools[1]:
         print("\n\n***************************2. HMMER start*************************************************\n\n")
-        os.system(f"hmmscan --domtblout {outPath}h.out --cpu {args.hmm_cpu} -o /dev/null {os.path.join(dbDir, args.dbCANFile)} {os.path.join(outPath, 'uniInput')} ")
+        os.system(f"hmmscan --domtblout {outPath}h.out --cpu {args.hmm_cpu} -o /dev/null {os.path.join(dbDir, args.dbCANFile)} {outPath}uniInput ")
         print("\n\n***************************2. HMMER end***************************************************\n\n")
-        call(f"hmmscan-parser.py {os.path.join(outPath,'h.out')} {str(args.hmm_eval)} {str(args.hmm_cov)} > {os.path.join(outPath, 'hmmer.out')}", shell=True)
+        call(f"hmmscan-parser.py {outPath}h.out {str(args.hmm_eval)} {str(args.hmm_cov)} > {outPath}hmmer.out ", shell=True)
         with open(f"{outPath}hmmer.out", "r+") as f:
             text = f.read()
             f.close()
@@ -194,8 +194,8 @@ def cli_main():
     if tools[2]:
         print("\n\n***************************3. eCAMI start***************************************************\n\n")
         ecami_config = eCAMI_config(
-            input = os.path.join(outPath, "uniInput"),
-            output= os.path.join(outPath, "eCAMI.out"),
+            input = f"{outPath}uniInput",
+            output= f"{outPath}eCAMI.out",
             k_mer = args.eCAMI_k_mer,
             jobs = args.eCAMI_jobs,
             important_k_mer_number = args.eCAMI_important_k_mer_number,

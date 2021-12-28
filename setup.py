@@ -12,10 +12,10 @@ long_description = """This is the standalone version of dbCAN annotation tool fo
 """
 
 setup(name='dbcan',
-      version="3.0.1",
+      version="3.0.2",
       description='Standalone version of dbCAN annotation tool for automated CAZyme annotation',
       long_description=long_description,
-      author='Tanner Yohe, Le Huang and Qiwei Ge',
+      author='Tanner Yohe, Le Huang, Qiwei Ge, and Haidong Yi',
       author_email='lehuang@unc.edu',
       url='https://github.com/linnabrown/run_dbcan',
       classifiers=[
