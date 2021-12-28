@@ -17,7 +17,7 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 
 Update Info
 ---
-- V3.0.1  please use `pip install dbcan==3.0.1` for update
+- V3.0.2  please use `pip install dbcan==3.0.2` for update
     1. Added eCAMI tool, remove Hotpep from run_dbCAN;
     2. Changed the format of cgc.out to make it easy to read;
     3. Fixed ‘-t all’ will cause the program to generate empty files.
