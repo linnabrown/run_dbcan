@@ -267,7 +267,7 @@ def get_validation_results(input_fasta_file,database_dir,output_dir,output_file_
 class eCAMI_config(object):
     def __init__(
         self,
-        db_type = 'Cazyme',
+        db_type = 'CAZyme',
         output = 'examples/prediction/output/test_pred_cluster_labels.txt',
         input = 'examples/prediction/input/test.faa',
         k_mer = 8,
