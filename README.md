@@ -75,7 +75,7 @@ conda activate run_dbcan
 3. Install this package with pip.
 
 ```
-pip install dbcan==3.0.1
+pip install dbcan==3.0.2
 ```
 
 
