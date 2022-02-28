@@ -81,8 +81,6 @@ pip install dbcan==3.0.1
 
 4. Database Installation.
 ```
-git clone https://github.com/linnabrown/run_dbcan.git
-cd run_dbcan
 test -d db || mkdir db
 cd db \
     && wget http://bcb.unl.edu/dbCAN2/download/CAZyDB.09242021.fa && diamond makedb --in CAZyDB.09242021.fa -d CAZy \
