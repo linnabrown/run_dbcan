@@ -368,8 +368,7 @@ eprint = {/oup/backfile/content_public/journal/nar/46/d1/10.1093_nar_gkx894/2/gk
 }
 ```
 
-Fun Fact
-------
+
 
 ## Commit History
 
