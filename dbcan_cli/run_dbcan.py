@@ -193,6 +193,7 @@ def cli_main():
 
     if tools[2]:
         print("\n\n***************************3. eCAMI start***************************************************\n\n")
+        print("Using "+args.eCAMI_kmer_db+" db in eCAMI")
         ecami_config = eCAMI_config(
             db_type = args.eCAMI_kmer_db,
             input = f"{outPath}uniInput",
