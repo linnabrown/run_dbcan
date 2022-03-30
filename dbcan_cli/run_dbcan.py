@@ -223,12 +223,17 @@ def cli_main():
         call(['mv', outPath+'temp', outPath+'eCAMI.out'])
 
     if tools[1]:
-        with open(outDir+prefix+'hmmer.out') as f:
+        try:
+            with open(outDir+prefix+'hmmer.out') as f:
+                with open(outDir+prefix+'temp', 'w') as out:
+                    out.write('HMM Profile\tProfile Length\tGene ID\tGene Length\tE Value\tProfile Start\tProfile End\tGene Start\tGene End\tCoverage\n')
+                    for line in f:
+                        out.write(line)
+            call(['mv', outDir+prefix+'temp', outDir+prefix+'hmmer.out'])
+        except:
             with open(outDir+prefix+'temp', 'w') as out:
-                out.write('HMM Profile\tProfile Length\tGene ID\tGene Length\tE Value\tProfile Start\tProfile End\tGene Start\tGene End\tCoverage\n')
-                for line in f:
-                    out.write(line)
-        call(['mv', outDir+prefix+'temp', outDir+prefix+'hmmer.out'])
+                    out.write('HMM Profile\tProfile Length\tGene ID\tGene Length\tE Value\tProfile Start\tProfile End\tGene Start\tGene End\tCoverage\n')
+            call(['mv', outDir+prefix+'temp', outDir+prefix+'hmmer.out'])
 
     if tools[0]:
         with open(outDir+prefix+'diamond.out') as f:
