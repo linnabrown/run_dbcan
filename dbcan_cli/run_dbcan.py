@@ -515,6 +515,9 @@ def cli_main():
     def unique(seq):
         exists = set()
         return [x for x in seq if not (x in exists or exists.add(x))]
+    
+    arr_eCAMI = None
+    arr_hmmer = None
 
     # check if files exist. if so, read files and get the gene numbers
     if tools[0]:
