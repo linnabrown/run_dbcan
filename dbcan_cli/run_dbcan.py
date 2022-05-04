@@ -470,7 +470,7 @@ def cli_main():
 
         # call(['CGCFinder.py', outDir+prefix+'cgc.gff', '-o', outDir+prefix+'cgc.out', '-s', args.cgc_sig_genes, '-d', str(args.cgc_dis)])
         cgc_finder(outDir+prefix+'cgc.gff', args.cgc_dis, args.cgc_sig_genes, outDir+prefix+'cgc.out')
-        simplify_output(outDir+prefix+'cgc.out')
+        simplify_output(outDir+prefix+'cgc_standard.out')
         print("**************************************CGC-Finder end***********************************************")
         # End CGCFinder call
         # End CGCFinder
