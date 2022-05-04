@@ -34,6 +34,9 @@ def simplify_output(inFile):
 	annotation = ''
 	if '' in text:
 		text.remove('')
+	with open(dir + 'cgc_standard.out', 'a') as f:
+		f.write("CGC#\tGene Type\tContig ID\tGenome ID\tGene Start\tGene Stop\tDirection\tDatabase\n")
+		f.close()
 	for i in range(len(text)):
 		simplified_line = []
 		if '+++++' not in text[i]:
@@ -93,6 +96,7 @@ def simplify_output(inFile):
 					annotation = 'none'
 				simplified_line.append(annotation)
 			elif 'null' in each_line[1]:
+				simplified_line[3] = each_line[10].split('=')[1]
 				annotation = 'null'
 				simplified_line.append(annotation)
 			else:
@@ -100,7 +104,7 @@ def simplify_output(inFile):
 				simplified_line.append(annotation)
 			simplified_line = '\t'.join(simplified_line)
 
-			with open(inFile, 'a') as f:
+			with open("cgc_standard.out", 'a') as f:
 				f.write(simplified_line+'\n')
 				f.close()
 		else:
