@@ -35,7 +35,7 @@ def simplify_output(inFile):
 	if '' in text:
 		text.remove('')
 	with open(dir + 'cgc_standard.out', 'a') as f:
-		f.write("CGC#\tGene Type\tContig ID\tGenome ID\tGene Start\tGene Stop\tDirection\tDatabase\n")
+		f.write("CGC#\tGene Type\tContig ID\tProtein ID\tGene Start\tGene Stop\tDirection\tProtein Family\n")
 		f.close()
 	for i in range(len(text)):
 		simplified_line = []
