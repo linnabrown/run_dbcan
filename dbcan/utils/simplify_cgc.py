@@ -34,7 +34,7 @@ def simplify_output(inFile):
 	annotation = ''
 	if '' in text:
 		text.remove('')
-	with open(dir + 'cgc_standard.out', 'a') as f:
+	with open(dir + '/cgc_standard.out', 'a') as f:
 		f.write("CGC#\tGene Type\tContig ID\tProtein ID\tGene Start\tGene Stop\tDirection\tProtein Family\n")
 		f.close()
 	for i in range(len(text)):
@@ -104,7 +104,7 @@ def simplify_output(inFile):
 				simplified_line.append(annotation)
 			simplified_line = '\t'.join(simplified_line)
 
-			with open(dir + "cgc_standard.out", 'a') as f:
+			with open(dir + "/cgc_standard.out", 'a') as f:
 				f.write(simplified_line+'\n')
 				f.close()
 		else:
@@ -112,7 +112,7 @@ def simplify_output(inFile):
 	
 
 
-if __name__ == "__main__":
-    cgc_file = sys.argv[1]
+# if __name__ == "__main__":
+#     cgc_file = sys.argv[1]
     
-    simplify_output(cgc_file)
+#     simplify_output(cgc_file)
