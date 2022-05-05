@@ -104,7 +104,7 @@ def simplify_output(inFile):
 				simplified_line.append(annotation)
 			simplified_line = '\t'.join(simplified_line)
 
-			with open("cgc_standard.out", 'a') as f:
+			with open(dir + "cgc_standard.out", 'a') as f:
 				f.write(simplified_line+'\n')
 				f.close()
 		else:
