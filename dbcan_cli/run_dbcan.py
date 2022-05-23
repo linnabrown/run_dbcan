@@ -414,12 +414,12 @@ def cli_main():
                                     for x in note:
                                         temp = x.split('=')
                                         notes[temp[0]] = temp[1]
-                                    if "Name" in notes:
-                                        gene = notes["Name"]
-                                    elif "ID" in notes:
-                                        gene = notes["ID"]
-#                                     if "ID" in notes:
+#                                     if "Name" in notes:
+#                                         gene = notes["Name"]
+#                                     elif "ID" in notes:
 #                                         gene = notes["ID"]
+                                    if "ID" in notes:
+                                        gene = notes["ID"]
                                     else:
                                         continue
                                     
