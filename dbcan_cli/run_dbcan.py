@@ -64,7 +64,7 @@ def cli_main():
     parser.add_argument('--out_pre', default="", help='Output files prefix')
     parser.add_argument('--out_dir', default="output", help='Output directory')
     parser.add_argument('--db_dir', default="db", help='Database directory')
-    parser.add_argument('--cgc_dis', default=2, help='CGCFinder Distance value')
+    parser.add_argument('--cgc_dis', default=2, type=int, help='CGCFinder Distance value')
     parser.add_argument('--cgc_sig_genes', default='tp', choices=['tp', 'tf','all'], help='CGCFinder Signature Genes value')
     parser.add_argument('--tools', '-t', nargs='+', choices=['hmmer', 'diamond', 'eCAMI', 'all'], default='all', help='Choose a combination of tools to run')
     parser.add_argument('--use_signalP', default=False, type=bool, help='Use signalP or not, remember, you need to setup signalP tool first. Because of signalP license, Docker version does not have signalP.')
