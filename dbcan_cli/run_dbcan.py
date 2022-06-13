@@ -32,7 +32,11 @@ def some functions
 def runHmmScan(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name):
     hmmer = Popen(['hmmscan', '--domtblout', '%sh%s.out' % (outPath, db_name), '--cpu', hmm_cpu, '-o', '/dev/null', '%s%s.hmm' % (dbDir,db_name), '%suniInput' % outPath])
     hmmer.wait()
-    call('hmmscan_parser.py %sh%s.out %s %s > %s%s.out'%(outPath, db_name, hmm_eval, hmm_cov, outPath, db_name), shell=True)
+    # call('hmmscan_parser.py %sh%s.out %s %s > %s%s.out'%(outPath, db_name, hmm_eval, hmm_cov, outPath, db_name), shell=True)
+    parsed_hmm_output = hmmscan_parser.run(input_file=f"{outPath}h{db_name}.out", eval_num=hmm_eval, coverage=hmm_cov)
+    with open(f"{outPath}{db_name}.out", 'w') as f:
+        f.write(parsed_hmm_output)
+
     if os.path.exists('%sh%s.out' % (outPath, db_name)):
         call(['rm', '%sh%s.out' % (outPath, db_name)])
 
@@ -163,7 +167,6 @@ def cli_main(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval
     if tools[2]:
         print("\n\n***************************3. eCAMI start***************************************************\n\n")
         print("Using "+eCAMI_kmer_db+" db in eCAMI")
-        # exit(0)
         ecami_config = eCAMI_config(
             db_type = eCAMI_kmer_db,
             input = f"{outPath}uniInput",
@@ -193,12 +196,17 @@ def cli_main(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval
         call(['mv', outPath+'temp', outPath+'eCAMI.out'])
 
     if tools[1]:
-        with open(outDir+prefix+'hmmer.out') as f:
+        try:
+            with open(outDir+prefix+'hmmer.out') as f:
+                with open(outDir+prefix+'temp', 'w') as out:
+                    out.write('HMM Profile\tProfile Length\tGene ID\tGene Length\tE Value\tProfile Start\tProfile End\tGene Start\tGene End\tCoverage\n')
+                    for line in f:
+                        out.write(line)
+            call(['mv', outDir+prefix+'temp', outDir+prefix+'hmmer.out'])
+        except:
             with open(outDir+prefix+'temp', 'w') as out:
                 out.write('HMM Profile\tProfile Length\tGene ID\tGene Length\tE Value\tProfile Start\tProfile End\tGene Start\tGene End\tCoverage\n')
-                for line in f:
-                    out.write(line)
-        call(['mv', outDir+prefix+'temp', outDir+prefix+'hmmer.out'])
+            call(['mv', outDir+prefix+'temp', outDir+prefix+'hmmer.out'])
 
     if tools[0]:
         with open(outDir+prefix+'diamond.out') as f:
@@ -484,6 +492,9 @@ def cli_main(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval
     def unique(seq):
         exists = set()
         return [x for x in seq if not (x in exists or exists.add(x))]
+
+    arr_eCAMI = None
+    arr_hmmer = None
 
     # check if files exist. if so, read files and get the gene numbers
     if tools[0]:
