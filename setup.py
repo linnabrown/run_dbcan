@@ -35,7 +35,7 @@ setup(name='dbcan',
       ) + ['dbcan_cli'],
       include_package_data=True,
       scripts=[
-          'dbcan_cli/hmmscan-parser.py'
+          'dbcan_cli/hmmscan_parser.py'
       ],
       entry_points={
         "console_scripts":[
