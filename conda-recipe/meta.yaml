@@ -1,0 +1,26 @@
+{% set name = "run_dbcan" %}
+{% set version = "3.0.4" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+source:
+  git_url: https://github.com/AlexSCFraser/run_dbcan.git@master
+  git_depth: 1 # only grab most recent commit on branch
+
+requirements:
+  host:
+    - python
+  run:
+    - python
+    - natsort
+    - setuptools
+    - scipy
+    - psutil
+    - numpy
+
+about:
+  home: http://bcb.unl.edu/dbCAN2/
+  dev_url: https://github.com/linnabrown/run_dbcan
+  summary: A standalone tool of http://bcb.unl.edu/dbCAN2/

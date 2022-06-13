@@ -41,7 +41,7 @@ def runHmmScan(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name):
         call(['rm', '%sh%s.out' % (outPath, db_name)])
 
 
-def cli_main(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval=1e-102, dia_cpu=4, hmm_eval=1e-15,
+def run(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval=1e-102, dia_cpu=4, hmm_eval=1e-15,
              hmm_cov=0.35, hmm_cpu=4, eCAMI_kmer_db="CAZyme", eCAMI_k_mer=8, eCAMI_jobs=8, eCAMI_important_k_mer_number=5,
              eCAMI_beta=2, tf_eval=1e-4, tf_cov=0.35, tf_cpu=1, stp_eval=1e-4, stp_cov=0.3, stp_cpu=1, prefix="",
              outDir="output", dbDir="db", cgc_dis=2, cgc_sig_genes="tp", tool_arg="all", use_signalP=False, gram="all"):
@@ -633,7 +633,7 @@ def cli_main(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval
 # Putting the ArgumentParser in this block allows the script to be called from command line as before, while
 # allowing the main function to be called directly from other scripts without invoking a subprocess. This prevents extra
 # subprocesses or extra python interpreters being spawned, as well as simplifying python scripts which call run_dbcan.
-if __name__ == '__main__':
+def cli_main():
     parser = argparse.ArgumentParser(description='dbCAN2 Driver Script')
     parser.add_argument('inputFile', help='User input file. Must be in FASTA format.')
     parser.add_argument('inputType', choices=['protein', 'prok', 'meta'], #protein=proteome, prok=prokaryote nucleotide, meta=metagenome nucleotide
@@ -668,7 +668,7 @@ if __name__ == '__main__':
     parser.add_argument('--gram', '-g', choices=["p","n","all"], default="all", help="Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of SingalP, only if user use singalP")
     args = parser.parse_args()
 
-    cli_main(inputFile=args.inputFile, inputType=args.inputType, cluster=args.cluster, dbCANFile=args.dbCANFile,
+    run(inputFile=args.inputFile, inputType=args.inputType, cluster=args.cluster, dbCANFile=args.dbCANFile,
              dia_eval=args.dia_eval, dia_cpu=args.dia_cpu, hmm_eval=args.hmm_eval, hmm_cov=args.hmm_cov, hmm_cpu=args.hmm_cpu,
              eCAMI_kmer_db=args.eCAMI_kmer_db, eCAMI_k_mer=args.eCAMI_k_mer, eCAMI_jobs=args.eCAMI_jobs,
              eCAMI_important_k_mer_number=args.eCAMI_important_k_mer_number,
@@ -676,3 +676,7 @@ if __name__ == '__main__':
              stp_eval=args.stp_eval, stp_cov=args.stp_cov, stp_cpu=args.stp_cpu, prefix=args.out_pre,
              outDir=args.out_dir, dbDir=args.db_dir, cgc_dis=args.cgc_dis, cgc_sig_genes=args.cgc_sig_genes,
              tool_arg=args.tools, use_signalP=args.use_signalP, gram=args.gram)
+
+
+if __name__ == '__main__':
+    cli_main()
