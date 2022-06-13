@@ -11,10 +11,16 @@ source:
   git_depth: 1 # only grab most recent commit on branch
 
 requirements:
+  build:
+    - git
   host:
     - python
   run:
+    - diamond
+    - hmmer
+    - prodigal
     - python
+    - bioconda
     - natsort
     - setuptools
     - scipy
