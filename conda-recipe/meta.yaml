@@ -6,7 +6,8 @@ package:
   version: "{{ version }}"
 
 source:
-  git_url: https://github.com/AlexSCFraser/run_dbcan.git@master
+  #  git_url: https://github.com/linnabrown/run_dbcan.git@master  #uncomment this when merging into main repo
+  git_url: https://github.com/AlexSCFraser/run_dbcan.git@master #delete this when merging into main repo
   git_depth: 1 # only grab most recent commit on branch
 
 requirements:
