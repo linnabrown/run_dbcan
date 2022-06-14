@@ -141,6 +141,7 @@ And then, use this command:
 sudo cp signalp /usr/bin/signalp
 sudo chmod 755 /usr/bin/signalp
 ```
+If you don't have the permission to access `/usr/bin`, you can use the parameter `-sp` or `--signalP_path` to indicate your `signalp` file path in the run_dbcan program. Please see the step 6.
 6. Check Program.
 ```
 run_dbcan EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655
@@ -151,7 +152,11 @@ If you want to run the code with SignalP
 run_dbcan EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655 --use_signalP=TRUE
 
 '''
+If you don't have the permission to access `/usr/bin` when running with signalP, you can use the parameter `-sp` or `--signalP_path` to indicate your `signalp` file path in the run_dbcan program. 
 
+'''
+run_dbcan EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655 --use_signalP=TRUE -sp /home/lehuang/Downloads/signalp-4.1/signalp 
+'''
 Docker version Usage
 ----
 1. Make sure docker is installed on your computer successfully.
