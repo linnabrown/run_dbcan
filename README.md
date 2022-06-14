@@ -148,15 +148,15 @@ run_dbcan EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655
 ```
 
 If you want to run the code with SignalP
-'''
+```
 run_dbcan EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655 --use_signalP=TRUE
 
-'''
+```
 If you don't have the permission to access `/usr/bin` when running with signalP, you can use the parameter `-sp` or `--signalP_path` to indicate your `signalp` file path in the run_dbcan program. 
 
-'''
+```
 run_dbcan EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655 --use_signalP=TRUE -sp /home/lehuang/Downloads/signalp-4.1/signalp 
-'''
+```
 Docker version Usage
 ----
 1. Make sure docker is installed on your computer successfully.
@@ -182,7 +182,7 @@ P.S.: You do not need to download `CGCFinder` and `hmmscan-parser` because they 
 
 [Python3]--Be sure to use python3, not python2
 
-[DIAMOND](https://github.com/bbuchfink/diamond)-- please install from github as instructions.
+[DIAMOND](https://github.com/bbuchfink/diamond)-- Included in dbCAN2.
 
 [HMMER](hmmer.org)
 
@@ -276,8 +276,10 @@ information. Otherwise, the AuxillaryFile may be left blank.
 
 [--use_signalP] - optional, Use signalP or not, remember, you need to setup signalP tool first. Because of signalP license, python package does not have signalP. If your input is proteome/prokaryote nucleotide, please also certify the "--gram"(in the below). Default = False.
 
-[--gram] - optional, Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of SignalP, only if you use SignalP. Only you set use_signalP. The options are: "all"(gram positive + gram negative), "n"(gram negative), "p"(gram positive). Default = "all".
+[use_signalP] - optional, Use signalP or not, remember, you need to setup signalP tool first. Because of signalP license, Docker version does not have signalP.
+[signalP_path] - optional, The path for signalp. Default location is signalp
 
+[--gram] - optional, Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of SignalP, only if you use SignalP. Only you set use_signalP. The options are: "all"(gram positive + gram negative), "n"(gram negative), "p"(gram positive). Default = "all".
 
 
 
