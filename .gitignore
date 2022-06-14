@@ -127,3 +127,6 @@ meta.yaml
 
 Hotpep_bkp*
 
+#ignore example data
+EscheriaColiK12MG1655.*
+

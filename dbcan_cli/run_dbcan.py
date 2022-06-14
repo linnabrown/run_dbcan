@@ -68,6 +68,7 @@ def cli_main():
     parser.add_argument('--cgc_sig_genes', default='tp', choices=['tp', 'tf','all'], help='CGCFinder Signature Genes value')
     parser.add_argument('--tools', '-t', nargs='+', choices=['hmmer', 'diamond', 'eCAMI', 'all'], default='all', help='Choose a combination of tools to run')
     parser.add_argument('--use_signalP', default=False, type=bool, help='Use signalP or not, remember, you need to setup signalP tool first. Because of signalP license, Docker version does not have signalP.')
+    parser.add_argument('--signalP_path', '-sp',default="signalp", type=str, help='The path for signalp. Default location is signalp')
     parser.add_argument('--gram', '-g', choices=["p","n","all"], default="all", help="Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of SingalP, only if user use singalP")
     args = parser.parse_args()
 
@@ -154,9 +155,9 @@ def cli_main():
     if args.use_signalP:
         print("\n\n***************************0. SIGNALP start*************************************************\n\n")
         if args.gram == "p" or args.gram=="all":
-            signalpos = Popen('signalp -t gram+ %suniInput > %ssignalp.pos' % (outPath, outPath), shell=True)
+            signalpos = Popen('%s -t gram+ %suniInput > %ssignalp.pos' % (args.signalP_path, outPath, outPath), shell=True)
         if args.gram == "n" or args.gram == "all":
-            signalpneg = Popen('signalp -t gram- %suniInput > %ssignalp.neg' % (outPath, outPath), shell=True)
+            signalpneg = Popen('%s -t gram- %suniInput > %ssignalp.neg' % (args.signalP_path, outPath, outPath), shell=True)
 
     # End SignalP
     #######################

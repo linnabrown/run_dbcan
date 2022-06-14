@@ -17,6 +17,9 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 
 Update Info
 ---
+--V3.0.5 please use `pip install dbcan==3.0.5` for update
+    1. Fixed the bug in signalP
+    2. Fixed the cgc problems and run_dbcan small bugs.
 - V3.0.4 please use `pip install dbcan==3.0.4` for update
     1. Fixed eCAMI tool problem.
     2. If you download gff file from [NCBI](https://www.ncbi.nlm.nih.gov/), please check the last column, replace Name with ID, and ID with Name.
@@ -78,7 +81,7 @@ conda activate run_dbcan
 3. Install this package with pip.
 
 ```
-pip install dbcan==3.0.4
+pip install dbcan==3.0.5
 ```
 
 
@@ -142,6 +145,12 @@ sudo chmod 755 /usr/bin/signalp
 ```
 run_dbcan EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655
 ```
+
+If you want to run the code with SignalP
+'''
+run_dbcan EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655 --use_signalP=TRUE
+
+'''
 
 Docker version Usage
 ----
@@ -305,6 +314,7 @@ To run this example type, run:
 ```
 run_dbcan EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655
 ```
+
 or
 
 ```
