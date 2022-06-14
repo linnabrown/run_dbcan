@@ -20,7 +20,9 @@
 from subprocess import Popen, call, check_output
 import os
 import argparse
-from dbcan.utils import simplify_output, cgc_finder
+import dbcan
+from dbcan.utils.simplify_cgc import simplify_output
+from dbcan.utils.CGCFinder import cgc_finder
 from dbcan.eCAMI import eCAMI_config, eCAMI_main
 import hmmscan_parser
 
