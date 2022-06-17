@@ -12,6 +12,8 @@ source:
 
 requirements:
   build:
+    - python
+    - setuptools
     - git
   host:
     - python
@@ -21,7 +23,6 @@ requirements:
     - prodigal
     - python
     - natsort
-    - setuptools
     - scipy
     - psutil
     - numpy
