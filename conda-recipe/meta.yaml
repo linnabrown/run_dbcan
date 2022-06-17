@@ -29,4 +29,6 @@ requirements:
 about:
   home: http://bcb.unl.edu/dbCAN2/
   dev_url: https://github.com/linnabrown/run_dbcan
+  license: GPLv3
+  license_file: LICENSE
   summary: A standalone tool of http://bcb.unl.edu/dbCAN2/
