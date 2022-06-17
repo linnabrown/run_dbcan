@@ -24,7 +24,7 @@ import dbcan
 from dbcan.utils.simplify_cgc import simplify_output
 from dbcan.utils.CGCFinder import cgc_finder
 from dbcan.eCAMI import eCAMI_config, eCAMI_main
-import hmmscan_parser
+from dbcan_cli import hmmscan_parser
 
 '''
 def some functions
