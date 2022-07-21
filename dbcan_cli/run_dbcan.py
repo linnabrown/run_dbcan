@@ -44,9 +44,10 @@ def runHmmScan(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name):
 
 
 def run(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval=1e-102, dia_cpu=4, hmm_eval=1e-15,
-             hmm_cov=0.35, hmm_cpu=4, eCAMI_kmer_db="CAZyme", eCAMI_k_mer=8, eCAMI_jobs=8, eCAMI_important_k_mer_number=5,
-             eCAMI_beta=2, tf_eval=1e-4, tf_cov=0.35, tf_cpu=1, stp_eval=1e-4, stp_cov=0.3, stp_cpu=1, prefix="",
-             outDir="output", dbDir="db", cgc_dis=2, cgc_sig_genes="tp", tool_arg="all", use_signalP=False, gram="all"):
+        hmm_cov=0.35, hmm_cpu=4, eCAMI_kmer_db="CAZyme", eCAMI_k_mer=8, eCAMI_jobs=8, eCAMI_important_k_mer_number=5,
+        eCAMI_beta=2, tf_eval=1e-4, tf_cov=0.35, tf_cpu=1, stp_eval=1e-4, stp_cov=0.3, stp_cpu=1, prefix="",
+        outDir="output", dbDir="db", cgc_dis=2, cgc_sig_genes="tp", tool_arg="all", use_signalP=False,
+        signalP_path="signalp", gram="all"):
 
     ####
     #  run_dbcan.py [inputFile] [inputType]
@@ -125,9 +126,9 @@ def run(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval=1e-1
     if use_signalP:
         print("\n\n***************************0. SIGNALP start*************************************************\n\n")
         if gram == "p" or gram=="all":
-            signalpos = Popen('signalp -t gram+ %suniInput > %ssignalp.pos' % (outPath, outPath), shell=True)
+            signalpos = Popen('%s -t gram+ %suniInput > %ssignalp.pos' % (signalP_path, outPath, outPath), shell=True)
         if gram == "n" or gram == "all":
-            signalpneg = Popen('signalp -t gram- %suniInput > %ssignalp.neg' % (outPath, outPath), shell=True)
+            signalpneg = Popen('%s -t gram- %suniInput > %ssignalp.neg' % (signalP_path, outPath, outPath), shell=True)
 
     # End SignalP
     #######################
@@ -667,17 +668,18 @@ def cli_main():
     parser.add_argument('--cgc_sig_genes', default='tp', choices=['tp', 'tf','all'], help='CGCFinder Signature Genes value')
     parser.add_argument('--tools', '-t', nargs='+', choices=['hmmer', 'diamond', 'eCAMI', 'all'], default='all', help='Choose a combination of tools to run')
     parser.add_argument('--use_signalP', default=False, type=bool, help='Use signalP or not, remember, you need to setup signalP tool first. Because of signalP license, Docker version does not have signalP.')
+    parser.add_argument('--signalP_path', '-sp',default="signalp", type=str, help='The path for signalp. Default location is signalp')
     parser.add_argument('--gram', '-g', choices=["p","n","all"], default="all", help="Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of SingalP, only if user use singalP")
     args = parser.parse_args()
 
     run(inputFile=args.inputFile, inputType=args.inputType, cluster=args.cluster, dbCANFile=args.dbCANFile,
-             dia_eval=args.dia_eval, dia_cpu=args.dia_cpu, hmm_eval=args.hmm_eval, hmm_cov=args.hmm_cov, hmm_cpu=args.hmm_cpu,
-             eCAMI_kmer_db=args.eCAMI_kmer_db, eCAMI_k_mer=args.eCAMI_k_mer, eCAMI_jobs=args.eCAMI_jobs,
-             eCAMI_important_k_mer_number=args.eCAMI_important_k_mer_number,
-             eCAMI_beta=args.eCAMI_beta, tf_eval=args.tf_eval, tf_cov=args.tf_cov, tf_cpu=args.tf_cpu,
-             stp_eval=args.stp_eval, stp_cov=args.stp_cov, stp_cpu=args.stp_cpu, prefix=args.out_pre,
-             outDir=args.out_dir, dbDir=args.db_dir, cgc_dis=args.cgc_dis, cgc_sig_genes=args.cgc_sig_genes,
-             tool_arg=args.tools, use_signalP=args.use_signalP, gram=args.gram)
+        dia_eval=args.dia_eval, dia_cpu=args.dia_cpu, hmm_eval=args.hmm_eval, hmm_cov=args.hmm_cov,
+        hmm_cpu=args.hmm_cpu, eCAMI_kmer_db=args.eCAMI_kmer_db, eCAMI_k_mer=args.eCAMI_k_mer,
+        eCAMI_jobs=args.eCAMI_jobs, eCAMI_important_k_mer_number=args.eCAMI_important_k_mer_number,
+        eCAMI_beta=args.eCAMI_beta, tf_eval=args.tf_eval, tf_cov=args.tf_cov, tf_cpu=args.tf_cpu,
+        stp_eval=args.stp_eval, stp_cov=args.stp_cov, stp_cpu=args.stp_cpu, prefix=args.out_pre, outDir=args.out_dir,
+        dbDir=args.db_dir, cgc_dis=args.cgc_dis, cgc_sig_genes=args.cgc_sig_genes, tool_arg=args.tools,
+        use_signalP=args.use_signalP, signalP_path=args.signalP_path, gram=args.gram)
 
 
 if __name__ == '__main__':

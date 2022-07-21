@@ -17,6 +17,9 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 
 Update Info
 ---
+- V3.0.5 please use `pip install dbcan==3.0.5` for update
+    1. Fixed the bug in signalP
+    2. Fixed the cgc problems and run_dbcan small bugs.
 - V3.0.4 please use `pip install dbcan==3.0.4` for update
     1. Fixed eCAMI tool problem.
     2. If you download gff file from [NCBI](https://www.ncbi.nlm.nih.gov/), please check the last column, replace Name with ID, and ID with Name.
@@ -78,7 +81,7 @@ conda activate run_dbcan
 3. Install this package with pip.
 
 ```
-pip install dbcan==3.0.4
+pip install dbcan==3.0.5
 ```
 
 
@@ -97,31 +100,36 @@ cd db \
     && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.gff
 ```
 5. (Optional) SignalP Installation.
-Our program include Signalp Petitide prediction with SignalP. Make sure to set `use_signalP=True` and *have to* obtain your own academic license of SignalP and download it from [here](http://www.cbs.dtu.dk/cgi-bin/sw_request?signalp+4.1), and then move tarball (Signalp-4.1.tar.gz) into `run_dbcan/tools/` by yourself. Following statement is singalP-4.0 installation instruction.
+   Our program include Signalp Petitide prediction with SignalP. Make sure to set `use_signalP=True` and *have to* obtain your own academic license of SignalP and download it from [here](https://services.healthtech.dtu.dk/service.php?SignalP-4.1), and then move the perl file from the tarball file (signalp-4.1g.Linux.tar.gz) into `/usr/bin/signalp` by yourself. Following statement is singalP-4.1 installation instruction.
 ```
 mkdir -p run_dbcan/tools && run_dbcan/tools/
-tar xzf Signalp-4.1.tar.gz && cd Signalp-4.1
+ tar -xvf signalp-4.1g.Linux.tar.gz && cd signalp-4.1
 ```
+Then you can find those files/directories located in `signalp-4.1` directory
+```
+(base) lehuang@lehuang:~/Downloads/signalp-4.1$ ls
+bin  lib  signalp  signalp.1  signalp-4.1.readme  syn  test
+```
+*signalp* is the perl file that you will use in your program
 Edit the paragraph labeled  "GENERAL SETTINGS, CUSTOMIZE ..." in the top of
    the file 'signalp'. The following twovmandatory variables need to be set:
 
-   	SIGNALP		full path to the signalp-4.1 directory on your system
-	outputDir	where to store temporary files (writable to all users)
-
-   In addition,  for practical reasons,  it is possible to limit the number of
-   input sequences allowed per run (MAX_ALLOWED_ENTRIES). For example:
+   	**SIGNALP**		full path to the signalp-4.1 directory on your system
+	**outputDir**	where to store temporary files (writable to all users)
+	**MAX_ALLOWED_ENTRIES** the number of input sequences allowed per run.
 ```
+ Here is the example for me to change line 13, line 17 and line 20 in `singalp` file. I suggest you to set MAX_ALLOWED_ENTRIES as 100000
 ###############################################################################
 #               GENERAL SETTINGS: CUSTOMIZE TO YOUR SITE
 ###############################################################################
 
 # full path to the signalp-4.1 directory on your system (mandatory)
 BEGIN {
-    $ENV{SIGNALP} = '/home/abc/Desktop/run_dbcan/tools/signalp-4.1';
+     $ENV{SIGNALP} = '/home/lehuang/Downloads/signalp-4.1';
 }
 
 # determine where to store temporary files (must be writable to all users)
-my $outputDir = "/home/abc/Desktop/run_dbcan/tools/signalp-4.1/output";
+my $outputDir = "/home/lehuang/Downloads/signalp-4.1/output";
 
 # max number of sequences per run (any number can be handled)
 my $MAX_ALLOWED_ENTRIES=100000;
@@ -133,11 +141,22 @@ And then, use this command:
 sudo cp signalp /usr/bin/signalp
 sudo chmod 755 /usr/bin/signalp
 ```
+If you don't have the permission to access `/usr/bin`, you can use the parameter `-sp` or `--signalP_path` to indicate your `signalp` file path in the run_dbcan program. Please see the step 6.
 6. Check Program.
 ```
 run_dbcan EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655
 ```
 
+If you want to run the code with SignalP
+```
+run_dbcan EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655 --use_signalP=TRUE
+
+```
+If you don't have the permission to access `/usr/bin` when running with signalP, you can use the parameter `-sp` or `--signalP_path` to indicate your `signalp` file path in the run_dbcan program.
+
+```
+run_dbcan EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655 --use_signalP=TRUE -sp /home/lehuang/Downloads/signalp-4.1/signalp 
+```
 Docker version Usage
 ----
 1. Make sure docker is installed on your computer successfully.
@@ -163,7 +182,7 @@ P.S.: You do not need to download `CGCFinder` and `hmmscan-parser` because they 
 
 [Python3]--Be sure to use python3, not python2
 
-[DIAMOND](https://github.com/bbuchfink/diamond)-- please install from github as instructions.
+[DIAMOND](https://github.com/bbuchfink/diamond)-- Included in dbCAN2.
 
 [HMMER](hmmer.org)
 
@@ -257,8 +276,10 @@ information. Otherwise, the AuxillaryFile may be left blank.
 
 [--use_signalP] - optional, Use signalP or not, remember, you need to setup signalP tool first. Because of signalP license, python package does not have signalP. If your input is proteome/prokaryote nucleotide, please also certify the "--gram"(in the below). Default = False.
 
-[--gram] - optional, Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of SignalP, only if you use SignalP. Only you set use_signalP. The options are: "all"(gram positive + gram negative), "n"(gram negative), "p"(gram positive). Default = "all".
+[use_signalP] - optional, Use signalP or not, remember, you need to setup signalP tool first. Because of signalP license, Docker version does not have signalP.
+[signalP_path] - optional, The path for signalp. Default location is signalp
 
+[--gram] - optional, Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of SignalP, only if you use SignalP. Only you set use_signalP. The options are: "all"(gram positive + gram negative), "n"(gram negative), "p"(gram positive). Default = "all".
 
 
 
@@ -300,6 +321,7 @@ To run this example type, run:
 ```
 run_dbcan EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655
 ```
+
 or
 
 ```
