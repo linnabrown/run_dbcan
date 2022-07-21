@@ -100,10 +100,10 @@ cd db \
     && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.gff
 ```
 5. (Optional) SignalP Installation.
-   Our program include Signalp Petitide prediction with SignalP. Make sure to set `use_signalP=True` and *have to* obtain your own academic license of SignalP and download it from [here](https://services.healthtech.dtu.dk/service.php?SignalP-4.1), and then move the perl file from the tarball file (signalp-4.1g.Linux.tar.gz) into `/usr/bin/signalp` by yourself. Following statement is singalP-4.1 installation instruction.
+Our program include Signalp Petitide prediction with SignalP. Make sure to set `use_signalP=True` and *have to* obtain your own academic license of SignalP and download it from [here](https://services.healthtech.dtu.dk/service.php?SignalP-4.1), and then move the perl file from the tarball file (signalp-4.1g.Linux.tar.gz) into `/usr/bin/signalp` by yourself. Following statement is singalP-4.1 installation instruction.
 ```
 mkdir -p run_dbcan/tools && run_dbcan/tools/
- tar -xvf signalp-4.1g.Linux.tar.gz && cd signalp-4.1
+tar -xvf signalp-4.1g.Linux.tar.gz && cd signalp-4.1
 ```
 Then you can find those files/directories located in `signalp-4.1` directory
 ```
@@ -118,14 +118,14 @@ Edit the paragraph labeled  "GENERAL SETTINGS, CUSTOMIZE ..." in the top of
 	**outputDir**	where to store temporary files (writable to all users)
 	**MAX_ALLOWED_ENTRIES** the number of input sequences allowed per run.
 ```
- Here is the example for me to change line 13, line 17 and line 20 in `singalp` file. I suggest you to set MAX_ALLOWED_ENTRIES as 100000
+Here is the example for me to change line 13, line 17 and line 20 in `singalp` file. I suggest you to set MAX_ALLOWED_ENTRIES as 100000
 ###############################################################################
 #               GENERAL SETTINGS: CUSTOMIZE TO YOUR SITE
 ###############################################################################
 
 # full path to the signalp-4.1 directory on your system (mandatory)
 BEGIN {
-     $ENV{SIGNALP} = '/home/lehuang/Downloads/signalp-4.1';
+    $ENV{SIGNALP} = '/home/lehuang/Downloads/signalp-4.1';
 }
 
 # determine where to store temporary files (must be writable to all users)
@@ -152,7 +152,7 @@ If you want to run the code with SignalP
 run_dbcan EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655 --use_signalP=TRUE
 
 ```
-If you don't have the permission to access `/usr/bin` when running with signalP, you can use the parameter `-sp` or `--signalP_path` to indicate your `signalp` file path in the run_dbcan program.
+If you don't have the permission to access `/usr/bin` when running with signalP, you can use the parameter `-sp` or `--signalP_path` to indicate your `signalp` file path in the run_dbcan program. 
 
 ```
 run_dbcan EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655 --use_signalP=TRUE -sp /home/lehuang/Downloads/signalp-4.1/signalp 
