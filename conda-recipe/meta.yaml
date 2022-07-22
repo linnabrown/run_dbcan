@@ -10,6 +10,11 @@ source:
   git_url: https://github.com/AlexSCFraser/run_dbcan.git #delete this when merging into main repo
   git_depth: 1 # only grab most recent commit on branch
 
+build:
+  noarch: python
+  number: 0
+  script: {{ PYTHON }} setup.py install
+
 requirements:
   build:
     - python
