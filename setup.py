@@ -12,6 +12,7 @@ long_description = """This is the standalone version of dbCAN annotation tool fo
 """
 
 setup(name='dbcan',
+      # The version number here is the single source in the package
       version="3.0.5",
       description='Standalone version of dbCAN annotation tool for automated CAZyme annotation',
       long_description=long_description,
