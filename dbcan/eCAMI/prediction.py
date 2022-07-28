@@ -13,7 +13,7 @@ import datetime
 import re
 #import psutil
 import argparse,sys
-from multiprocessing import Pool 
+from multiprocessing import Pool
 # add by Le Nov 14, 2021
 
 # from eCAMI_data import eCAMI_data_path
@@ -40,23 +40,23 @@ def read_file(database_dir,input_fasta_file):
             else:
                 new_text[proteinname[len(proteinname)-1]]+=text[i]
     protein_string=[]
-#    print(len(proteinname))
+    #    print(len(proteinname))
     for each_name in proteinname:
         protein_string.append(new_text[each_name])
     return [proteinname,protein_string]
 
 
 def find_all(sub,s):
-	index_list = []
-	index = s.find(sub)
-	while index != -1:
-		index_list.append(index+1)
-		index = s.find(sub,index+1)
-	
-	if len(index_list) > 0:
-		return index_list
-	else:
-		return -1
+    index_list = []
+    index = s.find(sub)
+    while index != -1:
+        index_list.append(index+1)
+        index = s.find(sub,index+1)
+
+    if len(index_list) > 0:
+        return index_list
+    else:
+        return -1
 
 
 def get_kmer_dict(n_mer_dir_path):
@@ -152,9 +152,9 @@ def get_cluster_number(file_name,fam_kmer_dict,output_dir,n_mer,piece_number,pro
             each_cluster_score=sorted(each_cluster_score,key=(lambda x:x[1]),reverse=True)
             if each_cluster_score[0][2]>=beta and each_cluster_score[0][1]>=important_n_mer_number:
                 sort_fam.append([each_cluster_score[0][1],each_cluster_score[0][2],each_fam])
-                selected_fam_dict[each_fam]=[each_cluster_score[0][1]],\
-                                  each_cluster_score[0][2],each_cluster_score[0][3],\
-                                  kmer_message[each_cluster_score[0][0]],kmer_label[each_cluster_score[0][0]]
+                selected_fam_dict[each_fam]=[each_cluster_score[0][1]], \
+                                            each_cluster_score[0][2],each_cluster_score[0][3], \
+                                            kmer_message[each_cluster_score[0][0]],kmer_label[each_cluster_score[0][0]]
         if len(sort_fam)==0:
             continue
         sort_fam=sorted(sort_fam,key=(lambda x:x[1]),reverse=True)
@@ -182,7 +182,7 @@ def get_cluster_number(file_name,fam_kmer_dict,output_dir,n_mer,piece_number,pro
                 used_fam.append(temp_fam[0].split('_')[0])
                 if int(temp_fam[1])>1 and temp_name in selected_fam_dict.keys():
                     fw.write(protein_name[i]+'\t'+write_line(selected_fam_dict[temp_name],protein_string[i]))
-                    
+
 
     fw.close()
 
@@ -196,22 +196,13 @@ def get_validation_results(input_fasta_file,database_dir,output_dir,output_file_
         database_dir=database_dir+'/'
     [protein_name,protein_string] = read_file(database_dir,input_fasta_file)
 
-    current_path=os.getcwd()
+    # Simple method to make multiple folders along path if needed, should handle both relative and absolute paths.
+    # The previous code that handled this directory creation had a bug where it would treat absolute paths as relative
+    # paths and create a huge empty folder structure as a subdirectory of the current working directory.
+    out_dir_abs = os.path.abspath(output_dir)
+    os.makedirs(out_dir_abs, exist_ok=True)
+    temp_output_dir = output_dir
 
-    all_output_dir_name=output_dir.split('/')
-    while '' in all_output_dir_name:
-        all_output_dir_name.remove('')
-    for i in range(len(all_output_dir_name)):
-        if i==0:
-            temp_dir_list=os.listdir(current_path)
-            if all_output_dir_name[i] not in temp_dir_list:
-                os.mkdir(all_output_dir_name[i])
-        else:
-            temp_dir_name='/'.join(all_output_dir_name[0:i])
-            temp_dir_list=os.listdir(temp_dir_name)
-            if all_output_dir_name[i] not in temp_dir_list:
-                os.mkdir(temp_dir_name+'/'+all_output_dir_name[i])
-    temp_output_dir='/'.join(all_output_dir_name)  
     pred_file_name=output_file_name
     if temp_output_dir:
         temp_output_dir=output_dir+'/'
@@ -221,7 +212,7 @@ def get_validation_results(input_fasta_file,database_dir,output_dir,output_file_
 
     for i in range(jobs):
         file_name=input_fasta_file+'_thread_'+str(i)+'.txt'
-#        get_cluster_number(file_name,fam_kmer_dict,temp_output_dir,n_mer,piece_number[i],protein_name,protein_string,important_n_mer_number,beta)
+        #        get_cluster_number(file_name,fam_kmer_dict,temp_output_dir,n_mer,piece_number[i],protein_name,protein_string,important_n_mer_number,beta)
 
         pool.apply_async(get_cluster_number, (file_name,fam_kmer_dict,temp_output_dir,n_mer,piece_number[i],protein_name,protein_string,important_n_mer_number,beta,))
     pool.close()
@@ -234,7 +225,7 @@ def get_validation_results(input_fasta_file,database_dir,output_dir,output_file_
         fw.write(text)
         os.remove(temp_output_dir+input_fasta_file+'_thread_'+str(i)+'.txt')
     fw.close()
-        
+
 
 
 
@@ -266,14 +257,14 @@ def get_validation_results(input_fasta_file,database_dir,output_dir,output_file_
 
 class eCAMI_config(object):
     def __init__(
-        self,
-        db_type = 'CAZyme',
-        output = 'examples/prediction/output/test_pred_cluster_labels.txt',
-        input = 'examples/prediction/input/test.faa',
-        k_mer = 8,
-        jobs = 8,
-        important_k_mer_number = 5,
-        beta = 2.0
+            self,
+            db_type = 'CAZyme',
+            output = 'examples/prediction/output/test_pred_cluster_labels.txt',
+            input = 'examples/prediction/input/test.faa',
+            k_mer = 8,
+            jobs = 8,
+            important_k_mer_number = 5,
+            beta = 2.0
     ) -> None:
         if db_type == 'CAZyme':
             self.kmer_db = f'{os.path.dirname(__file__)}/CAZyme'
@@ -292,13 +283,13 @@ class eCAMI_config(object):
 def eCAMI_main(args):
     starttime = datetime.datetime.now()
     # args = arg_parser(sys.argv[1:])
-    
+
     database_dir=os.path.dirname(args.input)
     input_fasta_file = os.path.basename(args.input)
-    
+
     output_dir=os.path.dirname(args.output)
     output_file_name = os.path.basename(args.output)
-    
+
     n_mer=args.k_mer
     n_mer_dir_path=args.kmer_db
 

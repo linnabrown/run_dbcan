@@ -120,7 +120,7 @@ venv.bak/
 #vscode
 .vscode/
 
-meta.yaml
+conda-recipe/meta.yaml
 .DS_Store
 
 #comment Hotpep
@@ -129,4 +129,3 @@ Hotpep_bkp*
 
 #ignore example data
 EscheriaColiK12MG1655.*
-
