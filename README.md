@@ -17,6 +17,8 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 
 Update Info
 ---
+- V3.0.5 please use `pip install dbcan==3.0.6` for update
+    1. Rename the code hmmscan-parser.py to hmmscan_parser.py
 - V3.0.5 please use `pip install dbcan==3.0.5` for update
     1. Fixed the bug in signalP
     2. Fixed the cgc problems and run_dbcan small bugs.

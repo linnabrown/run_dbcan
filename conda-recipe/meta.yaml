@@ -1,41 +1,48 @@
-{% set name = "run_dbcan" %}
-{% set data = load_setup_py_data(setup_file='../setup.py', from_recipe_dir=True) %}
+{% set name = "dbcan" %}
+{% set version = "3.0.6" %}
 
 package:
   name: "{{ name|lower }}"
-  version: {{ data.get('version') }}
-#  pulls version number from setup.py
+  version: {{ version }}
 
 source:
-  #  may want to change this to pull from a stable git release branch, or look for stable release git commit labels, or from another source such as PyPi
-  git_url: https://github.com/linnabrown/run_dbcan.git
-  git_depth: 1 # only grab most recent commit on branch
+  url: https://github.com/linnabrown/run_dbcan/releases/download/{{ version }}/dbcan-{{ version }}.tar.gz
+  sha256: 2b07b0fdb623b6c54eac86adb9459d1c218a825f6991675fa01fe4ad25977f7e
 
 build:
-  noarch: python
   number: 0
-  script: {{ PYTHON }} setup.py install
+  script: "{{ PYTHON }} -m pip install . -vv"
+  noarch: python
 
 requirements:
-  build:
+  host:
+    - natsort
+    - pip
     - python
     - setuptools
-    - git
-  host:
-    - python
+    - setuptools_scm_git_archive
+
   run:
+    - natsort
+    - python
     - diamond
     - hmmer
     - prodigal
-    - python
-    - natsort
     - scipy
     - psutil
-    - numpy
+    - numpy>1.19
+
+test:
+  imports:
+    - dbcan --help
 
 about:
   home: http://bcb.unl.edu/dbCAN2/
   dev_url: https://github.com/linnabrown/run_dbcan
   license: GPLv3
   license_file: LICENSE
-  summary: A standalone tool of http://bcb.unl.edu/dbCAN2/
+  summary: Standalone version of dbCAN annotation tool for automated CAZyme annotation
+
+extra:
+  recipe-maintainers:
+    - Le Huang
