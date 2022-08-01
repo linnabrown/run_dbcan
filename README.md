@@ -73,21 +73,14 @@ Python Package Usage
 -----
 1. Please install [Anoconda](https://www.anaconda.com) first.
 
-2. Create virtual environment with dependencies and activate the virtual environment.
+2. Create virtual environment with dbcan and activate the virtual environment.
 
 ```
-conda create -n run_dbcan python=3.8 diamond hmmer prodigal -c conda-forge -c bioconda
+conda create -n run_dbcan python=3.8 dbcan -c conda-forge -c bioconda
 conda activate run_dbcan
 ```
 
-3. Install this package with pip.
-
-```
-pip install dbcan==3.0.5
-```
-
-
-4. Database Installation.
+3. Database Installation.
 ```
 test -d db || mkdir db
 cd db \
@@ -101,7 +94,7 @@ cd db \
     && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.faa \
     && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.gff
 ```
-5. (Optional) SignalP Installation.
+4. (Optional) SignalP Installation.
 Our program include Signalp Petitide prediction with SignalP. Make sure to set `use_signalP=True` and *have to* obtain your own academic license of SignalP and download it from [here](https://services.healthtech.dtu.dk/service.php?SignalP-4.1), and then move the perl file from the tarball file (signalp-4.1g.Linux.tar.gz) into `/usr/bin/signalp` by yourself. Following statement is singalP-4.1 installation instruction.
 ```
 mkdir -p run_dbcan/tools && run_dbcan/tools/
