@@ -74,7 +74,7 @@ Support Platform
 -----
 Linux(Ubuntu, CentOS), MacOS
 
-Python Package Usage
+Installation via Bioconda
 -----
 1. Please install [Anoconda](https://www.anaconda.com) first.
 
@@ -157,7 +157,7 @@ If you don't have the permission to access `/usr/bin` when running with signalP,
 ```
 run_dbcan EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655 --use_signalP=TRUE -sp /home/lehuang/Downloads/signalp-4.1/signalp 
 ```
-Docker version Usage
+Installation via Docker
 ----
 1. Make sure docker is installed on your computer successfully.
 2. Docker pull image
