@@ -17,8 +17,13 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 
 Update Info
 ---
-- V3.0.6 please use `pip install dbcan==3.0.6` for update
-    1. Rename the code hmmscan-parser.py to hmmscan_parser.py
+- V3.0.6 We now create the bioconda version. To old users, please run `conda install dbcan -c bioconda` for update from now on. To new users, please follow the installation instruction below.
+    1. 
+    ```
+    conda create -n run_dbcan python=3.8 dbcan -c conda-forge -c bioconda
+    conda activate run_dbcan 
+    ```
+    2. Rename the code hmmscan-parser.py to hmmscan_parser.py
 - V3.0.5 please use `pip install dbcan==3.0.5` for update
     1. Fixed the bug in signalP
     2. Fixed the cgc problems and run_dbcan small bugs.
@@ -69,25 +74,18 @@ Support Platform
 -----
 Linux(Ubuntu, CentOS), MacOS
 
-Python Package Usage
+Installation via Bioconda
 -----
 1. Please install [Anoconda](https://www.anaconda.com) first.
 
-2. Create virtual environment with dependencies and activate the virtual environment.
+2. Create virtual environment with dbcan and activate the virtual environment.
 
 ```
-conda create -n run_dbcan python=3.8 diamond hmmer prodigal -c conda-forge -c bioconda
+conda create -n run_dbcan python=3.8 dbcan -c conda-forge -c bioconda
 conda activate run_dbcan
 ```
 
-3. Install this package with pip.
-
-```
-pip install dbcan==3.0.5
-```
-
-
-4. Database Installation.
+3. Database Installation.
 ```
 test -d db || mkdir db
 cd db \
@@ -101,7 +99,7 @@ cd db \
     && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.faa \
     && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.gff
 ```
-5. (Optional) SignalP Installation.
+4. (Optional) SignalP Installation.
 Our program include Signalp Petitide prediction with SignalP. Make sure to set `use_signalP=True` and *have to* obtain your own academic license of SignalP and download it from [here](https://services.healthtech.dtu.dk/service.php?SignalP-4.1), and then move the perl file from the tarball file (signalp-4.1g.Linux.tar.gz) into `/usr/bin/signalp` by yourself. Following statement is singalP-4.1 installation instruction.
 ```
 mkdir -p run_dbcan/tools && run_dbcan/tools/
@@ -159,7 +157,7 @@ If you don't have the permission to access `/usr/bin` when running with signalP,
 ```
 run_dbcan EscheriaColiK12MG1655.fna prok --out_dir output_EscheriaColiK12MG1655 --use_signalP=TRUE -sp /home/lehuang/Downloads/signalp-4.1/signalp 
 ```
-Docker version Usage
+Installation via Docker
 ----
 1. Make sure docker is installed on your computer successfully.
 2. Docker pull image
