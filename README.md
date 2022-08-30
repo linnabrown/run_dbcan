@@ -17,8 +17,8 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 
 Update Info
 ---
--3.0.7 Fix the bug in cgc_parser.py
--hmmdb, cazydb, tf-1, tf-2, stp and tcdb are updated. **Please update all of the databases**
+1. 3.0.7 Fix the bug in cgc_parser.py.
+2. hmmdb, cazydb, tf-1, tf-2, stp and tcdb are updated. **Please update all of the databases**.
 
 [Previous update information](https://github.com/linnabrown/run_dbcan/wiki/Update-information-Archive)
 
