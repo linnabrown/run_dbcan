@@ -17,51 +17,9 @@ Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner 
 
 Update Info
 ---
-- V3.0.6 We now create the bioconda version. To old users, please run `conda install dbcan -c bioconda` for update from now on. To new users, please follow the installation instruction below.
-    1. 
-    ```
-    conda create -n run_dbcan python=3.8 dbcan -c conda-forge -c bioconda
-    conda activate run_dbcan 
-    ```
-    2. Rename the code hmmscan-parser.py to hmmscan_parser.py
-- V3.0.5 please use `pip install dbcan==3.0.5` for update
-    1. Fixed the bug in signalP
-    2. Fixed the cgc problems and run_dbcan small bugs.
-- V3.0.4 please use `pip install dbcan==3.0.4` for update
-    1. Fixed eCAMI tool problem.
-    2. If you download gff file from [NCBI](https://www.ncbi.nlm.nih.gov/), please check the last column, replace Name with ID, and ID with Name.
-- V3.0.2  please use `pip install dbcan==3.0.2` for update
-    1. Added eCAMI tool, remove Hotpep from run_dbCAN;
-    2. Changed the format of cgc.out to make it easy to read;
-    3. Fixed ‘-t all’ will cause the program to generate empty files.
-    4. Updated CAZy db for Diamond and HMMER DB for HMMER.
-    5. Re-arranged the code. The command line is `run_dbcan` without the suffix `.py`. Please check the command lines below.
-    6. The database files under `db` folder is now hosted through `Git-LFS`. To download the complete db files, please use the command `git lfs pull` (Note: To use git lfs, please check the installation guide at [https://git-lfs.github.com/](https://git-lfs.github.com/)).
-    7. Docker file is updated and we simplify the installation step.
+-3.0.7 Fix the bug in cgc_parser.py
 
-- v2.0.11 please use `pip install run-dbcan==2.0.11` for update
-    1. Add ec number prediction to hotpep result; 
-    2. 04/21/2020 dbCAN2 Hotpep PPR patterns updated to most recent release of CAZyDB (2019). Also missing group EC# files for families added in;
-    3. Revising the output name file in hotpep as random number, to make the program more robust for paralleing running.
-    4. Prioritizing the CAZyme prediction over TF/TC/STP prediction when preparing gff input file for CGC-Finder. 
-    5. Rewrite the installation steps. Recommend user to use customized virtual environment (use certain python version).
-    6. Fix the duplicate ACC of tf-2.hmm to make it compatiable for the newest hmmer (3.3). Delete version limitatino to hmmer.
-    7. Fix the prodigal predicted gff file end with `";"` problem.
-
-- v2.0.6 released on Feb 17, 2020, please use `pip install run-dbcan==2.0.6` for update
-We forgo FragGeneScan because this program does not work now. We use Prodigal instead. So, you don't need to use conda install fraggenescan now.
-We add extra information `EC number` to the last columns of Hotpep output to make it consistent with previous Hotpep result.
-
-- 10/08/2019
-We create a [python package](https://pypi.org/project/run-dbcan/#files).
-Be sure to install [Anaconda](https://www.anaconda.com/) or Miniconda first, and then use the following commands to install our program one time.
-We strongly recommend you to use virtual environment to seperate your own system and this executive scripts. Please make sure to use `conda install -c bioconda diamond hmmer prodigal` and database installation script to have the appropriate dependencies and database installed and configured. Thanks for suggestion and contribution from [tesujimath](https://github.com/tesujimath) .
-
-- 04/15/2019
-We created a [docker image](https://hub.docker.com/r/haidyi/run_dbcan) of run_dbcan. Make sure to install docker properly. Thanks for suggestion and contributions from [Haidyi](https://github.com/HaidYi).
-
-- 1/10/2019
-We rewritted program and added `stp hmmdb` signature gene in CGC_Finder.py (stp means signal transduction proteins; the hmmdb was constructed by Catherine Ausland of the Yin lab at NIU). Then Change tfdb from `tfdb` to `tf.hmm`, which is added to `db/` directory (tfdb was a fasta format sequence file, which contains just bacterial transcription factor proteins; tf.hmm is a hmmer format file containing hmms downloaded from the Pfam and SUPERFAMILY database according to the DBD database: http://www.transcriptionfactor.org). Also, our project updates dbCAN-HMM db(V8) and CAZy db. Furthermore, we fixed bugs in HotPep python version to fit python 3 user. Last but not least, we added certain codes to make it robust. Thanks for hmmscan-parser.py suggestion from [Mick](mick.watson@roslin.ed.ac.uk).
+[Previous update information](https://github.com/linnabrown/run_dbcan/wiki/Update-information-Archive)
 
 Function
 ----
