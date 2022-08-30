@@ -40,7 +40,7 @@ def run(input_file, eval_num=1e-15, coverage=0.35, verbose=False):
 		for line in f:
 			row = line.rstrip().split('\t')
 			row.append(float(int(row[6])-int(row[5]))/int(row[1]))
-			if float(row[4]) <= eval_num and float(row[-1]) >= coverage:
+			if float(row[4]) <= float(eval_num) and float(row[-1]) >= float(coverage):
 				if verbose:
 					print('\t'.join([str(x) for x in row]))
 				output += '\t'.join([str(x) for x in row]) + '\n'
