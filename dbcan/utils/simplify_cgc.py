@@ -1,27 +1,6 @@
 import os
 import sys
 
-
-# def read_file(input_file):
-# 	dir = os.path.dirname(input_file)
-# 	update_cgc = os.path.join(dir, 'update_cgc.out')
-# 	if os.path.exists(update_cgc):
-# 		os.remove(update_cgc)
-# 	try:
-# 		f = open(dir+input_file, 'r')
-# 	except:
-# 		print('fail to open')
-# 		exit(-1)
-# 	try:
-# 		text = f.read()
-# 	except:
-# 		print('fail to read')
-# 		exit(-1)
-# 	finally:
-# 		f.close()
-# 		text = text.split('\n')
-# 	return text,dir
-
 def simplify_output(inFile):
 	try:
 		text = open(inFile).readlines()
