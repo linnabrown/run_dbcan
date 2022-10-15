@@ -357,7 +357,12 @@ def run(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval=1e-1
                             row[8] = ""
                             if gene in cazyme:
                                 row[2] = "CAZyme"
-                                row[8] = "DB="+'|'.join(cazyme_genes[gene])
+                                # Uncomment this, if all CAZyme results need to be write into cgc.out
+                                # row[8] = "DB="+'|'.join(cazyme_genes[gene])
+                                #
+                                cazyme_genes_list = list(cazyme_genes[gene])
+                                row[8] = "DB="+cazyme_genes_list[0]
+                                #
                             elif gene in tf:
                                 row[2] = "TF"
                                 row[8] = "DB="+tf_genes[gene]
@@ -401,7 +406,12 @@ def run(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval=1e-1
 
                                     if gene in cazyme:
                                         row[2] = "CAZyme"
-                                        row[8] = "DB="+'|'.join(cazyme_genes[gene])
+                                        # Uncomment this, if all CAZyme results need to be write into cgc.out
+                                        # row[8] = "DB="+'|'.join(cazyme_genes[gene])
+                                        #
+                                        cazyme_genes_list = list(cazyme_genes[gene])
+                                        row[8] = "DB="+cazyme_genes_list[0]
+                                        #
                                     elif gene in tf:
                                         row[2] = "TF"
                                         row[8] = "DB="+tf_genes[gene]
@@ -426,7 +436,12 @@ def run(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval=1e-1
                             gene = row[1]
                             if gene in cazyme:
                                 outrow[2] = 'CAZyme'
-                                outrow[8] = "DB="+'|'.join(cazyme_genes[gene])
+                                # Uncomment this, if all CAZyme results need to be write into cgc.out
+                                # outrow[8] = "DB="+'|'.join(cazyme_genes[gene])
+                                #
+                                cazyme_genes_list = list(cazyme_genes[gene])
+                                outrow[8] = "DB="+cazyme_genes_list[0]
+                                #
                             elif gene in tf:
                                 outrow[2] = 'TF'
                                 outrow[8] =  "DB="+tf_genes[gene]
