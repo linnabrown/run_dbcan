@@ -62,14 +62,17 @@ cd db \
 Our program include Signalp Petitide prediction with SignalP. Make sure to set `use_signalP=True` and *have to* obtain your own academic license of SignalP and download it from [here](https://services.healthtech.dtu.dk/service.php?SignalP-4.1), and then move the perl file from the tarball file (signalp-4.1g.Linux.tar.gz) into `/usr/bin/signalp` by yourself. Following statement is singalP-4.1 installation instruction.
 
 Decompress signalp-4.1g.Linux.tar.gz than open the directory
+
 ```
 tar -xvf signalp-4.1g.Linux.tar.gz && cd signalp-4.1
 ```
+
 Then you can find those files/directories located in `signalp-4.1` directory
 ```
 (base) lehuang@lehuang:~/Downloads/signalp-4.1$ ls
 bin  lib  signalp  signalp.1  signalp-4.1.readme  syn  test
 ```
+
 *signalp* is the perl file that you will use in your program
 Edit the paragraph labeled  "GENERAL SETTINGS, CUSTOMIZE ..." in the top of
    the file 'signalp'. The following twovmandatory variables need to be set:
