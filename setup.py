@@ -51,6 +51,6 @@ setup(name='dbcan',
           'psutil',
           'numpy'
       ],
-      python_requires='>=3.5',
+      python_requires='>=3.7',
       zip_safe=False
      )
