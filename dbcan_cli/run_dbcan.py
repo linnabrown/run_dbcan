@@ -129,6 +129,8 @@ def run(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval=1e-1
             signalpos = Popen('%s -t gram+ %suniInput > %ssignalp.pos' % (signalP_path, outPath, outPath), shell=True)
         if gram == "n" or gram == "all":
             signalpneg = Popen('%s -t gram- %suniInput > %ssignalp.neg' % (signalP_path, outPath, outPath), shell=True)
+        if gram == "euk" or gram=="all":
+            signalpeuk = Popen('%s -t euk %suniInput > %ssignalp.euk' % (signalP_path, outPath, outPath), shell=True)
 
     # End SignalP
     #######################
@@ -497,6 +499,17 @@ def run(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval=1e-1
                             if row[9] == 'Y':
                                 out.write(line)
                 call(['rm', outDir+prefix+'signalp.neg'])
+             if gram == "all" or gram == "euk":
+                signalpeuk.wait()
+                print("SignalP euk complete")
+                with open(outDir+prefix+'signalp.euk') as f:
+                    for line in f:
+                        if not line.startswith('#'):
+                            row = line.split(' ')
+                            row = [x for x in row if x != '']
+                            if row[9] == 'Y':
+                                out.write(line)
+                call(['rm', outDir+prefix+'signalp.euk'])
         call('sort -u '+outDir+prefix+'temp > '+outDir+prefix+'signalp.out', shell=True)
         call(['rm', outDir+prefix+'temp'])
 
@@ -684,7 +697,7 @@ def cli_main():
     parser.add_argument('--tools', '-t', nargs='+', choices=['hmmer', 'diamond', 'eCAMI', 'all'], default='all', help='Choose a combination of tools to run')
     parser.add_argument('--use_signalP', default=False, type=bool, help='Use signalP or not, remember, you need to setup signalP tool first. Because of signalP license, Docker version does not have signalP.')
     parser.add_argument('--signalP_path', '-sp',default="signalp", type=str, help='The path for signalp. Default location is signalp')
-    parser.add_argument('--gram', '-g', choices=["p","n","all"], default="all", help="Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of signalP, only if user use signalP")
+    parser.add_argument('--gram', '-g', choices=["p","n","euk","all"], default="all", help="Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, or euk(euk) for which are params of signalP, only if user use signalP")
     args = parser.parse_args()
 
     run(inputFile=args.inputFile, inputType=args.inputType, cluster=args.cluster, dbCANFile=args.dbCANFile,
