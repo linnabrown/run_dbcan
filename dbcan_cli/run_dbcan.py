@@ -684,7 +684,7 @@ def cli_main():
     parser.add_argument('--tools', '-t', nargs='+', choices=['hmmer', 'diamond', 'eCAMI', 'all'], default='all', help='Choose a combination of tools to run')
     parser.add_argument('--use_signalP', default=False, type=bool, help='Use signalP or not, remember, you need to setup signalP tool first. Because of signalP license, Docker version does not have signalP.')
     parser.add_argument('--signalP_path', '-sp',default="signalp", type=str, help='The path for signalp. Default location is signalp')
-    parser.add_argument('--gram', '-g', choices=["p","n","all"], default="all", help="Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of SingalP, only if user use singalP")
+    parser.add_argument('--gram', '-g', choices=["p","n","all"], default="all", help="Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of signalP, only if user use signalP")
     args = parser.parse_args()
 
     run(inputFile=args.inputFile, inputType=args.inputType, cluster=args.cluster, dbCANFile=args.dbCANFile,
