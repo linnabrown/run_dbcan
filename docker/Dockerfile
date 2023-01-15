@@ -1,23 +1,28 @@
-FROM conda/miniconda3
+FROM continuumio/miniconda3
+
+# set work dir
+WORKDIR /app
 
 # install conda packages
-RUN conda install -c anaconda conda-build \
-  && conda install wget \
-  && conda install -c bioconda -y diamond hmmer prodigal \
-  && conda clean -a
+RUN conda create -y -n run_dbcan python=3.8 dbcan -c conda-forge -c bioconda && conda clean -ya
 
-# install dbcan via pip
-RUN pip install dbcan
+# add run_dbcan environment to path
+RUN echo "source activate run_dbcan" > ~/.bashrc
+ENV PATH /opt/conda/envs/run_dbcan/bin:$PATH
 
 # download and make the databases
-RUN mkdir -p /app/db && cd /app/db \
-  && wget http://bcb.unl.edu/dbCAN2/download/CAZyDB.09242021.fa && diamond makedb --in CAZyDB.09242021.fa -d CAZy \
-    && wget https://bcb.unl.edu/dbCAN2/download/Databases/V10/dbCAN-HMMdb-V10.txt && mv dbCAN-HMMdb-V10.txt dbCAN.txt && hmmpress dbCAN.txt \
-    && wget http://bcb.unl.edu/dbCAN2/download/Databases/tcdb.fa && diamond makedb --in tcdb.fa -d tcdb \
-    && wget http://bcb.unl.edu/dbCAN2/download/Databases/tf-1.hmm && hmmpress tf-1.hmm \
-    && wget http://bcb.unl.edu/dbCAN2/download/Databases/tf-2.hmm && hmmpress tf-2.hmm \
-    && wget http://bcb.unl.edu/dbCAN2/download/Databases/stp.hmm && hmmpress stp.hmm
+RUN test -d db || mkdir db
+RUN cd db \
+    && wget http://bcb.unl.edu/dbCAN2/download/Databases/V11/CAZyDB.08062022.fa && diamond makedb --in CAZyDB.08062022.fa -d CAZy \
+    && wget https://bcb.unl.edu/dbCAN2/download/Databases/V11/dbCAN-HMMdb-V11.txt && mv dbCAN-HMMdb-V11.txt dbCAN.txt && hmmpress dbCAN.txt \
+    && wget https://bcb.unl.edu/dbCAN2/download/Databases/V11/tcdb.fa && diamond makedb --in tcdb.fa -d tcdb \
+    && wget http://bcb.unl.edu/dbCAN2/download/Databases/V11/tf-1.hmm && hmmpress tf-1.hmm \
+    && wget http://bcb.unl.edu/dbCAN2/download/Databases/V11/tf-2.hmm && hmmpress tf-2.hmm \
+    && wget https://bcb.unl.edu/dbCAN2/download/Databases/V11/stp.hmm && hmmpress stp.hmm \
+    && cd ../ && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.fna \
+    && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.faa \
+    && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.gff
 
-WORKDIR /app
+ENTRYPOINT ["run_dbcan"]
 
 CMD [ "run_dbcan -h" ]
