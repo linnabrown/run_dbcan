@@ -28,8 +28,7 @@ jobs:
         run: |
           conda install -c anaconda -y conda-build
           conda install -y wget
-          conda install -c bioconda -y diamond hmmer prodigal
-          pip install dbcan
+          conda install -c bioconda -y dbcan
       - name: Test
         run: |
           run_dbcan --help
