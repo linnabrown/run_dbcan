@@ -13,11 +13,16 @@ Status
 
 <!-- [![Package version](https://img.shields.io/pypi/v/dbcan.svg)](https://pypi.org/project/dbcan/#files) -->
 
-A standalone tool of http://bcb.unl.edu/dbCAN2/
+A standalone tool of [dbCAN3 web server](http://bcb.unl.edu/dbCAN2/).
 
 Update Info
 ---
 4.0.0 Released.
+
+Q&A
+---
+Why we use dbCAN4 here but dbCAN3 on the webserver? Since previously the github standalone codes included eCAMI, but the webserver does not, so the version with eCAMI as dbCAN3. Recently, we need to change it into dbCAN4 to keep it the same as the web server. dbCAN4 on Github is totally the same as [dbCAN3 web server](http://bcb.unl.edu/dbCAN2/).
+
 
 **Please update all of the databases**.
 
