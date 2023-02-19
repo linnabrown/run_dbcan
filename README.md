@@ -17,11 +17,10 @@ A standalone tool of [dbCAN3 web server](http://bcb.unl.edu/dbCAN2/).
 
 Update Info
 ---
-4.0.0 Released.
+run_dbcan 4.0.0 is released.
+1. CAZyme substrate prediction based on dbCAN-sub ; 
 
-Q&A
----
-Why we use dbCAN4 here but dbCAN3 on the webserver? Since previously the github standalone codes included eCAMI, but the webserver does not, so the version with eCAMI as dbCAN3. Recently, we need to change it into dbCAN4 to keep it the same as the web server. dbCAN4 on Github is totally the same as [dbCAN3 web server](http://bcb.unl.edu/dbCAN2/).
+2. CGC substrate prediction based on dbCAN-PUL searching and [dbCAN-sub](https://bcb.unl.edu/dbCAN_sub/) majority voting. For CGC substrate prediction, please see our [dbCAN-seq update paper](https://academic.oup.com/nar/article/51/D1/D557/6833251?login=false) for details. With these new functions (esp. the dbCAN-sub search), run_dbcan4.0 is now slower to get the result back to you. Please be patience!
 
 
 **Please update all of the databases**.
@@ -160,19 +159,19 @@ P.S.: You do not need to download `CGCFinder` and `hmmscan-parser` because they 
 
 [Python3]--Be sure to use python3, not python2
 
-[DIAMOND](https://github.com/bbuchfink/diamond)-- Included in dbCAN4.
+[DIAMOND](https://github.com/bbuchfink/diamond)-- Included in run_dbcan4.
 
-[HMMER](hmmer.org)--Included in dbCAN4
+[HMMER](hmmer.org)--Included in run_dbcan4.
 
-[hmmscan-parser](https://github.com/linnabrown/run_dbcan/blob/master/hmmscan-parser.py)--This is included in dbCAN4.
+[hmmscan-parser](https://github.com/linnabrown/run_dbcan/blob/master/hmmscan-parser.py)--This is included in run_dbcan4.
 
-dbCAN_sub--Included in dbCAN4.
+dbCAN_sub--Included in run_dbcan4.
 
 [signalp](http://www.cbs.dtu.dk/services/SignalP/)--please download and install if you need.
 
-[Prodigal](https://github.com/hyattpd/Prodigal)--Included in dbCAN4.
+[Prodigal](https://github.com/hyattpd/Prodigal)--Included in run_dbcan4.
 
-[CGCFinder](https://github.com/linnabrown/run_dbcan/blob/master/dbcan/utils/CGCFinder.py)--Included in dbCAN4.
+[CGCFinder](https://github.com/linnabrown/run_dbcan/blob/master/dbcan/utils/CGCFinder.py)--Included in run_dbcan4.
 
 **DATABASES Installation (those are included in step4 Database Installation)**
 
@@ -351,9 +350,9 @@ Reference
 
 This is the standalone version of dbCAN annotation tool for automated CAZyme annotation (known as run_dbCAN), written by Le Huang and Tanner Yohe.
 
-If you want to use our dbCAN2 webserver, please go to http://bcb.unl.edu/dbCAN2/.
+If you want to use our dbCAN3 webserver, please go to http://bcb.unl.edu/dbCAN2/.
 
-If you use dbCAN standalone tool or/and our web server for publication, please cite us:
+If you use dbCAN standalone tool (run_dbcan) or/and our web server for publication, please cite us:
 
 *Han Zhang, Tanner Yohe, **Le Huang**, Sarah Entwistle, Peizhi Wu, Zhenglu Yang, Peter K Busk, Ying Xu, Yanbin Yin;
 dbCAN2: a meta server for automated carbohydrate-active enzyme annotation, Nucleic Acids Research,
