@@ -15,8 +15,6 @@ Status
 
 A standalone tool of http://bcb.unl.edu/dbCAN2/
 
-Rewritten by Le Huang in the Zhang Lab at NKU, now in UNC; V1 version was written by Tanner Yohe of the Yin lab at NIU, now in UNL.
-
 Update Info
 ---
 4.0.0 Released.
@@ -40,14 +38,16 @@ Installation via Bioconda
 -----
 1. Please install [Anoconda](https://www.anaconda.com) first.
 
-2. Create virtual environment with dbcan and activate the virtual environment.
+2. Install [NCBI Blast+](https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download).
+
+3. Create virtual environment with dbcan and activate the virtual environment.
 
 ```
 conda create -n run_dbcan python=3.8 dbcan -c conda-forge -c bioconda
 conda activate run_dbcan
 ```
 
-3. Database Installation.
+4. Database Installation.
 ```
 test -d db || mkdir db
 cd db \
@@ -68,7 +68,7 @@ cd db \
     && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.gff
 
 ```
-4. (Optional) SignalP Installation.
+5. (Optional) SignalP Installation.
 Our program include Signalp Petitide prediction with SignalP. Make sure to set `use_signalP=True` and *have to* obtain your own academic license of SignalP and download it from [here](https://services.healthtech.dtu.dk/service.php?SignalP-4.1), and then move the perl file from the tarball file (signalp-4.1g.Linux.tar.gz) into `/usr/bin/signalp` by yourself. Following statement is singalP-4.1 installation instruction.
 
 Decompress signalp-4.1g.Linux.tar.gz than open the directory
@@ -150,39 +150,38 @@ REQUIREMENTS
 **TOOLS**
 
 ----
-P.S.: You do not need to download `CGCFinder` and `hmmscan-parser` because they are included in run_dbcan V2. If you use python package or docker, you don't need to download Prodigal because they includes these denpendencies. Otherwise we recommend you to install and copy them into `/usr/bin` as system application or add their path into system envrionmental profile.
+P.S.: You do not need to download `CGCFinder` and `hmmscan-parser` because they are included in run_dbcan V4. If you use python package or docker, you don't need to download Prodigal because they includes these denpendencies. Otherwise we recommend you to install and copy them into `/usr/bin` as system application or add their path into system envrionmental profile.
 
 
 [Python3]--Be sure to use python3, not python2
 
-[DIAMOND](https://github.com/bbuchfink/diamond)-- Included in dbCAN2.
+[DIAMOND](https://github.com/bbuchfink/diamond)-- Included in dbCAN4.
 
-[HMMER](hmmer.org)
+[HMMER](hmmer.org)--Included in dbCAN4
 
-[hmmscan-parser](https://github.com/linnabrown/run_dbcan/blob/master/hmmscan-parser.py)--This is included in dbCAN2.
+[hmmscan-parser](https://github.com/linnabrown/run_dbcan/blob/master/hmmscan-parser.py)--This is included in dbCAN4.
 
-[eCAMI-Python](https://github.com/zhanglabNKU/eCAMI.git)--This newest version is included in eCAMI.
+dbCAN_sub--Included in dbCAN4.
 
 [signalp](http://www.cbs.dtu.dk/services/SignalP/)--please download and install if you need.
 
-[Prodigal](https://github.com/hyattpd/Prodigal)--please download and install if you need.
+[Prodigal](https://github.com/hyattpd/Prodigal)--Included in dbCAN4.
 
-[!we no longer use FragGeneScan to predict genes from meta genome, we use Prodigal instead][FragGeneScan](http://omics.informatics.indiana.edu/FragGeneScan/)--please download and install if you need.
+[CGCFinder](https://github.com/linnabrown/run_dbcan/blob/master/dbcan/utils/CGCFinder.py)--Included in dbCAN4.
 
-[CGCFinder](https://github.com/linnabrown/run_dbcan/blob/master/CGCFinder.py)--This newest version is included in dbCAN2 project.
-
-**DATABASES Installation**
+**DATABASES Installation (those are included in step4 Database Installation)**
 
 ----
 [Databse](http://bcb.unl.edu/dbCAN2/download/Databases) -- Database Folder
 
 [CAZy.fa](http://bcb.unl.edu/dbCAN2/download/Databases/CAZyDB.09242021.fa)--use `diamond makedb --in CAZyDB.09242021.fa -d CAZy`
 
-[CAZyme]:included in eCAMI.
+[dbCAN_sub](http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN_sub.hmm) --use `hmmpress dbCAN_sub.hmm` .
 
-[EC]: included in eCAMI.
+[dbCAN-PUL](http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-PUL.tar.gz) The substrates files from dbCAN-PUL.
 
-[dbCAN-HMMdb-V10.txt](http://bcb.unl.edu/dbCAN2/download/Databases/V10/dbCAN-HMMdb-V10.txt)--First use `mv dbCAN-HMMdb-V10.txt dbCAN.txt`, then use `hmmpress dbCAN.txt`
+[PUL](http://bcb.unl.edu/dbCAN2/download/Databases/PUL.faa)--The PUL sequences, use `makeblastdb -in PUL.faa -dbtype prot`.
+[dbCAN-HMMdb-V11.txt](http://bcb.unl.edu/dbCAN2/download/Databases/V11/dbCAN-HMMdb-V11.txt)--First use `mv dbCAN-HMMdb-V11.txt dbCAN.txt`, then use `hmmpress dbCAN.txt`
 
 [tcdb.fa](http://bcb.unl.edu/dbCAN2/download/Databases/tcdb.fa)--use `diamond makedb --in tcdb.fa -d tcdb`
 
@@ -195,66 +194,91 @@ P.S.: You do not need to download `CGCFinder` and `hmmscan-parser` because they 
 
 Params
 ----
-[inputFile] - FASTA format file of either nucleotide or protein sequences
+```
+Required arguments:
+  inputFile             User input file. Must be in FASTA format.
+  {protein,prok,meta}   Type of sequence input. protein=proteome; prok=prokaryote; meta=metagenome
 
-[inputType] - protein=proteome, prok=prokaryote, meta=metagenome/mRNA/CDSs/short DNA seqs
+optional arguments:
+  -h, --help            show this help message and exit
+  --dbCANFile DBCANFILE
+                        Indicate the file name of HMM database such as dbCAN.txt, please use the newest one from dbCAN2 website.
+  --dia_eval DIA_EVAL   DIAMOND E Value
+  --dia_cpu DIA_CPU     Number of CPU cores that DIAMOND is allowed to use
+  --hmm_eval HMM_EVAL   HMMER E Value
+  --hmm_cov HMM_COV     HMMER Coverage val
+  --hmm_cpu HMM_CPU     Number of CPU cores that HMMER is allowed to use
+  --out_pre OUT_PRE     Output files prefix
+  --out_dir OUT_DIR     Output directory
+  --db_dir DB_DIR       Database directory
+  --tools {hmmer,diamond,dbcansub,all} [{hmmer,diamond,dbcansub,all} ...], -t {hmmer,diamond,dbcansub,all} [{hmmer,diamond,dbcansub,all} ...]
+                        Choose a combination of tools to run
+  --use_signalP USE_SIGNALP
+                        Use signalP or not, remember, you need to setup signalP tool first. Because of signalP license, Docker version does not have signalP.
+  --signalP_path SIGNALP_PATH, -sp SIGNALP_PATH
+                        The path for signalp. Default location is signalp
+  --gram {p,n,all}, -g {p,n,all}
+                        Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of SingalP, only if user use singalP
+  -v VERSION, --version VERSION
 
-[--out_dir] - REQUIRED, user specifies an output directory.
+dbCAN-sub parameters:
+  --dbcan_thread DBCAN_THREAD, -dt DBCAN_THREAD
+  --tf_eval TF_EVAL     tf.hmm HMMER E Value
+  --tf_cov TF_COV       tf.hmm HMMER Coverage val
+  --tf_cpu TF_CPU       tf.hmm Number of CPU cores that HMMER is allowed to use
+  --stp_eval STP_EVAL   stp.hmm HMMER E Value
+  --stp_cov STP_COV     stp.hmm HMMER Coverage val
+  --stp_cpu STP_CPU     stp.hmm Number of CPU cores that HMMER is allowed to use
 
-[-c AuxillaryFile]- optional, include to enable CGCFinder. If using a proteome input,
-the AuxillaryFile must be a GFF or BED format file containing gene positioning
-information. Otherwise, the AuxillaryFile may be left blank.
+CGC_Finder parameters:
+  --cluster CLUSTER, -c CLUSTER
+                        Predict CGCs via CGCFinder. This argument requires an auxillary locations file if a protein input is being used
+  --cgc_dis CGC_DIS     CGCFinder Distance value
+  --cgc_sig_genes {tf,tp,stp,tp+tf,tp+stp,tf+stp,all}
+                        CGCFinder Signature Genes value
 
-[-t Tools] 		- optional, allows user to select a combination of tools to run. The options are any combination of 'diamond', 'hmmer', and 'eCAMI'. The default value is 'all' which runs all three tools.
+CGC_Substrate parameters:
+  --cgc_substrate       run cgc substrate prediction?
+  --pul PUL             dbCAN-PUL PUL.faa
+  -o OUT, --out OUT
+  -w WORKDIR, --workdir WORKDIR
+  -env ENV, --env ENV
+  -oecami, --oecami     out eCAMI prediction intermediate result?
+  -odbcanpul, --odbcanpul
+                        output dbCAN-PUL prediction intermediate result?
 
-[--dbCANFile]   - optional, allows user to set the file name of dbCAN HMM Database.
+dbCAN-PUL homologous searching parameters:
+  how to define homologous gene hits and PUL hits
 
-[--dia_eval]    - optional, allows user to set the DIAMOND E Value. Default = 1e-102.
+  -upghn UNIQ_PUL_GENE_HIT_NUM, --uniq_pul_gene_hit_num UNIQ_PUL_GENE_HIT_NUM
+  -uqcgn UNIQ_QUERY_CGC_GENE_NUM, --uniq_query_cgc_gene_num UNIQ_QUERY_CGC_GENE_NUM
+  -cpn CAZYME_PAIR_NUM, --CAZyme_pair_num CAZYME_PAIR_NUM
+  -tpn TOTAL_PAIR_NUM, --total_pair_num TOTAL_PAIR_NUM
+  -ept EXTRA_PAIR_TYPE, --extra_pair_type EXTRA_PAIR_TYPE
+                        None[TC-TC,STP-STP]. Some like sigunature hits
+  -eptn EXTRA_PAIR_TYPE_NUM, --extra_pair_type_num EXTRA_PAIR_TYPE_NUM
+                        specify signature pair cutoff.1,2
+  -iden IDENTITY_CUTOFF, --identity_cutoff IDENTITY_CUTOFF
+                        identity to identify a homologous hit
+  -cov COVERAGE_CUTOFF, --coverage_cutoff COVERAGE_CUTOFF
+                        query coverage cutoff to identify a homologous hit
+  -bsc BITSCORE_CUTOFF, --bitscore_cutoff BITSCORE_CUTOFF
+                        bitscore cutoff to identify a homologous hit
+  -evalue EVALUE_CUTOFF, --evalue_cutoff EVALUE_CUTOFF
+                        evalue cutoff to identify a homologous hit
 
-[--dia_cpu]     - optional, allows user to set how many CPU cores DIAMOND can use. Default = 2.
+dbCAN-sub major voting parameters:
+  how to define dbsub hits and dbCAN-sub subfamily substrate
 
-[--hmm_eval]    - optional, allows user to set the HMMER E Value. Default = 1e-15.
-
-[--hmm_cov]     - optional, allows user to set the HMMER Coverage value. Default = 0.35.
-
-[--hmm_cpu]     - optional, allows user to set how many CPU cores HMMER can use. Default = 1.
-
-[--eCAMI_kmer_db] -optional, allows user to set n_mer directories path for prediction. Default=Cazyme.
-
-[--eCAMI_k_mer] -optional, allows user to set peptide length for prediction. Default=8.
-
-[--eCAMI_jobs] -optional, number of jobs for prediction. Default=8.
-
-[--eCAMI_important_k_mer_number] -optional, Minimum number of n_mer for prediction. Default=5.
-
-[--eCAMI_beta] -optional, Minimum sum of percentage of frequency of n_mer for prediction. Default=2.
-
-[--tf_eval]     - optional, allows user to set tf.hmm HMMER E Value. Default = 1e-4.
-
-[--tf_cov]     - optional, allows user to set tf.hmm HMMER Coverage val. Default = 0.35.
-
-[--tf_cpu]     - optional, allows user to tf.hmm Number of CPU cores that HMMER is allowed to use. Default = 1.
-
-[--stp_eval]     - optional, allows user to set stp.hmm HMMER E Value. Default = 1e-4.
-
-[--tf_cov]     - optional, allows user to set stp.hmm HMMER Coverage val. Default = 0.3.
-
-[--tf_cpu]     - optional, allows user to stp.hmm Number of CPU cores that HMMER is allowed to use. Default = 1.
-
-[--out_pre]     - optional, allows user to set a prefix for all output files.
-
-[--db_dir]      - optional, allows user to specify a database directory. Default = db/
-
-[--cgc_dis]     - optional, allows user to specify CGCFinder Distance value. Allowed values are integers between 0-10. Default = 2.
-
-[--use_signalP] - optional, Use signalP or not, remember, you need to setup signalP tool first. Because of signalP license, python package does not have signalP. If your input is proteome/prokaryote nucleotide, please also certify the "--gram"(in the below). Default = False.
-
-[use_signalP] - optional, Use signalP or not, remember, you need to setup signalP tool first. Because of signalP license, Docker version does not have signalP.
-[signalP_path] - optional, The path for signalp. Default location is signalp
-
-[--gram] - optional, Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of SignalP, only if you use SignalP. Only you set use_signalP. The options are: "all"(gram positive + gram negative), "n"(gram negative), "p"(gram positive). Default = "all".
-
-
+  -hmmcov HMMCOV, --hmmcov HMMCOV
+  -hmmevalue HMMEVALUE, --hmmevalue HMMEVALUE
+  -ndsc NUM_OF_DOMAINS_SUBSTRATE_CUTOFF, --num_of_domains_substrate_cutoff NUM_OF_DOMAINS_SUBSTRATE_CUTOFF
+                        define how many domains share substrates in a CGC, one protein may include several subfamily domains.
+  -npsc NUM_OF_PROTEIN_SUBSTRATE_CUTOFF, --num_of_protein_substrate_cutoff NUM_OF_PROTEIN_SUBSTRATE_CUTOFF
+                        define how many sequences share substrates in a CGC, one protein may include several subfamily domains.
+  -subs SUBSTRATE_SCORS, --substrate_scors SUBSTRATE_SCORS
+                        each cgc contains with substrate must more than this value
+```
 
 RUN & OUTPUT
 ----
@@ -268,7 +292,7 @@ Several files will be produced via `run_dbcan`. They are as follows:
 	uniInput - The unified input file for the rest of the tools
 			(created by prodigal if a nucleotide sequence was used)
 
-	eCAMI.out - the output from the eCAMI run
+	dbsub.out - the output from the dbCAN_sub run
 
 	diamond.out - the output from the diamond blast
 
@@ -300,8 +324,6 @@ or
 ```
 run_dbcan EscheriaColiK12MG1655.faa protein --out_dir output_EscheriaColiK12MG1655
 ```
-
-While this example directory contains all the databases you will need (already formatted) and the eCAMI and Prodigal programs, you will still need to have the remaining programs installed on your machine (DIAMOND, HMMER, etc.).
 
 To run the examples with CGCFinder turned on, run:
 ```
