@@ -389,9 +389,6 @@ eprint = {/oup/backfile/content_public/journal/nar/46/d1/10.1093_nar_gkx894/2/gk
 ```
 
 
-
-## Commit History
-
 ## Commit History
 
 [![Commit History Chart](https://commit-history-api.herokuapp.com/svg?repos=linnabrown/run_dbcan&type=Date)](https://the-commit-history.vercel.app/#linnabrown/run_dbcan&Date)
