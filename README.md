@@ -1,24 +1,27 @@
 
-run_dbcan3
+run_dbcan4
 ========================
 
 Status
 ----
 [![dbcan](https://github.com/linnabrown/run_dbcan/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/linnabrown/run_dbcan/actions/workflows/ci.yml)
-[![Package status](https://img.shields.io/pypi/status/dbcan.svg)](https://pypi.org/project/dbcan/#files)
+[![Package status](https://anaconda.org/bioconda/dbcan/badges/version.svg)](https://anaconda.org/bioconda/dbcan)
 [![GitHub license](https://img.shields.io/badge/license-GUN3.0-blue.svg)](https://github.com/linnabrown/run_dbcan/blob/master/LICENSE)
-[![GitHub downloads](https://img.shields.io/pypi/dm/run-dbcan.svg)](https://pypi.org/project/dbcan/#files)
-[![GitHub versions](https://img.shields.io/pypi/pyversions/dbcan.svg)](https://pypi.org/project/dbcan/#files)
-[![Package version](https://img.shields.io/pypi/v/dbcan.svg)](https://pypi.org/project/dbcan/#files)
+[![Platform](https://anaconda.org/bioconda/dbcan/badges/platforms.svg)](https://anaconda.org/bioconda/dbcan/badges/platforms.svg)
+[![GitHub downloads](https://anaconda.org/bioconda/dbcan/badges/downloads.svg)](https://anaconda.org/bioconda/dbcan)
+[![GitHub versions](https://img.shields.io/pypi/pyversions/dbcan.svg)](https://anaconda.org/bioconda/dbcan)
+
+<!-- [![Package version](https://img.shields.io/pypi/v/dbcan.svg)](https://pypi.org/project/dbcan/#files) -->
 
 A standalone tool of http://bcb.unl.edu/dbCAN2/
 
-Rewritten by Huang Le in the Zhang Lab at NKU; V1 version was written by Tanner Yohe of the Yin lab at NIU.
+Rewritten by Le Huang in the Zhang Lab at NKU, now in UNC; V1 version was written by Tanner Yohe of the Yin lab at NIU, now in UNL.
 
 Update Info
 ---
-1. 3.0.7 Fix the bug in cgc_parser.py.
-2. hmmdb, cazydb, tf-1, tf-2, stp and tcdb are updated. **Please update all of the databases**.
+4.0.0 Released.
+
+**Please update all of the databases**.
 
 [Previous update information](https://github.com/linnabrown/run_dbcan/wiki/Update-information-Archive)
 
@@ -26,7 +29,7 @@ Function
 ----
 - Accepts user input
 - Predicts genes if needed
-- Runs input against HMMER, DIAMOND, and eCAMI
+- Runs input against HMMER, DIAMOND, and dbCAN_sub
 - Optionally predicts CGCs with CGCFinder
 
 Support Platform
@@ -48,10 +51,11 @@ conda activate run_dbcan
 ```
 test -d db || mkdir db
 cd db \
-    && wget  http://bcb.unl.edu/dbCAN2/download/Databases/fam-substrate-mapping-08252022.tsv \
-    && wget http://bcb.unl.edu/dbCAN2/download/Databases/PUL.faa && makeblastdb -in PUL.faa -dbtype prot \
-    && wget http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-PUL_07-01-2022.xlsx \
+    && wget http://bcb.unl.edu/dbCAN2/download/Databases/fam-substrate-mapping-08252022.tsv \
+	&& wget http://bcb.unl.edu/dbCAN2/download/Databases/PUL.faa && makeblastdb -in PUL.faa -dbtype prot \
+	&& wget http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-PUL_07-01-2022.xlsx \
     && wget http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-PUL_07-01-2022.txt \
+	&& wget http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-PUL.tar.gz && tar xvf dbCAN-PUL.tar.gz \
     && wget http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN_sub.hmm && hmmpress dbCAN_sub.hmm \
     && wget http://bcb.unl.edu/dbCAN2/download/Databases/V11/CAZyDB.08062022.fa && diamond makedb --in CAZyDB.08062022.fa -d CAZy \
     && wget https://bcb.unl.edu/dbCAN2/download/Databases/V11/dbCAN-HMMdb-V11.txt && mv dbCAN-HMMdb-V11.txt dbCAN.txt && hmmpress dbCAN.txt \

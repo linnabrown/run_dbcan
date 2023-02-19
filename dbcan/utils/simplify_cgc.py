@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+#########################################################
+# Written by Qiwei Ge in Yin Lab at UNL
+# A readable version of cgc
+#########################################################
+
 import os
 import sys
 
