@@ -51,6 +51,8 @@ conda create -n run_dbcan python=3.8 dbcan -c conda-forge -c bioconda
 conda activate run_dbcan
 ```
 
+If you are old user, just update the conda virtual environment `run_dbcan` via running `conda install dbcan`.
+
 4. Database Installation.
 ```
 test -d db || mkdir db
