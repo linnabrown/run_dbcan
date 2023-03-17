@@ -799,7 +799,7 @@ def run(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval=1e-1
 # allowing the main function to be called directly from other scripts without invoking a subprocess. This prevents extra
 # subprocesses or extra python interpreters being spawned, as well as simplifying python scripts which call run_dbcan.
 def cli_main():
-    '''
+    example_command='''
     example command:
     1. CAZyme annotation with isolated genome sequence as input
     run_dbcan EscheriaColiK12MG1655.fna prok
@@ -832,20 +832,18 @@ def cli_main():
     parser.add_argument('-v', '--version',default="3.0.0", type=str)
     # dbCAN-sub
     dbCAN_sub_group = parser.add_argument_group('dbCAN-sub parameters')
-    dbCAN_sub_group.add_argument('--dbcan_thread', '-dt', default=5,type=int)
-    dbCAN_sub_group.add_argument('--tf_eval', default=1e-4, type=float, help='tf.hmm HMMER E Value')
-    dbCAN_sub_group.add_argument('--tf_cov', default=0.35, type=float, help='tf.hmm HMMER Coverage val')
-    dbCAN_sub_group.add_argument('--tf_cpu', default=1, type=int, help='tf.hmm Number of CPU cores that HMMER is allowed to use')
-    dbCAN_sub_group.add_argument('--stp_eval', default=1e-4, type=float, help='stp.hmm HMMER E Value')
-    dbCAN_sub_group.add_argument('--stp_cov', default=0.3, type=float, help='stp.hmm HMMER Coverage val')
-    dbCAN_sub_group.add_argument('--stp_cpu', default=1, type=int, help='stp.hmm Number of CPU cores that HMMER is allowed to use')
-    
+    dbCAN_sub_group.add_argument('--dbcan_thread', '-dt', default=5,type=int, help='number of cpu for dbcan-sub')
     ### cgc finder 
     cgcfinder_group = parser.add_argument_group('CGC_Finder parameters')
     cgcfinder_group.add_argument('--cluster', '-c', help='Predict CGCs via CGCFinder. This argument requires an auxillary locations file if a protein input is being used')
     cgcfinder_group.add_argument('--cgc_dis', default=2, type=int, help='CGCFinder Distance value')
     cgcfinder_group.add_argument('--cgc_sig_genes', default='tp', choices=['tf', 'tp', 'stp', 'tp+tf', 'tp+stp', 'tf+stp', 'all'], help='CGCFinder Signature Genes value')
-
+    cgcfinder_group.add_argument('--tf_eval', default=1e-4, type=float, help='tf.hmm HMMER E Value')
+    cgcfinder_group.add_argument('--tf_cov', default=0.35, type=float, help='tf.hmm HMMER Coverage val')
+    cgcfinder_group.add_argument('--tf_cpu', default=1, type=int, help='tf.hmm Number of CPU cores that HMMER is allowed to use')
+    cgcfinder_group.add_argument('--stp_eval', default=1e-4, type=float, help='stp.hmm HMMER E Value')
+    cgcfinder_group.add_argument('--stp_cov', default=0.3, type=float, help='stp.hmm HMMER Coverage val')
+    cgcfinder_group.add_argument('--stp_cpu', default=1, type=int, help='stp.hmm Number of CPU cores that HMMER is allowed to use')
     ### cgc substrate prediction 
     cgcsubstrate_group = parser.add_argument_group('CGC_Substrate parameters')
     cgcsubstrate_group.add_argument('--cgc_substrate',action='store_true',help="run cgc substrate prediction?")
