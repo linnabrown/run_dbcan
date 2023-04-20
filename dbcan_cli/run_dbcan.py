@@ -887,8 +887,8 @@ def cli_main():
     
     ### convert cgc_standard.out to json format
     
-    if args.cluster: ### run cgc_finder
-        os.system(f"cgc_standard2json -i {args.out_dir}/cgc_standard.out -o {args.out_dir}/cgc_standard.out.json")
+#     if args.cluster: ### run cgc_finder
+#         os.system(f"cgc_standard2json -i {args.out_dir}/cgc_standard.out -o {args.out_dir}/cgc_standard.out.json")
     ### substarate prediction 
     if args.cgc_substrate:
         cgc_substrate_prediction(args)
