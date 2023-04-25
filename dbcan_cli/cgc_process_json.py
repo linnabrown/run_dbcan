@@ -11,6 +11,7 @@ import json
 import time
 import argparse
 import pandas as pd
+import numpy as np
 
 
 class PrePro:
@@ -93,6 +94,11 @@ def file_ext(choices,fname):
         parser.error("File needs to be a .out or .csv")
     return fname
 
+class CustomEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.int64):
+            return str(obj)
+        return super().default(obj)
 
 def main():
     parser = argparse.ArgumentParser(description='Compiling Json from cgc_standard.out')
@@ -111,7 +117,7 @@ def main():
     pul_dict = {}
     for sub_dict in pul_list:
         pul_dict.update(sub_dict)
-    jsonPuls = json.dumps(pul_dict, indent=4)
+    jsonPuls = json.dumps(pul_dict, indent=4, cls=CustomEncoder)
     
     with open(args.output,"w") as outfile:
     #with open("Json"+time.strftime("%Y%m%d%H%M%S")+".json","w") as outfile:
