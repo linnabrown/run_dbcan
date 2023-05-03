@@ -352,7 +352,24 @@ Reference
 
 This is the standalone version of dbCAN annotation tool for automated CAZyme annotation (known as run_dbCAN), written by Le Huang and Tanner Yohe.
 
-If you want to use our dbCAN3 webserver, please go to http://bcb.unl.edu/dbCAN2/.
+If you want to use our dbCAN3 webserver, please go to http://bcb.unl.edu/dbCAN2/. Please cite us:
+*Jinfang Zheng, Qiwei Ge, Yuchen Yan, Xinpeng Zhang, Le Huang, Yanbin Yin, dbCAN3: automated carbohydrate-active enzyme and substrate annotation, Nucleic Acids Research, 2023;, gkad328, https://doi.org/10.1093/nar/gkad328*
+```
+@article{10.1093/nar/gkad328,
+    author = {Zheng, Jinfang and Ge, Qiwei and Yan, Yuchen and Zhang, Xinpeng and Huang, Le and Yin, Yanbin},
+    title = "{dbCAN3: automated carbohydrate-active enzyme and substrate annotation}",
+    journal = {Nucleic Acids Research},
+    year = {2023},
+    month = {05},
+    issn = {0305-1048},
+    doi = {10.1093/nar/gkad328},
+    url = {https://doi.org/10.1093/nar/gkad328},
+    note = {gkad328},
+    eprint = {https://academic.oup.com/nar/advance-article-pdf/doi/10.1093/nar/gkad328/50150154/gkad328.pdf},
+}
+
+```
+
 
 If you use dbCAN standalone tool (run_dbcan) or/and our web server for publication, please cite us:
 
