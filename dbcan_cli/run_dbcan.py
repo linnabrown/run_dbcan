@@ -32,19 +32,20 @@ import time
 from dbcan.utils.cgc_substrate_prediction import cgc_substrate_prediction
 
 
-def runHmmScan(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name):
+def runHmmScan(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name, hmmsearch=False):
     '''
     Run Hmmer
     '''
-    hmmer = Popen(['hmmscan', '--domtblout', '%sh%s.out' % (outPath, db_name), '--cpu', hmm_cpu, '-o', '/dev/null', '%s%s.hmm' % (dbDir,db_name), '%suniInput' % outPath])
+    hmm_runner = 'hmmsearch' if hmmsearch else 'hmmscan'
+    hmmer = Popen([hmm_runner, '--domtblout', '%sh%s.out' % (outPath, db_name), '--cpu', hmm_cpu, '-o', '/dev/null', '%s%s.hmm' % (dbDir,db_name), '%suniInput' % outPath])
     hmmer.wait()
-    parsed_hmm_output = hmmscan_parser.run(input_file=f"{outPath}h{db_name}.out", eval_num=hmm_eval, coverage=hmm_cov)
+    parsed_hmm_output = hmmscan_parser.run(input_file=f"{outPath}h{db_name}.out", eval_num=hmm_eval, coverage=hmm_cov, hmmsearch=hmmsearch)
     with open(f"{outPath}{db_name}.out", 'w') as f:
         f.write(parsed_hmm_output)
     if os.path.exists('%sh%s.out' % (outPath, db_name)):
         call(['rm', '%sh%s.out' % (outPath, db_name)])
 
-def split_uniInput(uniInput,dbcan_thread,outPath,dbDir,hmm_eval,hmm_cov):
+def split_uniInput(uniInput, dbcan_thread, outPath, dbDir, hmm_eval, hmm_cov, hmmsearch):
     '''
     Run dbcan_sub
     '''
@@ -69,7 +70,7 @@ def split_uniInput(uniInput,dbcan_thread,outPath,dbDir,hmm_eval,hmm_cov):
             signal_count+=1
     print("ID count: %s" % signal_count)
 
-    if signal_count >= min_files:
+    if signal_count >= min_files and not hmmsearch:
         for i in range(fsize):
             f = open("%s%s.txt"%(outPath,i),"w")
             f.close()
@@ -92,7 +93,7 @@ def split_uniInput(uniInput,dbcan_thread,outPath,dbDir,hmm_eval,hmm_cov):
             th.wait()
 
         for m in split_files:
-            hmm_parser_output = hmmscan_parser.run("%sd%s"%(outPath,m), eval_num=hmm_eval, coverage=hmm_cov)
+            hmm_parser_output = hmmscan_parser.run("%sd%s"%(outPath,m), eval_num=hmm_eval, coverage=hmm_cov, hmmsearch=hmmsearch)
             with open("%stemp_%s"%(outPath,m), 'w') as temp_hmmer_file:
                 temp_hmmer_file.write(hmm_parser_output)
             call(['rm', '%sd%s'%(outPath,m)])
@@ -111,18 +112,22 @@ def split_uniInput(uniInput,dbcan_thread,outPath,dbDir,hmm_eval,hmm_cov):
                 f.write(files_lines[j])
                 f.close()
     else:
-        dbsub = Popen(['hmmscan', '--domtblout', '%sd.txt'%outPath, '--cpu', '5', '-o', '/dev/null', '%sdbCAN_sub.hmm'%dbDir, '%suniInput'%outPath])
+        if hmmsearch:
+            dbsub = Popen(['hmmsearch', '--domtblout', '%sd.txt'%outPath, '--cpu', str(dbcan_thread), '-o', '/dev/null', '%sdbCAN_sub.hmm'%dbDir, '%suniInput'%outPath])
+        else:
+            dbsub = Popen(['hmmscan', '--domtblout', '%sd.txt'%outPath, '--cpu', '5', '-o', '/dev/null', '%sdbCAN_sub.hmm'%dbDir, '%suniInput'%outPath])
         dbsub.wait()
 
-        hmm_parser_output = hmmscan_parser.run("%sd.txt"%outPath, eval_num=hmm_eval, coverage=hmm_cov)
+        hmm_parser_output = hmmscan_parser.run("%sd.txt"%outPath, eval_num=hmm_eval, coverage=hmm_cov, hmmsearch=hmmsearch)
         with open("%sdtemp.out"%outPath, 'w') as temp_hmmer_file:
             temp_hmmer_file.write(hmm_parser_output)
+        call(['rm', '%sd.txt'%outPath])
 
     print("total time:",time.time() - ticks)
 
 def run(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval=1e-102, dia_cpu=4, hmm_eval=1e-15,
         hmm_cov=0.35, hmm_cpu=4, dbcan_thread=5, tf_eval=1e-4, tf_cov=0.35, tf_cpu=1, stp_eval=1e-4, stp_cov=0.3, stp_cpu=1, prefix="",
-        outDir="output", dbDir="db", cgc_dis=2, cgc_sig_genes="tp", tool_arg="all", use_signalP=False,
+        outDir="output", dbDir="db", cgc_dis=2, cgc_sig_genes="tp", tool_arg="all", hmmsearch=False, use_signalP=False,
         signalP_path="signalp", gram="all"):
     '''
     Run dbCAN
@@ -218,15 +223,20 @@ def run(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval=1e-1
     if tools[0]: ### run diamond
         # diamond blastp -d db/CAZy -e 1e-102 -q output_EscheriaColiK12MG1655/uniInput -k 1 -p 2 -o output_EscheriaColiK12MG1655/diamond1.out -f 6
         print("\n\n***************************1. DIAMOND start*************************************************\n\n")
+        ticks = time.time()
         os.system('diamond blastp -d %s -e %s -q %suniInput -k 1 -p %d -o %sdiamond.out -f 6'%(os.path.join(dbDir, "CAZy"), str(dia_eval), outPath, dia_cpu, outPath))
+        print("total time:",time.time() - ticks)
         print("\n\n***************************1. DIAMOND end***************************************************\n\n")
 
     if tools[1]: ### run hmmscan (hmmer)
         print("\n\n***************************2. HMMER start*************************************************\n\n")
-        os.system(f"hmmscan --domtblout {outPath}h.out --cpu {hmm_cpu} -o /dev/null {os.path.join(dbDir, dbCANFile)} {outPath}uniInput ")
+        ticks = time.time()
+        hmm_runner = 'hmmsearch' if hmmsearch else 'hmmscan'
+        os.system(f"{hmm_runner} --domtblout {outPath}h.out --cpu {hmm_cpu} -o /dev/null {os.path.join(dbDir, dbCANFile)} {outPath}uniInput ")
+        print("total time:",time.time() - ticks)
         print("\n\n***************************2. HMMER end***************************************************\n\n")
 
-        hmm_parser_output = hmmscan_parser.run(f"{outPath}h.out", eval_num=hmm_eval, coverage=hmm_cov)
+        hmm_parser_output = hmmscan_parser.run(f"{outPath}h.out", eval_num=hmm_eval, coverage=hmm_cov, hmmsearch=hmmsearch)
         with open(f"{outPath}hmmer.out", 'w') as hmmer_file:
             hmmer_file.write(hmm_parser_output)
         # could clean this up and manipulate hmm_parser_output data directly instead of passing it into a temp file
@@ -249,7 +259,7 @@ def run(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval=1e-1
 
     if tools[2]:
         print("\n\n***************************3. dbCAN_sub start***************************************************\n\n")
-        split_uniInput('%suniInput'%outPath,dbcan_thread,outPath,dbDir,hmm_eval,hmm_cov)
+        split_uniInput('%suniInput'%outPath, dbcan_thread, outPath, dbDir, hmm_eval, hmm_cov, hmmsearch)
         print("\n\n***************************3. dbCAN_sub end***************************************************\n\n")
         with open(f"{outPath}dtemp.out", 'r') as f:
             with open('%sdbsub.out'%outPath, 'w') as out:
@@ -378,12 +388,12 @@ def run(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval=1e-1
         tf hmmer
         '''
         #call(['diamond', 'blastp', '-d', dbDir+'tf_v1/tf.dmnd', '-e', '1e-10', '-q', '%suniInput' % outPath, '-k', '1', '-p', '1', '-o', outDir+prefix+'tf.out', '-f', '6'])
-        runHmmScan(outPath, str(tf_cpu), dbDir, str(tf_eval), str(tf_cov), "tf-1")
-        runHmmScan(outPath, str(tf_cpu), dbDir, str(tf_eval), str(tf_cov), "tf-2")
+        runHmmScan(outPath, str(tf_cpu), dbDir, str(tf_eval), str(tf_cov), "tf-1", hmmsearch)
+        runHmmScan(outPath, str(tf_cpu), dbDir, str(tf_eval), str(tf_cov), "tf-2", hmmsearch)
         '''
         stp hmmer
         '''
-        runHmmScan(outPath, str(stp_cpu), dbDir, str(stp_eval), str(stp_cov), "stp")
+        runHmmScan(outPath, str(stp_cpu), dbDir, str(stp_eval), str(stp_cov), "stp", hmmsearch)
 
         '''
         tp diamond
@@ -826,6 +836,7 @@ def cli_main():
     parser.add_argument('--out_dir', default="output", help='Output directory')
     parser.add_argument('--db_dir', default="db", help='Database directory')
     parser.add_argument('--tools', '-t', nargs='+', choices=['hmmer', 'diamond', 'dbcansub', 'all'], default='all', help='Choose a combination of tools to run')
+    parser.add_argument('--hmmsearch', default=False, action='store_true', help='Use hmmsearch instead of hmmscan')
     parser.add_argument('--use_signalP', default=False, type=bool, help='Use signalP or not, remember, you need to setup signalP tool first. Because of signalP license, Docker version does not have signalP.')
     parser.add_argument('--signalP_path', '-sp',default="signalp", type=str, help='The path for signalp. Default location is signalp')
     parser.add_argument('--gram', '-g', choices=["p","n","all"], default="all", help="Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of SingalP, only if user use singalP")
@@ -882,7 +893,7 @@ def cli_main():
         dia_eval=args.dia_eval, dia_cpu=args.dia_cpu, hmm_eval=args.hmm_eval, hmm_cov=args.hmm_cov,
         hmm_cpu=args.hmm_cpu, dbcan_thread=args.dbcan_thread, tf_eval=args.tf_eval, tf_cov=args.tf_cov, tf_cpu=args.tf_cpu,
         stp_eval=args.stp_eval, stp_cov=args.stp_cov, stp_cpu=args.stp_cpu, prefix=args.out_pre, outDir=args.out_dir,
-        dbDir=args.db_dir, cgc_dis=args.cgc_dis, cgc_sig_genes=args.cgc_sig_genes, tool_arg=args.tools,
+        dbDir=args.db_dir, cgc_dis=args.cgc_dis, cgc_sig_genes=args.cgc_sig_genes, tool_arg=args.tools, hmmsearch=args.hmmsearch,
         use_signalP=args.use_signalP, signalP_path=args.signalP_path, gram=args.gram)
     
     ### convert cgc_standard.out to json format
