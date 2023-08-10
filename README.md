@@ -20,7 +20,7 @@ Update Info
 run_dbcan 4.0.0 is released.
 1. CAZyme substrate prediction based on dbCAN-sub ; 
 
-2. CGC substrate prediction based on dbCAN-PUL searching and [dbCAN-sub](https://bcb.unl.edu/dbCAN_sub/) majority voting. For CGC substrate prediction, please see our [dbCAN-seq update paper](https://academic.oup.com/nar/article/51/D1/D557/6833251?login=false) for details. With these new functions (esp. the dbCAN-sub search), run_dbcan4.0 is now slower to get the result back to you. Please be patience!
+2. CGC substrate prediction based on dbCAN-PUL searching and [dbCAN-sub](https://bcb.unl.edu/dbCAN_sub/) majority voting. For CGC substrate prediction, please see our [dbCAN-seq update paper](https://academic.oup.com/nar/article/51/D1/D557/6833251?login=false) for details. With these new functions (esp. the dbCAN-sub search), run_dbcan4.0 is now slower to get the result back to you. Please be patient!
 
 3. See https://github.com/linnabrown/run_dbcan/issues/127 for some explanation of different output files for substrate predictions
 
