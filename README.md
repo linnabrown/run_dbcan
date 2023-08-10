@@ -313,6 +313,8 @@ Several files will be produced via `run_dbcan`. They are as follows:
 	cgc.out - ouput from the CGCFinder run
 
 	overview.txt - Details the CAZyme predictions across the three tools with signalp results
+ 
+ see https://github.com/linnabrown/run_dbcan/issues/127 for some explanation of different output files for substrate predictions
 
 EXAMPLE
 ----
