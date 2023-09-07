@@ -26,6 +26,8 @@ requirements:
     - python
     - diamond
     - hmmer
+    - blast
+    - pyhmmer
     - prodigal
     - scipy
     - psutil
