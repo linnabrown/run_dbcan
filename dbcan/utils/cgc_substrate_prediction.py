@@ -330,7 +330,7 @@ class dbCAN_substrate_prediction(object):
         self.dbsub_parameters  = eCAMI_parameter(args)
         
         ### output parameters, intermediate results
-        self.oecami = args.oecami
+        self.odbsub = args.odbsub
         self.odbcanpul = args.odbcanpul
         self.dbcanpul_tmp = "dbcanpul.tmp.txt"
         self.ecamipul_tmp = "ecamipul.tmp.txt"
@@ -909,7 +909,7 @@ def cgc_substrate_prediction(args):
     print(f"Substrate prediciton done! {(time_end-time_start)}s")
     sub_pred.result_print_to_file()
     
-    if sub_pred.oecami:
+    if sub_pred.odbsub:
         sub_pred.eCAMI_intermediate_file()
     time_end = time.time()
     
@@ -996,7 +996,7 @@ def parse_argv():
     group.add_argument('-w','--workdir',type=str,default=".")
     group.add_argument('-rerun','--rerun',type=bool,default=False)
     group.add_argument('-env','--env',type=str,default="local")
-    group.add_argument('-oecami','--oecami', help="output dbCAN-PUL prediction intermediate result?")
+    group.add_argument('-odbsub','--odbsub', help="output dbcan_sub prediction intermediate result?")
     group.add_argument('-odbcanpul','--odbcanpul',type=bool,default=True,help="output dbCAN-PUL prediction intermediate result?")
     parser.add_argument('--db_dir', default="db", help='Database directory')
     

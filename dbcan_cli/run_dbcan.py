@@ -4,10 +4,12 @@
 #
 # Written by Tanner Yohe in the Yin Lab at NIU
 # Revised by Qiwei Ge in Yin Lab at UNL && Le Huang at NKU
-# Updated by Le Huang at NKU, Mohamad Majd Raslan in the Yin Lab at NIU, Wei Li, Qiwei Ge in Dr.Yin's Lab at UNL, Alex Fraser.
+# Updated by Le Huang at UNC, Mohamad Majd Raslan in the Yin Lab at NIU, Wei Li, Qiwei Ge in Dr.Yin's Lab at UNL
+# Updated by Haidong Yi for reconstructing codes,  Alex Fraser for adding functions.
 # Updated by Jinfang Zheng in Yinlab at UNL, new function, substrate prediciton based on dbCAN-PUL and dbCAN-sub database.
 
 # Recent updated information: 
+#   Sep/07/23: Replace hmmscan with hmmsearch. Update perl code [Le Huang, Yanbin Yin]
 #   Dec/15/22: 1.adding function to convert cgc_standard.out to json format. 2. adding function cgc_[Jinfang Zheng]
 #   Dec/06/22: fix gene ID in CGCfinder output file cgc.out[Jinfang Zheng]
 #   Nov/06/22: Using dbCAN_sub, eCAMI has been removed [Qiwei Ge]
@@ -19,7 +21,7 @@
 # Runs input against HMMER, DIAMOND, and dbCAN_sub
 # Optionally predicts CGCs with CGCFinder
 # Creats an overview table using output files from core
-# tools from dbsub.out,hmmer.out and diamond.out
+# tools from dbsub.out,hmmer.out and diamond.out if they exist.
 ##########################################################
 from subprocess import Popen, call, check_output
 import os
@@ -27,7 +29,7 @@ import argparse
 import dbcan
 from dbcan.utils.simplify_cgc import simplify_output
 from dbcan.utils.CGCFinder import cgc_finder
-from dbcan_cli import hmmscan_parser
+from dbcan_cli import hmmer_parser
 import time
 from dbcan.utils.cgc_substrate_prediction import cgc_substrate_prediction
 
@@ -36,15 +38,15 @@ def runHmmScan(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name):
     '''
     Run Hmmer
     '''
-    hmmer = Popen(['hmmscan', '--domtblout', '%sh%s.out' % (outPath, db_name), '--cpu', hmm_cpu, '-o', '/dev/null', '%s%s.hmm' % (dbDir,db_name), '%suniInput' % outPath])
+    hmmer = Popen(['hmmsearch', '--domtblout', '%sh%s.out' % (outPath, db_name), '--cpu', hmm_cpu, '-o', '/dev/null', '%s%s.hmm' % (dbDir,db_name), '%suniInput' % outPath])
     hmmer.wait()
-    parsed_hmm_output = hmmscan_parser.run(input_file=f"{outPath}h{db_name}.out", eval_num=hmm_eval, coverage=hmm_cov)
+    parsed_hmm_output = hmmer_parser.run(input_file=f"{outPath}h{db_name}.out", eval_num=hmm_eval, coverage=hmm_cov)
     with open(f"{outPath}{db_name}.out", 'w') as f:
         f.write(parsed_hmm_output)
     if os.path.exists('%sh%s.out' % (outPath, db_name)):
         call(['rm', '%sh%s.out' % (outPath, db_name)])
 
-def split_uniInput(uniInput,dbcan_thread,outPath,dbDir,hmm_eval,hmm_cov):
+def split_uniInput(uniInput,dbcan_thread,outPath,dbDir,hmm_eval,hmm_cov, dbcan_offset):
     '''
     Run dbcan_sub
     '''
@@ -58,8 +60,7 @@ def split_uniInput(uniInput,dbcan_thread,outPath,dbDir,hmm_eval,hmm_cov):
     check_id = False
     file_number = None
     split_files = []
-    off_set = 3
-    fsize = int(os.path.getsize(uniInput)/float(1024*1024)*off_set)
+    fsize = int(os.path.getsize(uniInput)/float(1024*1024) * dbcan_offset)
 
     if fsize < 1:
         fsize = 1
@@ -87,12 +88,16 @@ def split_uniInput(uniInput,dbcan_thread,outPath,dbDir,hmm_eval,hmm_cov):
 
         ths = []
         for j in split_files:
-            ths.append(Popen(['hmmscan', '--domtblout', '%sd%s'%(outPath,j), '--cpu', '5', '-o', '/dev/null', '%sdbCAN_sub.hmm'%dbDir, "%s%s"%(outPath,j)]))
+            ths.append(Popen(['hmmsearch', '--domtblout', '%sd%s'%(outPath,j), '--cpu', '5', '-o', '/dev/null', '%sdbCAN_sub.hmm'%dbDir, "%s%s"%(outPath,j)]))
         for th in ths:
             th.wait()
-
+        # fn = '%sd%s'%(outPath,j)
+        # dd = open(fn).readlines()
+        # # print(dd)
+        print(hmm_eval, hmm_cov)
         for m in split_files:
-            hmm_parser_output = hmmscan_parser.run("%sd%s"%(outPath,m), eval_num=hmm_eval, coverage=hmm_cov)
+            hmm_parser_output = hmmer_parser.run("%sd%s"%(outPath,m), eval_num=hmm_eval, coverage=hmm_cov)
+            print(hmm_parser_output)
             with open("%stemp_%s"%(outPath,m), 'w') as temp_hmmer_file:
                 temp_hmmer_file.write(hmm_parser_output)
             call(['rm', '%sd%s'%(outPath,m)])
@@ -111,17 +116,17 @@ def split_uniInput(uniInput,dbcan_thread,outPath,dbDir,hmm_eval,hmm_cov):
                 f.write(files_lines[j])
                 f.close()
     else:
-        dbsub = Popen(['hmmscan', '--domtblout', '%sd.txt'%outPath, '--cpu', '5', '-o', '/dev/null', '%sdbCAN_sub.hmm'%dbDir, '%suniInput'%outPath])
+        dbsub = Popen(['hmmsearch', '--domtblout', '%sd.txt'%outPath, '--cpu', '5', '-o', '/dev/null', '%sdbCAN_sub.hmm'%dbDir, '%suniInput'%outPath])
         dbsub.wait()
 
-        hmm_parser_output = hmmscan_parser.run("%sd.txt"%outPath, eval_num=hmm_eval, coverage=hmm_cov)
+        hmm_parser_output = hmmer_parser.run("%sd.txt"%outPath, eval_num=hmm_eval, coverage=hmm_cov)
         with open("%sdtemp.out"%outPath, 'w') as temp_hmmer_file:
             temp_hmmer_file.write(hmm_parser_output)
 
     print("total time:",time.time() - ticks)
 
 def run(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval=1e-102, dia_cpu=4, hmm_eval=1e-15,
-        hmm_cov=0.35, hmm_cpu=4, dbcan_thread=5, tf_eval=1e-4, tf_cov=0.35, tf_cpu=1, stp_eval=1e-4, stp_cov=0.3, stp_cpu=1, prefix="",
+        hmm_cov=0.35, hmm_cpu=4, dbcan_thread=5, dbcan_offset=2, tf_eval=1e-4, tf_cov=0.35, tf_cpu=1, stp_eval=1e-4, stp_cov=0.3, stp_cpu=1, prefix="",
         outDir="output", dbDir="db", cgc_dis=2, cgc_sig_genes="tp", tool_arg="all", use_signalP=False,
         signalP_path="signalp", gram="all"):
     '''
@@ -223,10 +228,10 @@ def run(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval=1e-1
 
     if tools[1]: ### run hmmscan (hmmer)
         print("\n\n***************************2. HMMER start*************************************************\n\n")
-        os.system(f"hmmscan --domtblout {outPath}h.out --cpu {hmm_cpu} -o /dev/null {os.path.join(dbDir, dbCANFile)} {outPath}uniInput ")
+        os.system(f"hmmsearch --domtblout {outPath}h.out --cpu {hmm_cpu} -o /dev/null {os.path.join(dbDir, dbCANFile)} {outPath}uniInput ")
         print("\n\n***************************2. HMMER end***************************************************\n\n")
 
-        hmm_parser_output = hmmscan_parser.run(f"{outPath}h.out", eval_num=hmm_eval, coverage=hmm_cov)
+        hmm_parser_output = hmmer_parser.run(f"{outPath}h.out", eval_num=hmm_eval, coverage=hmm_cov)
         with open(f"{outPath}hmmer.out", 'w') as hmmer_file:
             hmmer_file.write(hmm_parser_output)
         # could clean this up and manipulate hmm_parser_output data directly instead of passing it into a temp file
@@ -249,8 +254,9 @@ def run(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval=1e-1
 
     if tools[2]:
         print("\n\n***************************3. dbCAN_sub start***************************************************\n\n")
-        split_uniInput('%suniInput'%outPath,dbcan_thread,outPath,dbDir,hmm_eval,hmm_cov)
+        split_uniInput('%suniInput'%outPath,dbcan_thread,outPath,dbDir,hmm_eval,hmm_cov, dbcan_offset)
         print("\n\n***************************3. dbCAN_sub end***************************************************\n\n")
+        
         with open(f"{outPath}dtemp.out", 'r') as f:
             with open('%sdbsub.out'%outPath, 'w') as out:
                 for line in f:
@@ -258,6 +264,7 @@ def run(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval=1e-1
                     row.append(float(int(row[6])-int(row[5]))/int(row[1]))
                     if float(row[4]) <= 1e-15 and float(row[-1]) >= 0.35:
                         out.write('\t'.join([str(x) for x in row]) + '\n')
+        
         with open(f"{outPath}dbsub.out", 'r+') as f: #formated GT2_ in hmmer.out
             text = f.read()
             f.close()
@@ -469,7 +476,7 @@ def run(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval=1e-1
                     else:
                         cazyme_genes[row[2]].add(row[0].split('.hmm')[0])
 
-        if tools[2]: ### deal with eCAMI result 
+        if tools[2]: ### deal with dbcan_sub result 
             with open(outDir+prefix+'dbsub.out') as f:
                 next(f)
                 for line in f:
@@ -799,7 +806,7 @@ def run(inputFile, inputType, cluster=None, dbCANFile="dbCAN.txt", dia_eval=1e-1
 # allowing the main function to be called directly from other scripts without invoking a subprocess. This prevents extra
 # subprocesses or extra python interpreters being spawned, as well as simplifying python scripts which call run_dbcan.
 def cli_main():
-    example_command='''
+    '''
     example command:
     1. CAZyme annotation with isolated genome sequence as input
     run_dbcan EscheriaColiK12MG1655.fna prok
@@ -832,18 +839,20 @@ def cli_main():
     parser.add_argument('-v', '--version',default="3.0.0", type=str)
     # dbCAN-sub
     dbCAN_sub_group = parser.add_argument_group('dbCAN-sub parameters')
-    dbCAN_sub_group.add_argument('--dbcan_thread', '-dt', default=5,type=int, help='number of cpu for dbcan-sub')
+    dbCAN_sub_group.add_argument('--dbcan_thread', '-dt', default=5,type=int)
+    dbCAN_sub_group.add_argument('--tf_eval', default=1e-4, type=float, help='tf.hmm HMMER E Value')
+    dbCAN_sub_group.add_argument('--tf_cov', default=0.35, type=float, help='tf.hmm HMMER Coverage val')
+    dbCAN_sub_group.add_argument('--tf_cpu', default=1, type=int, help='tf.hmm Number of CPU cores that HMMER is allowed to use')
+    dbCAN_sub_group.add_argument('--stp_eval', default=1e-4, type=float, help='stp.hmm HMMER E Value')
+    dbCAN_sub_group.add_argument('--stp_cov', default=0.3, type=float, help='stp.hmm HMMER Coverage val')
+    dbCAN_sub_group.add_argument('--stp_cpu', default=1, type=int, help='stp.hmm Number of CPU cores that HMMER is allowed to use')
+    
     ### cgc finder 
     cgcfinder_group = parser.add_argument_group('CGC_Finder parameters')
     cgcfinder_group.add_argument('--cluster', '-c', help='Predict CGCs via CGCFinder. This argument requires an auxillary locations file if a protein input is being used')
     cgcfinder_group.add_argument('--cgc_dis', default=2, type=int, help='CGCFinder Distance value')
     cgcfinder_group.add_argument('--cgc_sig_genes', default='tp', choices=['tf', 'tp', 'stp', 'tp+tf', 'tp+stp', 'tf+stp', 'all'], help='CGCFinder Signature Genes value')
-    cgcfinder_group.add_argument('--tf_eval', default=1e-4, type=float, help='tf.hmm HMMER E Value')
-    cgcfinder_group.add_argument('--tf_cov', default=0.35, type=float, help='tf.hmm HMMER Coverage val')
-    cgcfinder_group.add_argument('--tf_cpu', default=1, type=int, help='tf.hmm Number of CPU cores that HMMER is allowed to use')
-    cgcfinder_group.add_argument('--stp_eval', default=1e-4, type=float, help='stp.hmm HMMER E Value')
-    cgcfinder_group.add_argument('--stp_cov', default=0.3, type=float, help='stp.hmm HMMER Coverage val')
-    cgcfinder_group.add_argument('--stp_cpu', default=1, type=int, help='stp.hmm Number of CPU cores that HMMER is allowed to use')
+
     ### cgc substrate prediction 
     cgcsubstrate_group = parser.add_argument_group('CGC_Substrate parameters')
     cgcsubstrate_group.add_argument('--cgc_substrate',action='store_true',help="run cgc substrate prediction?")
@@ -851,7 +860,7 @@ def cli_main():
     cgcsubstrate_group.add_argument('-o','--out',default="sub.prediction.out")
     cgcsubstrate_group.add_argument('-w','--workdir',type=str,default=".")
     cgcsubstrate_group.add_argument('-env','--env',type=str,default="local")
-    cgcsubstrate_group.add_argument('-oecami','--oecami',action='store_true',help="out eCAMI prediction intermediate result?")
+    cgcsubstrate_group.add_argument('-odbsub','--odbsub',action='store_true',help="out dbcan_sub prediction intermediate result?")
     cgcsubstrate_group.add_argument('-odbcanpul','--odbcanpul',action='store_true',help="output dbCAN-PUL prediction intermediate result?")
 
     ### cgc substrate prediction:dbCAN-PUL
