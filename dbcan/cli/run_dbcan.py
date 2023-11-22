@@ -498,7 +498,7 @@ def run_dbCAN(
                         try:
                             # print(key1,key2[i])
                             substrate.append(subs_dict[key1, key2[i]])
-                        except ValueError as e:
+                        except KeyError as e:
                             print("No substrate for it", e)
 
                     subfam = "|".join(subfam)
