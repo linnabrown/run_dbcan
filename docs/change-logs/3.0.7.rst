@@ -1,0 +1,10 @@
+3.0.7
+~~~~~
+
+.. rubric:: BugFix
+
+- Fix the bug in ``cgc_parser.py``.
+
+.. rubric:: Regular Updates
+
+- ``hmmdb``, ``cazydb``, ``tf-1``, ``tf-2``, ``stp`` and ``tcdb`` are updated.
