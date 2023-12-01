@@ -147,7 +147,7 @@ docker pull haidyi/run_dbcan:latest
 ```
 3. Run. Mount `input sequence file` and `output directory` to the container.
 ```
-docker run --name <preferred_name> -v <host-path>:<container-path> -it haidyi/run_dbcan:latest run_dbcan <input_file> [params] --out_dir <output_dir>
+docker run --name <preferred_name> -v <host-path>:<container-path> -it haidyi/run_dbcan:latest <input_file> {protein,meta,prok} [params] --out_dir <output_dir>
 ```
 
 
