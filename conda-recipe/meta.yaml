@@ -28,6 +28,14 @@ requirements:
     - hmmer
     - blast
     - pyhmmer
+    - Prokka
+    - megahit
+    - trim-galore
+    - bwa
+    - samtools
+    - bedtools
+    - seqkit
+    - kraken2
     - prodigal
     - scipy
     - psutil
