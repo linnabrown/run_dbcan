@@ -314,7 +314,15 @@ Several files will be produced via `run_dbcan`. They are as follows:
 
 	cgc.out - ouput from the CGCFinder run
 
-  	cgc_standard.out - standardized output of cgc.out,  which contains column names.
+  	cgc_standard.out - simplified version of cgc.out,  which contains columns: 
+   			CGC_id (CAZyme Gene Cluster ID), 
+      			type (CAZyme, TC, null, etc.),
+	 		contig_id,
+    			gene_id,
+       			start,
+	  		end,
+     			strand,
+			annotation
 
 	overview.txt - Details the CAZyme predictions across the three tools with signalp results
  
