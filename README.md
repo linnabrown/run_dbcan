@@ -59,7 +59,7 @@ If you are old user, just update the conda virtual environment `run_dbcan` via r
 ```
 test -d db || mkdir db
 cd db \
-    && wget http://bcb.unl.edu/dbCAN2/download/Databases/fam-substrate-mapping-08252022.tsv \
+    && wget http://bcb.unl.edu/dbCAN2/download/Databases/fam-substrate-mapping-08012023.tsv \
 	&& wget http://bcb.unl.edu/dbCAN2/download/Databases/PUL_12112023.faa && mv PUL_12112023.faa PUL.faa && makeblastdb -in PUL.faa -dbtype prot \
 	&& wget http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-PUL_12-12-2023.xlsx \
     && wget http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-PUL_12-12-2023.txt \
