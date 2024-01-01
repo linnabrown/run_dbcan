@@ -1,0 +1,19 @@
+3.0.2
+~~~~~
+
+.. rubric:: Feature
+
+#. Added the `eCAMI <https://academic.oup.com/bioinformatics/article/36/7/2068/5651014>`_ tool and removed `Hotpep`.
+#. Changed the format of ``cgc.out`` to make it easy to read.
+#. Re-arranged the code. The command line is ``run_dbcan`` now without the suffix ``.py``.
+#. The database files under db folder is now hosted through ``Git-LFS``. To download the complete db files, please use the command ``git lfs pull``
+   (Note: To use git lfs, please check the installation guide at https://git-lfs.github.com/).
+#. ``Dockerfile`` is updated and we simplify the installation step.
+
+.. rubric:: BugFix
+
+- Fixed ``-t all`` which will cause the program to generate empty files.
+
+.. rubric:: Regular Updates
+
+- Updated ``CAZy db`` for ``Diamond`` and ``HMMER DB`` for ``HMMER``.

@@ -1,0 +1,12 @@
+3.0.4
+~~~~~
+
+
+.. rubric:: Updates
+
+- Please use ``pip install dbcan==3.0.4`` for update.
+
+.. rubric:: BugFix
+
+#. Fixed the `eCAMI <https://academic.oup.com/bioinformatics/article/36/7/2068/5651014>`_ tool problem.
+#. If you download gff file from `NCBI <https://www.ncbi.nlm.nih.gov/>`_, please check the last column, replace Name with ID, and ID with Name.
