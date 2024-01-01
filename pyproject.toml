@@ -10,10 +10,11 @@ readme = "README.md"
 requires-python = ">=3.6"
 license = {file = "LICENSE"}
 authors = [
-    {name = "Tanner Yohe"},
-    {name = "Le Huang", email = "lehuang@unc.edu"},
+    {name = "Le Huang"},
+    {name = "Jinfang Zheng"},
+    {name = "Haidong Yi"},
     {name = "Qiwei Ge"},
-    {name = "Haidong Yi", email = "haidyi@cs.unc.edu"}
+    {name = "Tanner Yohe"},
 ]
 maintainers = [
     {name = "Le Huang", email = "lehuang@unc.edu"},
