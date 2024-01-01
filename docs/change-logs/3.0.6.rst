@@ -1,0 +1,17 @@
+3.0.6
+~~~~~
+
+
+.. rubric:: Feature
+
+- We now create the ``bioconda`` version. To old users, please run ``conda install dbcan -c bioconda`` for update from now on.
+  To new users, please follow the installation instruction below.
+
+  .. code-block:: shell
+
+     conda create -n run_dbcan python=3.8 dbcan -c conda-forge -c bioconda
+     conda activate run_dbcan
+
+.. rubric:: Updates
+
+- Rename the code ``hmmscan-parser.py`` to ``hmmscan_parser.py``.

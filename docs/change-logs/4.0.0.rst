@@ -1,0 +1,16 @@
+4.0.0
+~~~~~
+
+.. rubric:: Features
+
+#. CAZyme substrate prediction based on dbCAN-sub;
+#. CGC substrate prediction based on dbCAN-PUL searching and `dbCAN-sub <https://bcb.unl.edu/dbCAN_sub/>`_ majority voting. For CGC substrate prediction, please see our `dbCAN-seq update paper <https://academic.oup.com/nar/article/51/D1/D557/6833251?login=false>`_ for details. With these new functions (esp. the dbCAN-sub search), run_dbcan 4.0 is now slower to get the result back to you. Please be patient!
+#. See :issue:`127` for some explanation of different output files for substrate predictions.
+
+.. rubric:: BugFix
+
+- Please split your files if your input contains > 1 million proteins.
+
+.. rubric:: Regular Updates
+
+- All the databases are updated.
