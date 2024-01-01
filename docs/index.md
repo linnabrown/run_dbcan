@@ -46,5 +46,6 @@ api/index
 change-logs/index
 contributors
 references
-
+template_usage.md
+faq/index
 ```

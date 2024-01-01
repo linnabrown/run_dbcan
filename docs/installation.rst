@@ -48,6 +48,23 @@ dependencies:
 - `DIAMOND <https://github.com/bbuchfink/diamond>`_ (:cite:`2021:diamond`);
 - `SignalP <https://services.healthtech.dtu.dk/services/SignalP-4.1/>`_ (:cite:`2017:nielsen`) (Optional).
 
+.. warning::
+
+   **SignalP Integration Notice**
+
+   Due to the specific licensing terms of `SignalP`, it is not included directly as a dependency in our package. This requires users to undertake a separate installation process.
+
+   **Installing SignalP (Optional)**:
+      - `SignalP` is optional and not essential for the core functionality of our software. Users requiring its specific features can integrate it as follows:
+         1. Visit the `SignalP website <https://services.healthtech.dtu.dk/services/SignalP-4.1/>`_.
+         2. Submit a download `request <https://services.healthtech.dtu.dk/cgi-bin/sw_request?software=signalp&version=4.1&packageversion=4.1g&platform=Linux>`_.
+         3. Post-download, add `SignalP` to your system's environmental variables to make it executable.
+      - For installation assistance, refer to the :doc:`faq/signalp_installation`.
+
+   This approach ensures compliance with `SignalP`'s licensing while offering the tool's functionality to those who need it.
+
+
+
 After the dependencies are installed, `dbcan`_ can be installed via `PyPI <https://pypi.org/>`_:
 
 .. code-block:: shell
