@@ -1,5 +1,5 @@
 {% set name = "dbcan" %}
-{% set version = "4.0.0" %}
+{% set version = "4.1.0" %}
 
 package:
   name: "{{ name|lower }}"
