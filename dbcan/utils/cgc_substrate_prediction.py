@@ -256,20 +256,13 @@ class dbSub(object):
         self.geneid2gene = geneid2gene
         return geneid2gene
 
-    #def GeneID2substrate(self):
-    #    geneid2sub = {}; geneid2subfam = {}; geneid2EC = {}
-    #    for gene in self:
-    #        geneid2sub.setdefault(gene.GeneID,[]).append(gene.Substrate)
-    #        geneid2sub.setdefault(gene.GeneID,[]).append(gene.eCAMI_subfam)
-    #        geneid2sub.setdefault(gene.GeneID,[]).append(gene.Subfam_EC)
-    #    return geneid2gene
 
 class dbSub_record(object):
     '''
     design for dbCAN_sub output, each line
     '''
     def __init__(self,lines):
-        self.eCAMI_subfam = lines[0]
+        self.dbcan_sub_subfam = lines[0]
         self.Subfam_Composition = lines[1]
         self.Subfam_EC = lines[2]
         self.Substrate = lines[3] if lines[3]!= "-" else ""
@@ -298,7 +291,7 @@ class dbCAN_substrate_prediction(object):
     '''
     design for running substrate prediciton process with the output of dbCAN3. Run the following step.
     Step 1: run dbCAN-PUL searcing substrate prediction. -> dbCAN_PUL_substrate_predict
-    Step 2: run eCAMI-family substrate prediciton. -> eCAMI_subfamily_substrate_prediction
+    Step 2: run dbCAN_sub-family substrate prediciton. -> dbcan_sub_subfamily_substrate_prediction
     Step 3: combine eCAM-family and dbCAN-PUL substrate prediciton.
     '''
     
@@ -310,7 +303,7 @@ class dbCAN_substrate_prediction(object):
         self.input_folder = args.input if args.input.endswith("/") else args.input +"/"
         self.cgc_out = self.input_folder + "cgc.out"
         self.cgc_standard_out = self.input_folder + "cgc_standard.out"
-        self.dbsub_out = self.input_folder +"dbsub.out"
+        self.dbsub_out = self.input_folder +"dbcan-sub.hmm.out"
         self.overview_txt = self.input_folder +"overview.txt" 
         self.protein_db     = self.input_folder +"uniInput"
 
@@ -320,29 +313,29 @@ class dbCAN_substrate_prediction(object):
         #self.random_str = "59f220bd5fc4422187679301976a3d76" ## for debug
         #self.tmp_folder = "/dev/shm/" + self.random_str ### tmp folder to save some tmp files
         self.tmp_folder = self.input_folder
-        self.tmp_blastp_out = self.tmp_folder + "blastp.out"
-        self.tmp_CAZyme_pep = f"{self.tmp_folder}CAZyme.pep"
+        self.tmp_blastp_out = self.tmp_folder + "PUL_blast.out"
+        self.tmp_CAZyme_pep = f"{self.tmp_folder}CGC.faa"
 
         ### parameters
         self.PULdb  = f"{ROOT_FOLDR}PUL.faa"
-        self.pul_excel_filename = f"{ROOT_FOLDR}dbCAN-PUL_07-01-2022.xlsx"
+        self.pul_excel_filename = f"{ROOT_FOLDR}dbCAN-PUL.xlsx"
         self.homologous_parameters  = HitParamter(args)
-        self.dbsub_parameters  = eCAMI_parameter(args)
+        self.dbsub_parameters  = dbcan_sub_parameter(args)
         
         ### output parameters, intermediate results
-        self.odbsub = args.odbsub
+        self.odbcan_sub = args.odbcan_sub
         self.odbcanpul = args.odbcanpul
         self.dbcanpul_tmp = "dbcanpul.tmp.txt"
-        self.ecamipul_tmp = "ecamipul.tmp.txt"
+        self.dbcan_sub_tmp = "dbcansubpul.tmp.txt"
 
         ### Method to predict substrate 
         self.run_dbCAN_sub = True
         self.run_dbCAN_PUL = True
         
         ### 
-        self.eCAMI_CGC2substrates = {}
+        self.dbcan_sub_CGC2substrates = {}
         self.queryCGC2hit = {}
-        self.eCAMI_CGC2maxscore = {}
+        self.dbcan_sub_CGC2maxscore = {}
     
     def check_input(self):
         '''
@@ -404,7 +397,10 @@ class dbCAN_substrate_prediction(object):
         SeqIO.write(self.seqs,self.tmp_CAZyme_pep,'fasta')
         
         outfmt = '"6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen"'
-        self.blastp_command = f"blastp -max_hsps 1 -query {self.tmp_CAZyme_pep} -db {self.PULdb} -outfmt {outfmt} -evalue 0.01 -out {self.tmp_blastp_out} -num_threads 6 "
+        self.blastp_command = f"blastp -max_hsps 1 -query {self.tmp_CAZyme_pep} -db {self.PULdb} -outfmt {outfmt} -evalue 0.01 -out {self.tmp_blastp_out} -num_threads 32 "
+        print(self.blastp_command)
+        print("[whether PUL db exists]", os.path.exists(self.PULdb))
+        
         ### checking the blastp out
         
         if not os.path.exists(self.tmp_blastp_out):
@@ -491,7 +487,7 @@ class dbCAN_substrate_prediction(object):
         else:
             return -1,homologous_pairs
     
-    def eCAMI_read_cgc(self):
+    def dbcan_sub_read_cgc(self):
         if not self.cgcid2cgc:
             ### need to read cgc
             self.dbCAN_hits = dbCAN_Out(self.cgc_standard_out)
@@ -629,26 +625,25 @@ class dbCAN_substrate_prediction(object):
                     #print(cgcid,gene.Protein_ID,self.geneid2dbsub[gene.Protein_ID])
 
 
-    def eCAMI_subfamily_substrate_prediction(self):
+    def dbcan_sub_subfamily_substrate_prediction(self):
         '''
-        substrate prediction based on eCAMI subfamily.
+        substrate prediction based on dbCAN-sub subfamily.
         this part includes 4 steps.
         Step 1: reading dbsub prediciton result -> Read_CAZyme_substrate
-        Step 2: reading cgc result -> eCAMI_read_cgc
-        Step 3: combine dbsub result and cgc result. -> CGC2substrate_eCAMI
-        Step 4: scoring the CGC substrate predicted by eCAMI, and get the best substrate -> substrate_scoring_eCAMI
+        Step 2: reading cgc result -> dbcan_sub_read_cgc
+        Step 3: combine dbsub result and cgc result. -> CGC2substrate_dbcan_sub
+        Step 4: scoring the CGC substrate predicted by dbCAN-sub, and get the best substrate -> substrate_scoring_dbcan_sub
         '''
         
         self.Read_CAZyme_substrate()
-        self.eCAMI_read_cgc()
-        self.CGC2substrate_eCAMI()
-        self.substrate_scoring_eCAMI()
-        #self.eCAMI_sub_print_result()
+        self.dbcan_sub_read_cgc()
+        self.CGC2substrate_dbcan_sub()
+        self.substrate_scoring_dbcan_sub()
 
-    def substrate_scoring_eCAMI(self):
-        print("Start eCAMI subfamily substrate scoring")
+    def substrate_scoring_dbcan_sub(self):
+        print("Start dbCAN-sub subfamily substrate scoring")
         finalsub = {}; finalscores = {}; finalranks = {}; finalmaxscore = {}
-        cgcid2sub = self.cgcid2substrate_eCAMI 
+        cgcid2sub = self.cgcid2substrate_dbcan_sub 
         ### cgcid map to dbsub records, two dimensions list. 
         ### one dimension is from CAZyme to substrate due to one CAZyme can have more than two substrate or two sub-family
         ### another dimension is from cgc, one cgc includes several CAZymes
@@ -684,7 +679,7 @@ class dbCAN_substrate_prediction(object):
                 ranks.append(f"{sub}:{scores[sub]}")
             finalscores[cgcid] = scores
             max_score = max(scores.values())
-            if max_score < self.dbsub_parameters.eCAMI_substrate_scors: ### subsrate score less than cutoff
+            if max_score < self.dbsub_parameters.dbcan_substrate_scors: ### subsrate score less than cutoff
                 continue ## next cgc
             finalmaxscore[cgcid] = max_score
             final_subs = []
@@ -694,25 +689,25 @@ class dbCAN_substrate_prediction(object):
             finalsub[cgcid] = ",".join(final_subs)
             finalranks[cgcid] = ranks
         
-        self.eCAMI_CGC2substrates = finalsub  ### save the cgc substrate
-        self.eCAMI_CGC2scores     = finalscores ### almost the same as eCAMI_substrate_score
-        self.eCAMI_substrate_score= finalranks  ###
-        self.eCAMI_CGC2maxscore   = finalmaxscore ### max score
+        self.dbcan_sub_CGC2substrates = finalsub  ### save the cgc substrate
+        self.dbcan_sub_CGC2scores     = finalscores ### almost the same as dbcan_sub_substrate_score
+        self.dbcan_sub_substrate_score= finalranks  ###
+        self.dbcan_sub_CGC2maxscore   = finalmaxscore ### max score
        
 
-    def eCAMI_intermediate_file(self):
-        f = open("ecami.tmp.txt",'w')
+    def dbcan_sub_intermediate_file(self):
+        f = open("dbCAN-sub.tmp.txt",'w')
         geneids_uniq = []
         for cgcid in self.cgcid2cgc:
-            if cgcid in self.eCAMI_CGC2substrates:
+            if cgcid in self.dbcan_sub_CGC2substrates:
                 for gene in self.cgcid2cgc[cgcid].genes:
                     geneid = gene.Protein_ID
                     if geneid not in geneids_uniq:
                         geneids_uniq.append(geneid)
-                        ECs,subs,esubfam = self.from_geneid_get_ecami(geneid)
+                        ECs,subs,esubfam = self.from_geneid_get_dbcan_sub(geneid)
                         f.write(cgcid+"\t"+geneid+"\t"+",".join(ECs)+"\t"+",".join(subs)+"\t"+",".join(esubfam)+"\n")
     
-    def from_geneid_get_ecami(self,geneid):
+    def from_geneid_get_dbcan_sub(self,geneid):
         genes = self.geneid2dbsub.get(geneid,"")
         if not genes:
             return [],[],[]
@@ -720,7 +715,7 @@ class dbCAN_substrate_prediction(object):
         for i,gene in enumerate(genes):
             ECs.extend(clean_EC(gene))
             subs.extend(clean_sub(gene))
-            esubfam.append(gene.eCAMI_subfam)
+            esubfam.append(gene.dbcan_sub_subfam)
         ECs = set(ECs)
         subs = set(subs)
         return ECs,subs,esubfam
@@ -728,30 +723,29 @@ class dbCAN_substrate_prediction(object):
         #print(geneid,ECs,subs,esubfam)
         #ECs = set([gene.Subfam_EC.split(":")[0] for gene in genes])
         #subs = set([gene.Substrate.strip(" ") for gene in genes])
-        #esubfam = [gene.eCAMI_subfam for gene in genes]
+        #esubfam = [gene.dbcan_sub_subfam for gene in genes]
         #f.write(geneid+"\t"+",".join(ECs)+"\t"+",".join(subs)+"\t"+",".join(esubfam)+"\n")
         #f.close()
 
-    def eCAMI_sub_print_result(self):
-        for cgc in self.eCAMI_CGC2substrates:
-            ###
-            print(cgc,self.eCAMI_CGC2substrates[cgc]) ### cgcid and substrates
-            print("\t".join(self.eCAMI_substrate_score[cgc]))  ### ranking
-            #print(self.eCAMI_CGC2scores[cgc])  ### ranking
+    def dbcan_sub_sub_print_result(self):
+        for cgc in self.dbcan_sub_CGC2substrates:
+            print(cgc,self.dbcan_sub_CGC2substrates[cgc]) ### cgcid and substrates
+            print("\t".join(self.dbcan_sub_substrate_score[cgc]))  ### ranking
+            #print(self.dbcan_sub_CGC2scores[cgc])  ### ranking
             tmp_lines = ""
-            for dbsubs in self.cgcid2substrate_eCAMI[cgc]:
+            for dbsubs in self.cgcid2substrate_dbcan_sub[cgc]:
                 for dbsub in dbsubs:
                     print(dbsub)
             print("-"*20)
     
-    def CGC2substrate_eCAMI(self):
+    def CGC2substrate_dbcan_sub(self):
         cgcid2sub = {} ; cgcid2substrate_CAZyme_num = {}
         for cgcid in self.cgcid2cgc: ## NC_000913.3|CGC26
             for gene in self.cgcid2cgc[cgcid]: ### 
                 if gene.Protein_ID in self.geneid2dbsub:
                     cgcid2sub.setdefault(cgcid,[]).append(self.geneid2dbsub[gene.Protein_ID])
                     #print(cgcid,gene.Protein_ID,self.geneid2dbsub[gene.Protein_ID])
-        self.cgcid2substrate_eCAMI = cgcid2sub
+        self.cgcid2substrate_dbcan_sub = cgcid2sub
         
         self.cgcid2CAZyme_domain_substrate_num = {}
         ### count how many sequences in CAZyme has a substrate, and then calcuate the cgc potential substrate number
@@ -776,7 +770,7 @@ class dbCAN_substrate_prediction(object):
         if self.run_dbCAN_PUL:
             self.dbCAN_PUL_substrate_predict()
         if self.run_dbCAN_sub:
-            self.eCAMI_subfamily_substrate_prediction()
+            self.dbcan_sub_subfamily_substrate_prediction()
 
     def __del__(self):
         ''' remove tmp folder
@@ -787,7 +781,7 @@ class dbCAN_substrate_prediction(object):
         ## print(f"Rmoving tmp file:{self.tmp_folder}")
         ## shutil.rmtree(self.tmp_folder)
     
-    def integrate_dbCANPUL_eCAMI(self): ### maybe need, in the future. 
+    def integrate_dbCANPUL_dbcan_sub(self): ### maybe need, in the future. 
         '''
         combine two methods
         '''
@@ -795,35 +789,35 @@ class dbCAN_substrate_prediction(object):
 
     def print_result(self):
         ### self.queryCGC2hit ### dbCAN-PUL hit
-        ### self.eCAMI_CGC2substrates ### eCAMI substrate
-        shared_cgcids = self.queryCGC2hit.keys() | self.eCAMI_CGC2substrates.keys()
-        print("#cgcid\tPULID\tdbCAN-PUL substrate\tbitscore\tsignarture pairs\teCAMI substrate\teCAMI substrate score")
+        ### self.dbcan_sub_CGC2substrates ### dbcan_sub substrate
+        shared_cgcids = self.queryCGC2hit.keys() | self.dbcan_sub_CGC2substrates.keys()
+        print("#cgcid\tPULID\tdbCAN-PUL substrate\tbitscore\tsignarture pairs\tdbCAN-sub substrate\tdbCAN-sub substrate score")
         for cgcid in shared_cgcids:
             dbcan_pul_part = self.queryCGC2hit.get(cgcid,"")
-            ecami_substate = self.eCAMI_CGC2substrates.get(cgcid,"")
+            dbcan_sub_substate = self.dbcan_sub_CGC2substrates.get(cgcid,"")
             PULID = dbcan_pul_part.pulid if dbcan_pul_part else ""
             dbcan_pul_sub = dbcan_pul_part.substrate if dbcan_pul_part else ""
             bitscore = dbcan_pul_part.score if dbcan_pul_part else ""
             sig_pairs = ";".join(dbcan_pul_part.maped_types) if dbcan_pul_part else ""
-            ecami_maxscore = self.eCAMI_CGC2maxscore.get(cgcid,"")
-            print(f"{cgcid}\t{PULID}\t{dbcan_pul_sub}\t{bitscore}\t{sig_pairs}\t{ecami_substate}\t{ecami_maxscore}")
+            dbcan_sub_maxscore = self.dbcan_sub_CGC2maxscore.get(cgcid,"")
+            print(f"{cgcid}\t{PULID}\t{dbcan_pul_sub}\t{bitscore}\t{sig_pairs}\t{dbcan_sub_substate}\t{dbcan_sub_maxscore}")
     
     def result_print_to_file(self):
         ### self.queryCGC2hit ### dbCAN-PUL hit
-        ### self.eCAMI_CGC2substrates ### eCAMI substrate
-        shared_cgcids = self.queryCGC2hit.keys() | self.eCAMI_CGC2substrates.keys()
+        ### self.dbcan_sub_CGC2substrates ### dbCAN-sub substrate
+        shared_cgcids = self.queryCGC2hit.keys() | self.dbcan_sub_CGC2substrates.keys()
         print (f"Writing substrate prediction result to file:{self.input_folder+self.out}")
         with open(self.input_folder+self.out,'w') as f:
-            f.write("#cgcid\tPULID\tdbCAN-PUL substrate\tbitscore\tsignature pairs\teCAMI substrate\teCAMI substrate score\n")
+            f.write("#cgcid\tPULID\tdbCAN-PUL substrate\tbitscore\tsignature pairs\tdbCAN-sub substrate\tdbCAN-sub substrate score\n")
             for cgcid in shared_cgcids:
                 dbcan_pul_part = self.queryCGC2hit.get(cgcid,"")
-                ecami_substate = self.eCAMI_CGC2substrates.get(cgcid,"")
+                dbcan_sub_substate = self.dbcan_sub_CGC2substrates.get(cgcid,"")
                 PULID = dbcan_pul_part.pulid if dbcan_pul_part else ""
                 dbcan_pul_sub = dbcan_pul_part.substrate if dbcan_pul_part else ""
                 bitscore = dbcan_pul_part.score if dbcan_pul_part else ""
                 sig_pairs = ";".join(dbcan_pul_part.maped_types) if dbcan_pul_part else ""
-                ecami_maxscore = self.eCAMI_CGC2maxscore.get(cgcid,"")
-                f.write(f"{cgcid}\t{PULID}\t{dbcan_pul_sub}\t{bitscore}\t{sig_pairs}\t{ecami_substate}\t{ecami_maxscore}\n")
+                dbcan_sub_maxscore = self.dbcan_sub_CGC2maxscore.get(cgcid,"")
+                f.write(f"{cgcid}\t{PULID}\t{dbcan_pul_sub}\t{bitscore}\t{sig_pairs}\t{dbcan_sub_substate}\t{dbcan_sub_maxscore}\n")
 
 class PULhit(object):
     '''
@@ -857,11 +851,11 @@ def cgc_prediction_webserver(args,sub_pred):
     
     ### update parameters
     sub_pred.tmp_folder = args.workdir ### tmp folder to save some tmp files
-    sub_pred.tmp_blastp_out = sub_pred.tmp_folder + "blastp.out"
-    sub_pred.tmp_CAZyme_pep = sub_pred.tmp_folder + "CAZyme.pep"
+    sub_pred.tmp_blastp_out = sub_pred.tmp_folder + "PUL_blast.out"
+    sub_pred.tmp_CAZyme_pep = sub_pred.tmp_folder + "CAZyme.faa"
 
     sub_pred.PULdb  = f"{script_folder}/PUL.faa"
-    sub_pred.pul_excel_filename = f"{script_folder}/dbCAN-PUL_07-01-2022.xlsx"
+    sub_pred.pul_excel_filename = f"{script_folder}/dbCAN-PUL.xlsx"
     
     ### loading parameters file from php blast.php named with parameters.json
     parameter_file = "parameters.json"
@@ -909,19 +903,19 @@ def cgc_substrate_prediction(args):
     print(f"Substrate prediciton done! {(time_end-time_start)}s")
     sub_pred.result_print_to_file()
     
-    if sub_pred.odbsub:
-        sub_pred.eCAMI_intermediate_file()
+    if sub_pred.odbcan_sub:
+        sub_pred.dbcan_sub_intermediate_file()
     time_end = time.time()
     
     ### plot the syntenic block 
-    #plot_command = "python3 /array1/www/dbCAN3/ty/syntenic.plot.py syntenic_plot -b blastp.out --cgc cgc_standard.out -i sub.prediction.out"
     if args.cgc_substrate:
         os.chdir(args.workdir)
-    #plot_command = f"python3 {ROOT_FOLDR}/syntenic.plot.py syntenic_plot -b blastp.out --cgc cgc_standard.out -i sub.prediction.out"
     if args.db_dir.startswith("/"):
-        plot_command = f"syntenic_plot syntenic_plot -b blastp.out --cgc cgc_standard.out -i sub.prediction.out --db {args.db_dir}"
+        plot_command = f"syntenic_plot syntenic_plot -b PUL_blast.out --cgc cgc_standard.out -i {args.out} --db {args.db_dir}"
     else:
-        plot_command = f"syntenic_plot syntenic_plot -b blastp.out --cgc cgc_standard.out -i sub.prediction.out --db ../{args.db_dir}"
+        plot_command = f"syntenic_plot syntenic_plot -b PUL_blast.out --cgc cgc_standard.out -i {args.out} --db ../{args.db_dir}"
+    #print command
+    print(plot_command)
     os.system(plot_command)
     print(f"All done! {(time_end-time_start)}s")
 
@@ -949,13 +943,13 @@ class HitParamter(object):
     def __repr__(self):
         return "\n".join([name + ": " +str(self.__dict__[name]) for name in self.__dict__])
 
-class eCAMI_parameter(object):
+class dbcan_sub_parameter(object):
     def __init__(self,args):
         self.hmmevalue = args.hmmevalue
         self.hmmcov    = args.hmmcov
         self.num_of_protein_shared_substrate_cutoff = args.num_of_protein_substrate_cutoff
         self.num_of_domains_substrate_cutoff = args.num_of_domains_substrate_cutoff
-        self.eCAMI_substrate_scors =  args.substrate_scors
+        self.dbcan_substrate_scors =  args.substrate_scors
     
     def __repr__(self):
         return "\n".join([name + ": " +str(self.__dict__[name]) for name in self.__dict__])
@@ -992,11 +986,11 @@ def parse_argv():
     group.add_argument('--pul',help="dbCAN-PUL PUL.faa")
     group.add_argument('-f','--fasta')
     group.add_argument('-b','--blastp')
-    group.add_argument('-o','--out',default="sub.prediction.out")
+    group.add_argument('-o','--out',default="substrate.out")
     group.add_argument('-w','--workdir',type=str,default=".")
     group.add_argument('-rerun','--rerun',type=bool,default=False)
     group.add_argument('-env','--env',type=str,default="local")
-    group.add_argument('-odbsub','--odbsub', help="output dbcan_sub prediction intermediate result?")
+    group.add_argument('-odbcan_sub','--odbcan_sub', help="output dbcan_sub prediction intermediate result?")
     group.add_argument('-odbcanpul','--odbcanpul',type=bool,default=True,help="output dbCAN-PUL prediction intermediate result?")
     parser.add_argument('--db_dir', default="db", help='Database directory')
     
@@ -1015,7 +1009,7 @@ def parse_argv():
     group1.add_argument('-bsc','--bitscore_cutoff',default = 50,type=float,help="bitscore cutoff to identify a homologous hit")
     group1.add_argument('-evalue','--evalue_cutoff',default = 0.01,type=float,help="evalue cutoff to identify a homologous hit")
 
-    group2 = parser.add_argument_group('eCAMI conditons', 'how to define dbsub hits and eCAMI subfamily substrate')
+    group2 = parser.add_argument_group('dbCAN-sub conditons', 'how to define dbsub hits and dbCAN-sub subfamily substrate')
     group2.add_argument('-hmmcov','--hmmcov',default = 0.,type=float)
     group2.add_argument('-hmmevalue','--hmmevalue',default = 0.01,type=float)
     group2.add_argument('-ndsc','--num_of_domains_substrate_cutoff',default = 2,type=int,help="define how many domains share substrates in a CGC, one protein may include several subfamily domains.")

@@ -1,0 +1,8 @@
+2.0.6 (02/17/2020)
+~~~~~~~~~~~~~~~~~~
+
+.. rubric:: Feature
+
+#. Please use ``pip install run-dbcan==2.0.6`` for update.
+#. We forgo ``FragGeneScan`` because this program does not work now. We use ``Prodigal`` instead. So, you don't need to use ``conda install fraggenescan`` now.
+#. We add extra information ``EC number`` to the last columns of ``Hotpep`` output to make it consistent with previous ``Hotpep`` result.

@@ -1,2 +1,1 @@
-from .simplify_cgc import simplify_output
-from .CGCFinder import cgc_finder
+from .CGCFinder import cgc_finder, simplify_cgc_output

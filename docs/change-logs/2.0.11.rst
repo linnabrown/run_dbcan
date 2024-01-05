@@ -1,0 +1,15 @@
+2.0.11
+~~~~~~
+
+.. rubric:: Feature
+
+#. Add ec number prediction to ``Hotpep`` result.
+#. dbCAN2 Hotpep PPR patterns updated to most recent release of ``CAZyDB (2019)``. Also missing group ``EC#`` files for families added in.
+#. Revising the output name file in ``Hotpep`` as random number, to make the program more robust for paralleing running.
+#. Prioritizing the CAZyme prediction over ``TF/TC/STP`` prediction when preparing gff input file for ``CGC-Finder``.
+#. Rewrite the installation steps. Recommend user to use customized virtual environment (use certain ``Python`` version).
+
+.. rubric:: BugFix
+
+#. Fix the duplicate ACC of ``tf-2.hmm`` to make it compatiable for the newest ``hmmer(3.3)``. Delete version limitatino to hmmer.
+#. Fix the ``prodigal`` predicted ``gff`` file end with ``";"`` problem.

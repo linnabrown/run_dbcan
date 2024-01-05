@@ -1,0 +1,13 @@
+3.0.5
+~~~~~
+
+
+.. rubric:: Feature
+
+- Please use ``pip install dbcan==3.0.5`` for updates.
+
+
+.. rubric:: BugFix
+
+#. Fixed the bug in ``signalP``;
+#. Fixed the ``cgc`` and ``run_dbcan`` small bugs.

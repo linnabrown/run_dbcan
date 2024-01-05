@@ -9,9 +9,9 @@ from matplotlib.lines import Line2D
 from matplotlib import pyplot
 from matplotlib.patches import Patch
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 
-plt.style.use('ggplot')
+#plt.style.use('ggplot')
 
 import argparse,os
 
@@ -97,46 +97,57 @@ def Get_Position(starts,ends,strands,maxbp,yshift=0,up=1):
             positions_str += str( ends[i] * pixeachbp - Triangle_length) + " " + str(plot_start_y) + " "## second point
             if up == 1: ###cluster 1
                 blocks.append(positions_str)
-            
             positions_str += str( ends[i] * pixeachbp) + " " + str(plot_start_y + poly_heigth) + " " ## 3
             positions_str += str( ends[i] * pixeachbp - Triangle_length) + " " + str( plot_start_y + 2*poly_heigth) + " " ### 4
             positions_str += str( starts[i] * pixeachbp )+ " " + str(plot_start_y + 2*poly_heigth)
             
             positions_str1 = str( starts[i] * pixeachbp )+ " " + str(plot_start_y + 2*poly_heigth) + " "
             positions_str1 += str( ends[i] * pixeachbp - Triangle_length) + " " + str( plot_start_y + 2*poly_heigth) + " " ### 5
-
             if up == 2: ### cluster 2
                 blocks.append(positions_str1)
-        
         if strands[i] == "-":
             positions_str = str( starts[i] * pixeachbp ) + " " + str(plot_start_y + poly_heigth) + " "
-            
             positions_str += str( starts[i] * pixeachbp + Triangle_length) + " " + str(plot_start_y) + " "
             positions_str += str(ends[i] * pixeachbp) + " " + str(plot_start_y) + " "
-            
             positions_str1 = str(ends[i] * pixeachbp) + " " + str(plot_start_y) + " "
             positions_str1 += str( starts[i] * pixeachbp + Triangle_length) + " " + str(plot_start_y) + " "
             if up == 1:
                 blocks.append(positions_str1)
-            
             positions_str += str( ends[i] *pixeachbp ) + " " + str(plot_start_y + 2* poly_heigth) + " "
             positions_str += str( starts[i]* pixeachbp +Triangle_length) + " " + str(plot_start_y + 2* poly_heigth)
-            
             positions_str1 = str( ends[i] *pixeachbp ) + " " + str(plot_start_y + 2* poly_heigth) + " "
             positions_str1 += str( starts[i]* pixeachbp +Triangle_length) + " " + str(plot_start_y + 2* poly_heigth)
             if up == 2:        
                 blocks.append(positions_str1)
-        
         #print (positions_str)
         polygens.append(positions_str)
-
         ### for genome line
         if i < len(starts) -1:
             positions_str = str( ends[i] *pixeachbp) + " " + str(plot_start_y + poly_heigth)  + " "
             positions_str += str( starts[i+1]*pixeachbp) + " " + str(plot_start_y + poly_heigth)
             lines.append(positions_str)
-
-    return polygens,blocks,lines
+    
+    scale_number = 10
+    each_scale_bp = maxbp / scale_number
+    each_scale_pix = each_scale_bp * pixeachbp
+    
+    plot_start_y -= 30
+    scale_positions = []; scale_positions_texts = [] ; scale_text = []
+    scale_positions.append("0 " + str(plot_start_y + 3*poly_heigth) + " " + str(10*each_scale_pix) + " " + str(plot_start_y + 3*poly_heigth))
+    
+    plot_start_y -= 1
+    for i in range(scale_number+1):
+        positions_str = str(i*each_scale_pix) + " "
+        positions_str += str(plot_start_y + 3* poly_heigth) + " "
+        positions_str += str(i*each_scale_pix) + " "
+        positions_str += str(plot_start_y + 3*poly_heigth + 0.6* poly_heigth)
+        scale_positions.append(positions_str)
+        positions_str = str(i*each_scale_pix) + " " + str(plot_start_y + 3*poly_heigth + 0.6* poly_heigth)
+        scale_positions_texts.append(positions_str)
+        scale_text.append(str(int(each_scale_bp*i)+ shfit_pos))
+    #print(scale_positions)
+    #print(scale_text)
+    return polygens,blocks,lines,scale_positions,scale_text
 
 
 def plot_Polygon_homologous(polygens1,polygens2,types1,types2,size,ax):
@@ -149,7 +160,7 @@ def plot_Polygon_homologous(polygens1,polygens2,types1,types2,size,ax):
         for i in range(int(len(polygen)/2)):
             points.append([float(polygen[2*i]),float(polygen[2*i+1])])
         ax.add_patch(
-        Polygon(points, color=color, alpha=0.5)
+        Polygon(points, color=color, alpha=0.5,lw=0)
         )
 
     for j in range(len(polygens2)):
@@ -159,7 +170,7 @@ def plot_Polygon_homologous(polygens1,polygens2,types1,types2,size,ax):
         for i in range(int(len(polygen)/2)):
             points.append([float(polygen[2*i]),float(polygen[2*i+1])])
         ax.add_patch(
-        Polygon(points, color=color, alpha=0.5)
+        Polygon(points, color=color, alpha=0.5,lw=0)
         )
 
 
@@ -186,7 +197,7 @@ def Shade_curve(x11,x12,y11,y12,x21,x22,y21,y22,xmid,ymid,color):
             (CP, (x11,y11))]
     codes, verts = zip(*pathdata)
     path = Path(verts, codes)
-    pp = PathPatch(path,color=color,alpha=0.5,lw=0)
+    pp = PathPatch(path,color=color,alpha=0.2,lw=0)
     
     return pp
 
@@ -220,10 +231,10 @@ def plot_genome_line(lines_coor1,lines_coor2,ax):
 
     for line in lines_coor1:
         x1,y1,x2,y2 = points2(line)
-        ax.add_patch(Polygon([(x1,y1),(x2,y2)], color="black",lw=2))
+        ax.add_patch(Polygon([(x1,y1),(x2,y2)], color="gray",lw=2))
     for line in lines_coor2:
         x1,y1,x2,y2 = points2(line)
-        ax.add_patch(Polygon([(x1,y1),(x2,y2)], color="black", lw=2))
+        ax.add_patch(Polygon([(x1,y1),(x2,y2)], color="gray", lw=2))
 
 ### input: gene cluster1: all starts coordinate, end coodinate, strands,Types,
 ### input: gene cluster2: all starts coordinate, end coodinate, strands,Types,
@@ -284,8 +295,8 @@ def syntenic_plot(starts,starts1,ends,ends1,strands,strands1,Types,Types1,blocks
     ### decide which 
     maxbp = max([max(ends) - min(starts),max(ends1) - min(starts1)])
 
-    polygens,blocks_coor,lines_coor = Get_Position(starts,ends,strands,maxbp,yshift=0,up=1)
-    polygens1,blocks1_coor,lines_coor1 = Get_Position(starts1,ends1,strands1,maxbp,yshift=60,up=2)
+    polygens,blocks_coor,lines_coor,_,_ = Get_Position(starts,ends,strands,maxbp,yshift=0,up=1)
+    polygens1,blocks1_coor,lines_coor1,_,_ = Get_Position(starts1,ends1,strands1,maxbp,yshift=40,up=2)
 
     ### 
 
@@ -309,12 +320,14 @@ def syntenic_plot(starts,starts1,ends,ends1,strands,strands1,Types,Types1,blocks
     plt.text(500,90,cgcid,fontsize=30,horizontalalignment='center')
     plt.text(500,0,pulid,fontsize=30,horizontalalignment='center')
     plt.ylim(0,100)
-    plt.xlim(-100,1000)
+    plt.xlim(-100,1100)
     plt.axis('off')
     ax.plot()
     plt.tight_layout(pad=0.01)
     cgcid = cgcid.replace("|","_") ### need to replace "|" to "_", because | is a special chara for system
-    plt.savefig(f"syntenic.svg/{cgcid}.svg")
+    ### for local 
+    #print(f"Save figure to file synteny.pdf/{cgcid}-syntenic.pdf ")
+    plt.savefig(f"synteny.pdf/{cgcid}-syntenic.pdf")
     plt.close()
     
 def read_blast_result_cgc(filename):
@@ -336,7 +349,7 @@ def syntenic_plot_allpairs(args):
     cgc_proteinid2gene,cgcid2gene,cgcid2geneid = read_UHGG_CGC_stanrdard_out(args.cgc)
     PULid_proteinid2gene,PULid2gene,PULid2geneid = read_PUL_cgcgff(args)
     
-    os.makedirs("syntenic.svg", exist_ok=True)
+    os.makedirs("synteny.pdf", exist_ok=True)
 
     for line in open(args.input).readlines()[1:]: ### for each pairs
         lines = line.rstrip().split("\t")
@@ -409,6 +422,8 @@ def read_PUL_cgcout(filename="PUL.out"):
 
 
 def read_cgcgff(filename,geneid2gene):
+    if not os.path.exists(filename):
+        return None
     for line in open(filename):
         lines = line.rstrip("\n").split("\t")
         proteinid = attribution(lines[-1],"ID")
