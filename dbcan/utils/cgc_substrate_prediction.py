@@ -398,6 +398,9 @@ class dbCAN_substrate_prediction(object):
         
         outfmt = '"6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qlen slen"'
         self.blastp_command = f"blastp -max_hsps 1 -query {self.tmp_CAZyme_pep} -db {self.PULdb} -outfmt {outfmt} -evalue 0.01 -out {self.tmp_blastp_out} -num_threads 32 "
+        print(self.blastp_command)
+        print("[whether PUL db exists]", os.path.exists(self.PULdb))
+        
         ### checking the blastp out
         
         if not os.path.exists(self.tmp_blastp_out):
@@ -911,6 +914,8 @@ def cgc_substrate_prediction(args):
         plot_command = f"syntenic_plot syntenic_plot -b PUL_blast.out --cgc cgc_standard.out -i {args.out} --db {args.db_dir}"
     else:
         plot_command = f"syntenic_plot syntenic_plot -b PUL_blast.out --cgc cgc_standard.out -i {args.out} --db ../{args.db_dir}"
+    #print command
+    print(plot_command)
     os.system(plot_command)
     print(f"All done! {(time_end-time_start)}s")
 

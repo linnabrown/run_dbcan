@@ -1050,19 +1050,19 @@ def rundbCAN_parser():
         default="all",
         help="Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of SingalP, only if user use singalP",
     )
-    parser.add_argument("-v", "--version", default="3.0.0", type=str)
+    parser.add_argument("-v", "--version", default="4.1.0", type=str)
     # dbCAN-sub
     dbCAN_sub_group = parser.add_argument_group("dbCAN-sub parameters")
-    dbCAN_sub_group.add_argument("--dbcan_thread", "-dt", default=5, type=int)
+    dbCAN_sub_group.add_argument("--dbcan_thread", "-dt", default=12, type=int)
     dbCAN_sub_group.add_argument("--tf_eval", default=1e-4, type=float, help="tf.hmm HMMER E Value")
     dbCAN_sub_group.add_argument("--tf_cov", default=0.35, type=float, help="tf.hmm HMMER Coverage val")
     dbCAN_sub_group.add_argument(
-        "--tf_cpu", default=1, type=int, help="tf.hmm Number of CPU cores that HMMER is allowed to use"
+        "--tf_cpu", default=8, type=int, help="tf.hmm Number of CPU cores that HMMER is allowed to use"
     )
     dbCAN_sub_group.add_argument("--stp_eval", default=1e-4, type=float, help="stp.hmm HMMER E Value")
     dbCAN_sub_group.add_argument("--stp_cov", default=0.3, type=float, help="stp.hmm HMMER Coverage val")
     dbCAN_sub_group.add_argument(
-        "--stp_cpu", default=1, type=int, help="stp.hmm Number of CPU cores that HMMER is allowed to use"
+        "--stp_cpu", default=8, type=int, help="stp.hmm Number of CPU cores that HMMER is allowed to use"
     )
 
     ### cgc finder
