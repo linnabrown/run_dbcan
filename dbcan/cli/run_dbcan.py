@@ -976,7 +976,8 @@ def rundbCAN_parser():
         - Parameters specific to CGC finder and substrate prediction modules.
     """
 
-    usage = '''
+    '''
+
     Example usages of run_dbcan:
     1. CAZyme annotation with isolated genome sequence as input:
     run_dbcan EscheriaColiK12MG1655.fna prok
@@ -1006,7 +1007,8 @@ def rundbCAN_parser():
     More usage can be found in our https://dbcan.readthedocs.io/en/latest.
     '''
 
-    parser = argparse.ArgumentParser(description="dbCAN: Automatic CAZyme Annotation", prog='run_dbcan', usage=usage)
+    parser = argparse.ArgumentParser(description="dbCAN: Automatic CAZyme Annotation", prog='run_dbcan')
+
     parser.add_argument("inputFile", help="User input file. Must be in FASTA format.")
     parser.add_argument(
         "inputType",
