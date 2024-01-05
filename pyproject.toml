@@ -4,7 +4,7 @@ requires = ["hatchling"]
 
 [project]
 name = "dbcan"
-version = "3.1"
+version = "4.1.0"
 description = "Standalone version of dbCAN annotation tool for automated CAZyme annotation"
 readme = "README.md"
 requires-python = ">=3.6"
@@ -46,6 +46,10 @@ Home-page = "https://bcb.unl.edu/dbCAN2/"
 [project.scripts]
 run_dbcan = "dbcan.cli.run_dbcan:cli_main"
 cgc_standard2json = "dbcan.cli.cgc_process_json:main"
+syntenic_plot = "dbcan.cli.syntenic_plot:main"
+dbcan_utils = "dbcan.utils.utils:main"
+dbcan_plot = "dbcan.utils.plots:main"
+dbcan_asmfree = "dbcan.utils.diamond_unassembly:main"
 
 [project.optional-dependencies]
 dev = [

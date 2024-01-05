@@ -13,6 +13,8 @@ import os
 import time
 
 # Recent updated information:
+#   Jan/01/23: Add doc code
+#   Oct/10/23: Recontructed the run_dbcan [Haidong Yi]
 #   Sep/07/23: Replace hmmscan with hmmsearch. Update perl code [Le Huang, Yanbin Yin]
 #   Dec/15/22: 1.adding function to convert cgc_standard.out to json format. 2. adding function cgc_[Jinfang Zheng]
 #   Dec/06/22: fix gene ID in CGCfinder output file cgc.out[Jinfang Zheng]
@@ -25,17 +27,17 @@ import time
 # Runs input against HMMER, DIAMOND, and dbCAN_sub
 # Optionally predicts CGCs with CGCFinder
 # Creats an overview table using output files from core
-# tools from dbsub.out,hmmer.out and diamond.out if they exist.
+# tools from dbcan-sub.hmm.out,hmmer.out and diamond.out if they exist.
 ##########################################################
 from subprocess import Popen, call
 
 from dbcan.cli import hmmer_parser
 from dbcan.utils.cgc_substrate_prediction import cgc_substrate_prediction
-from dbcan.utils.CGCFinder import cgc_finder
-from dbcan.utils.simplify_cgc import simplify_output
+from dbcan.utils.CGCFinder import cgc_finder, simplify_cgc_output
 
 
-def runHmmScan(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name):
+
+def runHmmer(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name):
     """
     Executes HMMER's hmmsearch tool to search sequence databases for sequence homologs.
 
@@ -64,7 +66,7 @@ def runHmmScan(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name):
             "--domtblout",
             domtblout_file,
             "--cpu",
-            hmm_cpu,
+            str(hmm_cpu),
             "-o",
             "/dev/null",
             hmm_file,
@@ -79,7 +81,7 @@ def runHmmScan(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name):
         call(["rm", domtblout_file])
 
 
-def split_uniInput(uniInput, dbcan_thread, outPath, dbDir, hmm_eval, hmm_cov, dbcan_offset):
+def split_uniInput(uniInput, dbcan_thread, outPath, dbDir, hmm_eval, hmm_cov, hmm_cpu, dbcan_offset):
     """
     Splits a large input file into smaller files and runs HMMER hmmsearch on each part.
 
@@ -110,9 +112,7 @@ def split_uniInput(uniInput, dbcan_thread, outPath, dbDir, hmm_eval, hmm_cov, db
     uniInput_file = file.readlines()
     file.close()
     signal_count = 0
-    # split_size = 0
     min_files = dbcan_thread
-    # check_id = False
     file_number = None
     split_files = []
     fsize = int(os.path.getsize(uniInput) / float(1024 * 1024) * dbcan_offset)
@@ -123,7 +123,7 @@ def split_uniInput(uniInput, dbcan_thread, outPath, dbDir, hmm_eval, hmm_cov, db
     for line in uniInput_file:
         if ">" in line:
             signal_count += 1
-    print(f"ID count: {signal_count}")
+    print(f"Count of proteins: {signal_count}")
 
     if signal_count >= min_files:
         for i in range(fsize):
@@ -145,7 +145,7 @@ def split_uniInput(uniInput, dbcan_thread, outPath, dbDir, hmm_eval, hmm_cov, db
                         "--domtblout",
                         f"{outPath}d{j}",
                         "--cpu",
-                        "5",
+                        str(hmm_cpu),
                         "-o",
                         "/dev/null",
                         f"{dbDir}dbCAN_sub.hmm",
@@ -155,32 +155,17 @@ def split_uniInput(uniInput, dbcan_thread, outPath, dbDir, hmm_eval, hmm_cov, db
             )
         for th in ths:
             th.wait()
-        # fn = '%sd%s'%(outPath,j)
-        # dd = open(fn).readlines()
-        # # print(dd)
-        print(hmm_eval, hmm_cov)
         for m in split_files:
             hmm_parser_output = hmmer_parser.run(f"{outPath}d{m}", eval_num=hmm_eval, coverage=hmm_cov)
-            print(hmm_parser_output)
             with open(f"{outPath}temp_{m}", "w") as temp_hmmer_file:
                 temp_hmmer_file.write(hmm_parser_output)
             os.remove(f"{outPath}d{m}")
             os.remove(f"{outPath}{m}")
-            # call(["rm", "%sd%s" % (outPath, m)])
-            # call(["rm", "%s%s" % (outPath, m)])  # remove temporary files
-
-        f = open(f"{outPath}dtemp.out", "w")
-        f.close()
-
+        with open(f"{outPath}dtemp.out", "w"): pass
         for n in split_files:
             with open(f"{outPath}temp_{n}") as file_read:
                 files_lines = file_read.readlines()
-            # call(["rm", "%stemp_%s" % (outPath, n)])  # remove temporary files
             os.remove(f"{outPath}temp_{n}")
-            # for j in range(len(files_lines)):
-            #    f = open("%sdtemp.out" % outPath, "a")
-            #    f.write(files_lines[j])
-            #    f.close()
             with open(f"{outPath}dtemp.out", "a") as f:
                 f.writelines(files_lines)
     else:
@@ -190,7 +175,7 @@ def split_uniInput(uniInput, dbcan_thread, outPath, dbDir, hmm_eval, hmm_cov, db
                 "--domtblout",
                 f"{outPath}d.txt",
                 "--cpu",
-                "5",
+                str(hmm_cpu),
                 "-o",
                 "/dev/null",
                 f"{dbDir}dbCAN_sub.hmm",
@@ -374,13 +359,10 @@ def run_dbCAN(
     if use_signalP:
         print("\n\n***************************0. SIGNALP start*************************************************\n\n")
         if gram == "p" or gram == "all":
-            # signalpos = Popen("%s -t gram+ %suniInput > %ssignalp.pos" % (signalP_path, outPath, outPath), shell=True)
             signalpos = Popen(f"{signalP_path} -t gram+ {outPath}uniInput > {outPath}signalp.pos", shell=True)
         if gram == "n" or gram == "all":
-            # signalpneg = Popen("%s -t gram- %suniInput > %ssignalp.neg" % (signalP_path, outPath, outPath), shell=True)
             signalpneg = Popen(f"{signalP_path} -t gram- {outPath}uniInput > {outPath}signalp.neg", shell=True)
         if gram == "euk" or gram == "all":
-            # signalpeuk = Popen("%s -t euk %suniInput > %ssignalp.euk" % (signalP_path, outPath, outPath), shell=True)
             signalpeuk = Popen(f"{signalP_path} -t euk {outPath}uniInput > {outPath}signalp.euk", shell=True)
 
     # End SignalP
@@ -388,7 +370,6 @@ def run_dbCAN(
     # Begin Core Tools
 
     if tools[0]:  ### run diamond
-        # diamond blastp -d db/CAZy -e 1e-102 -q output_EscheriaColiK12MG1655/uniInput -k 1 -p 2 -o output_EscheriaColiK12MG1655/diamond1.out -f 6
         print("\n\n***************************1. DIAMOND start*************************************************\n\n")
         os.system(
             "diamond blastp -d %s -e %s -q %suniInput -k 1 -p %d -o %sdiamond.out -f 6"
@@ -396,7 +377,7 @@ def run_dbCAN(
         )
         print("\n\n***************************1. DIAMOND end***************************************************\n\n")
 
-    if tools[1]:  ### run hmmscan (hmmer)
+    if tools[1]:  ### run hmmsearch (hmmer)
         print("\n\n***************************2. HMMER start*************************************************\n\n")
         os.system(
             f"hmmsearch --domtblout {outPath}h.out --cpu {hmm_cpu} -o /dev/null {os.path.join(dbDir, dbCANFile)} {outPath}uniInput "
@@ -428,31 +409,31 @@ def run_dbCAN(
         print(
             "\n\n***************************3. dbCAN_sub start***************************************************\n\n"
         )
-        split_uniInput("%suniInput" % outPath, dbcan_thread, outPath, dbDir, hmm_eval, hmm_cov, dbcan_offset)
+        split_uniInput("%suniInput" % outPath, dbcan_thread, outPath, dbDir, hmm_eval, hmm_cov, hmm_cpu, dbcan_offset)
         print("\n\n***************************3. dbCAN_sub end***************************************************\n\n")
 
+        # Process dtemp.out and create dbcan-sub.hmm.out
         with open(f"{outPath}dtemp.out") as f:
-            with open("%sdbsub.out" % outPath, "w") as out:
+            with open("%sdbcan-sub.hmm.out" % outPath, "w") as out:
+                processed_lines = []
                 for line in f:
                     row = line.rstrip().split("\t")
                     row.append(float(int(row[6]) - int(row[5])) / int(row[1]))
                     if float(row[4]) <= 1e-15 and float(row[-1]) >= 0.35:
-                        out.write("\t".join([str(x) for x in row]) + "\n")
+                        # out.write("\t".join([str(x) for x in row]) + "\n")
+                        processed_lines.append("\t".join([str(x) for x in row]))
+        # Process dbcan-sub.hmm.out content
+        updated_lines = [line for line in processed_lines if line.strip()]
+                
+        for i in range(len(updated_lines)):
+            if "GT2_" in updated_lines[i]:
+                profile = updated_lines[i].split("\t")[0].split(".")[0]
+                updated_lines[i] = updated_lines[i].replace(profile, "GT2")
+        if updated_lines:
+            with open(f"{outPath}dbcan-sub.hmm.out", "w") as f2:
+                f2.write("\n".join(updated_lines))
 
-        with open(f"{outPath}dbsub.out", "r+") as f:  # formated GT2_ in hmmer.out
-            text = f.read()
-            f.close()
-            call(["rm", f"{outPath}dbsub.out"])
-            text = text.split("\n")
-            if "" in text:
-                text.remove("")
-            for i in range(len(text)):
-                if "GT2_" in text[i]:
-                    profile = text[i].split("\t")[0].split(".")[0]
-                    text[i] = text[i].replace(profile, "GT2")
-                with open(f"{outPath}dbsub.out", "a") as f:
-                    f.write(text[i] + "\n")
-                    f.close()
+        
     # End Core Tools
     ########################
     # Begin Parse Results
@@ -460,69 +441,72 @@ def run_dbCAN(
     # parse dbCAN_sub result
     if tools[2]:
         subs_dict = {}
-        with open(f"{dbDir}fam-substrate-mapping-08252022.tsv") as f:
+        with open(f"{dbDir}fam-substrate-mapping.tsv") as f:
             next(f)
             for line in f:
                 r = line.split("\t")
-                if len(r[4]) == 1:
-                    subs_dict[r[2], "-"] = r[0]
-                else:
-                    subs_dict[r[2], r[4].strip()] = r[0]
-        with open(f"{outPath}dbsub.out") as f:
-            with open(f"{outPath}temp", "w") as out:
-                out.write(
-                    "dbCAN subfam\tSubfam Composition\tSubfam EC\tSubstrate\tProfile Length\tGene ID\tGene Length\tE Value\tProfile Start\tProfile End\tGene Start\tGene End\tCoverage\n"
-                )
+                key = (r[2], "-") if len(r[4]) == 1 else (r[2], r[4].strip())
+                subs_dict[key] = r[0]
+        # Process dbcan-sub.hmm.out if it exists
+        if os.path.exists(f"{outPath}dbcan-sub.hmm.out"):
+            if os.path.exists(f"{outPath}temp"):
+                os.system(f"rm {outPath}temp")
+            with open(f"{outPath}dbcan-sub.hmm.out") as f, open(f"{outPath}temp", "w") as out:
+                    out.write(
+                        "dbCAN subfam\tSubfam Composition\tSubfam EC\tSubstrate\tProfile Length\tGene ID\tGene Length\tE Value\tProfile Start\tProfile End\tGene Start\tGene End\tCoverage\n"
+                    )
 
-                for line in f:
-                    profile = line.split("\t")
-                    subfam = []
-                    sub_composition = []
-                    sub_ec = []
-                    newline = []
-                    substrate = []
-                    key1 = "-"
-                    key2 = ["-"]
+                    for line in f:
+                        profile = line.split("\t")
+                        subfam = []
+                        sub_composition = []
+                        sub_ec = []
+                        newline = []
+                        substrate = []
+                        key1 = "-"
+                        key2 = ["-"]
 
-                    for p in profile[0].split("|"):
-                        if ".hmm" in p:
-                            subfam.append(p.split(".")[0])
-                            key1 = p.split(".")[0].split("_")[0]
-                        elif len(p.split(".")) == 4:
-                            sub_ec.append(p)
-                            key2.append(p.split(":")[0])
+                        for p in profile[0].split("|"):
+                            if ".hmm" in p:
+                                subfam.append(p.split(".")[0])
+                                key1 = p.split(".")[0].split("_")[0]
+                            elif len(p.split(".")) == 4:
+                                sub_ec.append(p)
+                                key2.append(p.split(":")[0])
+                            else:
+                                sub_composition.append(p)
+
+                        for i in range(len(key2)):
+                            try:
+                                substrate.append(subs_dict[key1, key2[i]])
+                            except KeyError as e:
+                                print("No substrate for it", e)
+
+                        subfam = "|".join(subfam)
+
+                        if sub_composition:
+                            sub_composition = "|".join(sub_composition)
                         else:
-                            sub_composition.append(p)
+                            sub_composition = "-"
 
-                    for i in range(len(key2)):
-                        try:
-                            # print(key1,key2[i])
-                            substrate.append(subs_dict[key1, key2[i]])
-                        except KeyError as e:
-                            print("No substrate for it", e)
+                        if sub_ec:
+                            sub_ec = "|".join(sub_ec)
+                        else:
+                            sub_ec = "-"
 
-                    subfam = "|".join(subfam)
+                        if substrate:
+                            substrate = ", ".join(substrate)
+                        else:
+                            substrate = "-"
 
-                    if sub_composition:
-                        sub_composition = "|".join(sub_composition)
-                    else:
-                        sub_composition = "-"
+                        rest = "\t".join(profile[1:])
 
-                    if sub_ec:
-                        sub_ec = "|".join(sub_ec)
-                    else:
-                        sub_ec = "-"
+                        newline = subfam + "\t" + sub_composition + "\t" + sub_ec + "\t" + substrate + "\t" + rest
+                        out.write(newline)
+            call(["mv", f"{outPath}temp", f"{outPath}dbcan-sub.hmm.out"])
+        else:
+            print(f"File not found: {outPath}dbcan-sub.hmm.out")
 
-                    if substrate:
-                        substrate = ", ".join(substrate)
-                    else:
-                        substrate = "-"
-
-                    rest = "\t".join(profile[1:])
-
-                    newline = subfam + "\t" + sub_composition + "\t" + sub_ec + "\t" + substrate + "\t" + rest
-                    out.write(newline)
-        call(["mv", outDir + prefix + "temp", outDir + prefix + "dbsub.out"])
 
     # parse hmmer result
     if tools[1]:
@@ -545,13 +529,6 @@ def run_dbCAN(
             call(["mv", outDir + prefix + "temp", outDir + prefix + "hmmer.out"])
         except OSError as e:
             print(f"IO error occurred: {e}")
-            # Handle IO-related error
-
-            # with open(outDir + prefix + "temp", "w") as out:
-            #     out.write(
-            #         "HMM Profile\tProfile Length\tGene ID\tGene Length\tE Value\tProfile Start\tProfile End\tGene Start\tGene End\tCoverage\n"
-            #     )
-            # call(["mv", outDir + prefix + "temp", outDir + prefix + "hmmer.out"])
 
     # parse diamond result
     if tools[0]:
@@ -576,13 +553,12 @@ def run_dbCAN(
         """
         tf hmmer
         """
-        # call(['diamond', 'blastp', '-d', dbDir+'tf_v1/tf.dmnd', '-e', '1e-10', '-q', '%suniInput' % outPath, '-k', '1', '-p', '1', '-o', outDir+prefix+'tf.out', '-f', '6'])
-        runHmmScan(outPath, str(tf_cpu), dbDir, str(tf_eval), str(tf_cov), "tf-1")
-        runHmmScan(outPath, str(tf_cpu), dbDir, str(tf_eval), str(tf_cov), "tf-2")
+        runHmmer(outPath, str(tf_cpu), dbDir, str(tf_eval), str(tf_cov), "tf-1")
+        runHmmer(outPath, str(tf_cpu), dbDir, str(tf_eval), str(tf_cov), "tf-2")
         """
         stp hmmer
         """
-        runHmmScan(outPath, str(stp_cpu), dbDir, str(stp_eval), str(stp_cov), "stp")
+        runHmmer(outPath, str(stp_cpu), dbDir, str(stp_eval), str(stp_cov), "stp")
 
         """
         tp diamond
@@ -608,14 +584,10 @@ def run_dbCAN(
             ]
         )
 
-        tp = set()
-        tf = set()
-        stp = set()
-
-        tp_genes = {}
-        tf_genes = {}
-        stp_genes = {}
-
+        # Initialize set and dictionaries for TF,  STP, TP,
+        tf, stp, tp = set(), set(), set()
+        tf_genes, stp_genes, tp_genes = {}, {}, {}
+        
         with open("%stf-1.out" % outPath) as f:
             for line in f:
                 row = line.rstrip().split("\t")
@@ -636,15 +608,6 @@ def run_dbCAN(
                 else:
                     tf_genes[row[2]] += "," + row[0]
 
-        with open(outDir + prefix + "tp.out") as f:
-            for line in f:
-                row = line.rstrip().split("\t")
-                tp.add(row[0])
-                if row[0] not in tp_genes:
-                    tp_genes[row[0]] = row[1]
-                else:
-                    tp_genes[row[0]] += "," + row[1]
-
         with open("%sstp.out" % outPath) as f:
             for line in f:
                 row = line.rstrip().split("\t")
@@ -654,55 +617,60 @@ def run_dbCAN(
                     stp_genes[row[2]] = row[0]
                 else:
                     stp_genes[row[2]] += "," + row[0]
+
+        with open(outDir + prefix + "tp.out") as f:
+            for line in f:
+                row = line.rstrip().split("\t")
+                tp.add(row[0])
+                if row[0] not in tp_genes:
+                    tp_genes[row[0]] = row[1]
+                else:
+                    tp_genes[row[0]] += "," + row[1]
+
+        
         # End TF and TP prediction
         ##########################
         # Begine CAZyme Extraction
+        
+        #define dictionary for cazyme_genes: key -> gene; val -> fams
         cazyme_genes = {}
 
         dia = set()
         hmm = set()
         dbs = set()
 
-        if tools[0]:  ### deal with diamond result
+        if tools[0]:  # Deal with diamond result
             with open(outDir + prefix + "diamond.out") as f:
-                next(f)
+                next(f)  # Skip the first line
                 for line in f:
                     row = line.rstrip().split("\t")
-                    dia.add(row[0])
-                    if row[0] not in cazyme_genes:
-                        cazyme_genes[row[0]] = set()
-                        cazyme_genes[row[0]].update(set(row[1].strip("|").split("|")[1:]))
+                    gene_key = row[0]
+                    fam_vals = row[1].strip("|").split("|")[1:]
+                    dia.add(gene_key)
+                    cazyme_genes.setdefault(gene_key, set()).update(fam_vals)
 
-        if tools[1]:  ### deal with hmmscan result
+        if tools[1]:  # Deal with hmmer result
             with open(outDir + prefix + "hmmer.out") as f:
-                next(f)
+                next(f)  # Skip the first line
                 for line in f:
                     row = line.rstrip().split("\t")
-                    hmm.add(row[2])
-                    if row[2] not in cazyme_genes:
-                        cazyme_genes[row[2]] = set()
-                    if row[0].split(".hmm")[0] in cazyme_genes[row[2]]:
-                        cazyme_genes[row[2]].add(" " + row[0].split(".hmm")[0])
-                    else:
-                        cazyme_genes[row[2]].add(row[0].split(".hmm")[0])
+                    gene_key = row[2]
+                    fam_val = row[0].split(".hmm")[0]
+                    hmm.add(gene_key)
+                    cazyme_genes.setdefault(gene_key, set()).add(fam_val)
 
         if tools[2]:  ### deal with dbcan_sub result
-            with open(outDir + prefix + "dbsub.out") as f:
+            with open(outDir + prefix + "dbcan-sub.hmm.out") as f:
                 next(f)
                 for line in f:
                     row = line.rstrip().split("\t")
                     dbs.add(row[5])
-                    if row[5] not in cazyme_genes:
-                        cazyme_genes[row[5]] = set()
-                        cazyme_genes[row[5]].add(row[0])
-
+                    cazyme_genes.setdefault(row[5], set()).add(row[0])
+        cazyme_genes = {key: '|'.join(values) for key, values in cazyme_genes.items()}
         if tools.count(True) > 1:
             temp1 = hmm.intersection(dbs)
-            # print(hmm, 'This intersection  hmm')
             temp2 = hmm.intersection(dia)
-            # print(dia, 'This intersection  dia')
             temp3 = dia.intersection(dbs)
-            # print(dbs, 'This intersection  dbs')
             cazyme = temp1.union(temp2, temp3)
         else:
             cazyme = hmm.union(dia, dbs)
@@ -710,7 +678,7 @@ def run_dbCAN(
         ######################
         # Begin GFF preperation
 
-        if inputType == "prok" or inputType == "meta":  # use Prodigal GFF output
+        if inputType in ["prok", "meta"]:  # use Prodigal GFF output
             with open(outDir + prefix + "prodigal.gff") as f:
                 with open(outDir + prefix + "cgc.gff", "w") as out:
                     for line in f:
@@ -721,12 +689,7 @@ def run_dbCAN(
                             row[8] = ""
                             if gene in cazyme:
                                 row[2] = "CAZyme"
-                                # Uncomment this, if all CAZyme results need to be write into cgc.out
-                                row[8] = "DB=" + "|".join(cazyme_genes[gene])
-                                #
-                                # cazyme_genes_list = list(cazyme_genes[gene])
-                                # row[8] = "DB="+cazyme_genes_list[0]
-                                #
+                                row[8] = "DB=" + cazyme_genes[gene]
                             elif gene in tf:
                                 row[2] = "TF"
                                 row[8] = "DB=" + tf_genes[gene]
@@ -759,23 +722,13 @@ def run_dbCAN(
                                     for x in note:
                                         temp = x.split("=")
                                         notes[temp[0]] = temp[1]
-                                    # if "Name" in notes:
-                                    #     gene = notes["Name"]
-                                    # elif "ID" in notes:
-                                    #     gene = notes["ID"]
                                     if "ID" in notes:
                                         gene = notes["ID"]
                                     else:
                                         continue
-
                                     if gene in cazyme:
                                         row[2] = "CAZyme"
-                                        # Uncomment this, if all CAZyme results need to be write into cgc.out
-                                        row[8] = "DB=" + "|".join(cazyme_genes[gene])
-                                        #
-                                        # cazyme_genes_list = list(cazyme_genes[gene])
-                                        # row[8] = "DB="+cazyme_genes_list[0]
-                                        #
+                                        row[8] = "DB=" + cazyme_genes[gene]
                                     elif gene in tf:
                                         row[2] = "TF"
                                         row[8] = "DB=" + tf_genes[gene]
@@ -800,12 +753,7 @@ def run_dbCAN(
                             gene = row[1]
                             if gene in cazyme:
                                 outrow[2] = "CAZyme"
-                                # Uncomment this, if all CAZyme results need to be write into cgc.out
-                                outrow[8] = "DB=" + "|".join(cazyme_genes[gene])
-                                #
-                                # cazyme_genes_list = list(cazyme_genes[gene])
-                                # outrow[8] = "DB="+cazyme_genes_list[0]
-                                #
+                                outrow[8] = "DB=" + cazyme_genes[gene]
                             elif gene in tf:
                                 outrow[2] = "TF"
                                 outrow[8] = "DB=" + tf_genes[gene]
@@ -827,9 +775,8 @@ def run_dbCAN(
         ####################
         # Begin CGCFinder call
         print("**************************************CGC-Finder start***********************************************")
-        # call(['CGCFinder.py', outDir+prefix+'cgc.gff', '-o', outDir+prefix+'cgc.out', '-s', args.cgc_sig_genes, '-d', str(args.cgc_dis)])
         cgc_finder(outDir + prefix + "cgc.gff", cgc_dis, cgc_sig_genes, outDir + prefix + "cgc.out")
-        simplify_output(outDir + prefix + "cgc.out")
+        simplify_cgc_output(outDir + prefix + "cgc.out")
         print("**************************************CGC-Finder end***********************************************")
         # End CGCFinder call
         # End CGCFinder
@@ -900,7 +847,7 @@ def run_dbCAN(
         hmmer_genes = [arr_hmmer[i].split()[2] for i in range(1, len(arr_hmmer))]  # or hmmer_genes = []
 
     if tools[2]:
-        arr_dbsub = open(workdir + "dbsub.out").readlines()
+        arr_dbsub = open(workdir + "dbcan-sub.hmm.out").readlines()
         dbsub_genes = [arr_dbsub[i].split("\t")[5] for i in range(1, len(arr_dbsub))]  # or dbsub_genes = []
 
     if use_signalP and (os.path.exists(workdir + "signalp.out")):
@@ -910,7 +857,7 @@ def run_dbCAN(
             row = arr_sigp[i].split()
             sigp_genes[row[0]] = row[4]  # previous one is row[2], use Y-score instead from suggestion of Dongyao Li
 
-    ##Catie Ausland edits BEGIN, Le add variable exists or not, remove duplicates from input lists
+    # remove duplicates from input lists
     if not tools[0]:
         diamond_genes = []
     if not tools[1]:
@@ -920,7 +867,6 @@ def run_dbCAN(
 
     if len(dbsub_genes) > 0:
         if dbsub_genes[-1] is None:
-            # print('I am in &&&&&&&&&&&&&&&&&&&&&&')
             dbsub_genes.pop()
             dbsub_genes = unique(dbsub_genes)
             if "hmmer_genes" in locals():
@@ -929,7 +875,6 @@ def run_dbCAN(
             if "diamond_genes" in locals():
                 diamond_genes.pop()
                 diamond_genes = unique(diamond_genes)
-    ## Catie edits END, Le add variable exists or not, remove duplicates from input lists
 
     # parse input, stroe needed variables
     if tools[0] and (len(arr_diamond) > 1):
@@ -1030,7 +975,38 @@ def rundbCAN_parser():
         - Output settings, database directory, and tool selections.
         - Parameters specific to CGC finder and substrate prediction modules.
     """
-    parser = argparse.ArgumentParser(description="dbCAN3 Command Line Tool")
+
+    usage = '''
+    Example usages of run_dbcan:
+    1. CAZyme annotation with isolated genome sequence as input:
+    run_dbcan EscheriaColiK12MG1655.fna prok
+    
+    2. CAZyme annotation with protein sequence as input:
+    run_dbcan EscheriaColiK12MG1655.faa protein
+    
+    3. CAZyme annotation with meta genome as input:
+    run_dbcan EscheriaColiK12MG1655.fna meta
+    
+    4. CAZyme and CGC annotation with meta genome as input:
+    run_dbcan EscheriaColiK12MG1655.fna meta -c EscheriaColiK12MG1655.gff
+    
+    5. CGC substrate prediction with the results from #4:
+    run_dbcan EscheriaColiK12MG1655.fna meta -c EscheriaColiK12MG1655.gff --cgc_substrate --only_sub
+    
+    6. CAZyme, CGC annotation and substrate prediction with mete genome as input:
+    run_dbcan EscheriaColiK12MG1655.fna meta -c EscheriaColiK12MG1655.gff --cgc_substrate
+    
+    7. CAZyme, CGC annotation and substrate prediction with protein and gff as input:
+    run_dbcan EscheriaColiK12MG1655.faa protein -c EscheriaColiK12MG1655.gff --cgc_substrate
+    
+    8. CAZyme, CGC annotation and substrate prediction using hmmer against dbCAN-HMM datbase with protein and gff as input:
+    run_dbcan EscheriaColiK12MG1655.faa protein -c EscheriaColiK12MG1655.gff --cgc_substrate --tools hmmer
+    
+
+    More usage can be found in our https://dbcan.readthedocs.io/en/latest.
+    '''
+
+    parser = argparse.ArgumentParser(description="dbCAN: Automatic CAZyme Annotation", prog='run_dbcan', usage=usage)
     parser.add_argument("inputFile", help="User input file. Must be in FASTA format.")
     parser.add_argument(
         "inputType",
@@ -1043,10 +1019,10 @@ def rundbCAN_parser():
         help="Indicate the file name of HMM database such as dbCAN.txt, please use the newest one from dbCAN2 website.",
     )
     parser.add_argument("--dia_eval", default=1e-102, type=float, help="DIAMOND E Value")
-    parser.add_argument("--dia_cpu", default=4, type=int, help="Number of CPU cores that DIAMOND is allowed to use")
+    parser.add_argument("--dia_cpu", default=8, type=int, help="Number of CPU cores that DIAMOND is allowed to use")
     parser.add_argument("--hmm_eval", default=1e-15, type=float, help="HMMER E Value")
     parser.add_argument("--hmm_cov", default=0.35, type=float, help="HMMER Coverage val")
-    parser.add_argument("--hmm_cpu", default=4, type=int, help="Number of CPU cores that HMMER is allowed to use")
+    parser.add_argument("--hmm_cpu", default=8, type=int, help="Number of CPU cores that HMMER is allowed to use")
     parser.add_argument("--out_pre", default="", help="Output files prefix")
     parser.add_argument("--out_dir", default="output", help="Output directory")
     parser.add_argument("--db_dir", default="db", help="Database directory")
@@ -1106,16 +1082,17 @@ def rundbCAN_parser():
 
     ### cgc substrate prediction
     cgcsubstrate_group = parser.add_argument_group("CGC_Substrate parameters")
+    cgcsubstrate_group.add_argument('--only_sub',action='store_false',help="Only run substrate prediction for PUL. If this parameter is presented, dbcan will skip the CAZyme annotation and CGC prediction.")
     cgcsubstrate_group.add_argument("--cgc_substrate", action="store_true", help="run cgc substrate prediction?")
     cgcsubstrate_group.add_argument("--pul", help="dbCAN-PUL PUL.faa")
     cgcsubstrate_group.add_argument("-o", "--out", default="sub.prediction.out")
     cgcsubstrate_group.add_argument("-w", "--workdir", type=str, default=".")
     cgcsubstrate_group.add_argument("-env", "--env", type=str, default="local")
     cgcsubstrate_group.add_argument(
-        "-odbsub", "--odbsub", action="store_true", help="out dbcan_sub prediction intermediate result?"
+        "-odbcan_sub", "--odbcan_sub", action="store_true", help="Output dbCAN-sub prediction intermediate result? for debug"
     )
     cgcsubstrate_group.add_argument(
-        "-odbcanpul", "--odbcanpul", action="store_true", help="output dbCAN-PUL prediction intermediate result?"
+        "-odbcanpul", "--odbcanpul", action="store_true", help="Output dbCAN-PUL prediction intermediate result? for debug."
     )
 
     ### cgc substrate prediction:dbCAN-PUL
@@ -1180,52 +1157,39 @@ def rundbCAN_parser():
 # allowing the main function to be called directly from other scripts without invoking a subprocess. This prevents extra
 # subprocesses or extra python interpreters being spawned, as well as simplifying python scripts which call run_dbcan.
 def cli_main():
-    """
-    example command:
-
-    1. CAZyme annotation with isolated genome sequence as input
-    run_dbcan EscheriaColiK12MG1655.fna prok
-    2. CAZyme annotation with isolated protein sequence as input
-    run_dbcan EscheriaColiK12MG1655.faa protein
-    3. CAZyme annotation with meta genome as input
-    run_dbcan EscheriaColiK12MG1655.fna meta
-    4. CAZyme and CGC annotation with mete genome as input
-    run_dbcan EscheriaColiK12MG1655.fna meta -c EscheriaColiK12MG1655.gff
-    5. CAZyme, CGC annotation and substrate prediction with mete genome as input
-    run_dbcan EscheriaColiK12MG1655.fna meta -c EscheriaColiK12MG1655.gff --cgc_substrate
-
-    """
+    
     parser = rundbCAN_parser()
     args = parser.parse_args()
 
     ### rundbCAN3
-    run_dbCAN(
-        inputFile=args.inputFile,
-        inputType=args.inputType,
-        cluster=args.cluster,
-        dbCANFile=args.dbCANFile,
-        dia_eval=args.dia_eval,
-        dia_cpu=args.dia_cpu,
-        hmm_eval=args.hmm_eval,
-        hmm_cov=args.hmm_cov,
-        hmm_cpu=args.hmm_cpu,
-        dbcan_thread=args.dbcan_thread,
-        tf_eval=args.tf_eval,
-        tf_cov=args.tf_cov,
-        tf_cpu=args.tf_cpu,
-        stp_eval=args.stp_eval,
-        stp_cov=args.stp_cov,
-        stp_cpu=args.stp_cpu,
-        prefix=args.out_pre,
-        outDir=args.out_dir,
-        dbDir=args.db_dir,
-        cgc_dis=args.cgc_dis,
-        cgc_sig_genes=args.cgc_sig_genes,
-        tool_arg=args.tools,
-        use_signalP=args.use_signalP,
-        signalP_path=args.signalP_path,
-        gram=args.gram,
-    )
+    if args.only_sub:
+        run_dbCAN(
+            inputFile=args.inputFile,
+            inputType=args.inputType,
+            cluster=args.cluster,
+            dbCANFile=args.dbCANFile,
+            dia_eval=args.dia_eval,
+            dia_cpu=args.dia_cpu,
+            hmm_eval=args.hmm_eval,
+            hmm_cov=args.hmm_cov,
+            hmm_cpu=args.hmm_cpu,
+            dbcan_thread=args.dbcan_thread,
+            tf_eval=args.tf_eval,
+            tf_cov=args.tf_cov,
+            tf_cpu=args.tf_cpu,
+            stp_eval=args.stp_eval,
+            stp_cov=args.stp_cov,
+            stp_cpu=args.stp_cpu,
+            prefix=args.out_pre,
+            outDir=args.out_dir,
+            dbDir=args.db_dir,
+            cgc_dis=args.cgc_dis,
+            cgc_sig_genes=args.cgc_sig_genes,
+            tool_arg=args.tools,
+            use_signalP=args.use_signalP,
+            signalP_path=args.signalP_path,
+            gram=args.gram,
+        )
 
     ### convert cgc_standard.out to json format
 

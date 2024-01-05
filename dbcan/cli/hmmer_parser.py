@@ -1,23 +1,18 @@
 #!/usr/bin/env python3
 ##########################################################
-# hmmscan parser for dbCAN meta server
-#
-# Based off the hmmscan parser used in the dbCAN server,
-# written by Dr. Yin
+# hmmsearch parser for dbCAN meta server
 #
 # Written by Tanner Yohe under the supervision
 # of Dr. Yin in the YinLab at NIU.
-#
+# Updated by Haidong Yi to reformat the codes.
 # Updated by Le Huang from tips the contributor WATSON Mick <mick.watson@roslin.ed.ac.uk>,
 # Thank you!
 #
 # Modified by Alex Fraser to have a run() method that can be called and returns data for better integration with other
 # scripts. This script also retains the ability to be called from shell and output to pipe redirection.
-# This file had to be renamed from "hmmscan-parser.py" to "hmmscan_parser.py" because of python module import conventions.
-# Modified on 07/06/22
 #
 # INPUT
-# python hmmscan-parser-dbCANmeta.py [inputFile] [eval] [coverage]
+# python hmmer_parser.py [inputFile] [eval] [coverage]
 # eval and coverage are optional, inputFile is required
 # -updating info:
 # -adds pid for every subprocess to make codes robust.

@@ -42,6 +42,8 @@ requirements:
     - numpy >1.19
     - biopython
     - pandas
+    - openpyxl
+    - matplotlib
 
 test:
   imports:
