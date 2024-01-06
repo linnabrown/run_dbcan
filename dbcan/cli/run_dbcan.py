@@ -1087,7 +1087,7 @@ def rundbCAN_parser():
     cgcsubstrate_group.add_argument('--only_sub',action='store_false',help="Only run substrate prediction for PUL. If this parameter is presented, dbcan will skip the CAZyme annotation and CGC prediction.")
     cgcsubstrate_group.add_argument("--cgc_substrate", action="store_true", help="run cgc substrate prediction?")
     cgcsubstrate_group.add_argument("--pul", help="dbCAN-PUL PUL.faa")
-    cgcsubstrate_group.add_argument("-o", "--out", default="sub.prediction.out")
+    cgcsubstrate_group.add_argument("-o", "--out", default="substrate.out")
     cgcsubstrate_group.add_argument("-w", "--workdir", type=str, default=".")
     cgcsubstrate_group.add_argument("-env", "--env", type=str, default="local")
     cgcsubstrate_group.add_argument(
