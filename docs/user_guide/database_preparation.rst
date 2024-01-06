@@ -1,9 +1,8 @@
-Database preparation
-====================
-
-Install different databases and make index for them.
+Database Installation Command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: shell
+    :name: include-this-part
 
     test -d db || mkdir db
     cd db \

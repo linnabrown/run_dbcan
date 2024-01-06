@@ -5,7 +5,7 @@ Introduction
 ------------
 
 Overview
-````````
+-----------
 
 In this tutorial, we present a comprehensive protocol to annotate CAZymes and glycan substrates in microbiome datasets. Using a real-world microbiome dataset, this guide will walk you through each step of the computational workflow for analyzing occurrence and abundance. The workflow, depicted in Fig. 1, is designed to be user-friendly and does not require extensive programming knowledge.
 
@@ -14,14 +14,14 @@ In this tutorial, we present a comprehensive protocol to annotate CAZymes and gl
    :width: 700px
    :align: center
 
-.. |centered-text| raw:: html
+.. figure::
 
-   <div style="text-align: center">Fig.1 <strong>Overview of the protocol</strong></div>
+   Fig.1 <strong>Overview of the protocol</strong>
 
-|centered-text|
+
 
 Workflow Steps
-``````````````
+-----------``````
 
 1. **Pre-Processing of Raw Sequencing Reads:** 
    Begin with the preprocessing of raw sequencing reads. This includes the removal of contaminants, adapter sequences, and trimming of low-quality reads. We'll use `trim_galore` and `Kraken2` for this purpose (Steps 1-2).
@@ -52,12 +52,12 @@ Workflow Steps
 
 .. |centered-text2| raw:: html
 
-   <div style="text-align: center">Fig.2 <strong>Experimental design of CAZyme annotation in microbiomes</strong></div>
+   Fig.2 <strong>Experimental design of CAZyme annotation in microbiomes</strong>
 
 |centered-text2|
 
 User Requirements
-`````````````````
+----------------------`
 
 This protocol is designed for users who are comfortable with the Linux command-line interface and can execute Python scripts in the terminal. While extensive programming experience is not necessary, users should be familiar with editing Linux commands and plain-text scripts within a command-line environment.
 
@@ -65,7 +65,7 @@ Equipment
 ---------
 
 Operating System
-````````````````
+----------------------
 
 All the modules of this protocol (Fig. 2) are designed to run on a command line (CLI) environment with a Linux OS (e.g., Ubuntu). 
 We recommend users install these modules and execute all commands on a high-performance Linux cluster or workstation with >32 CPUs 
@@ -78,7 +78,7 @@ and for calculating abundance for CAZymes and substrates. In that case, they can
 module and read mapping module in this protocol.
 
 Data Files
-``````````
+-----------``
 
 The example dataset (Carter2023) is described above and detailed in Table 2. 
 The raw read data, intermediate data from each analysis step, and final result 
@@ -91,7 +91,7 @@ assembly route for Carter2023 in the main text to demonstrate all the commands.
 Commands for the other routes are provided Supplementary Protocols. 
 
 Software and versions
-`````````````````````
+----------------------`````
 
 - **Anaconda** (`Anaconda <https://www.anaconda.com>`_, version 23.7.3)
 - **MEGAHIT** (`MEGAHIT <https://github.com/voutcn/megahit>`_, version 1.2.9)
@@ -113,7 +113,7 @@ Software and versions
 - **Mmseqs2** (`Mmseqs2 <https://github.com/soedinglab/MMseqs2>`_, release 15-6f452)
 
 Anaconda as the Software Management System
-``````````````````````````````````````````
+-------------------------------------------------------``
 Anaconda will be used as the software package management system for this 
 protocol. Anaconda uses the ``conda`` command to create a virtual 
 environment to facilitate the easy installation of software packages 
@@ -129,7 +129,7 @@ Installation and Data Preparation
 ---------------------------------
 
 S1. Download Carter2023 (Table 2) raw reads (~10min)
-`````````````````````````````````````````````````````
+------------------------------------------------------------------`````
 To download the required raw reads, use the following wget commands:
 
 .. code-block:: shell
@@ -145,7 +145,7 @@ and https://www.ncbi.nlm.nih.gov/sra/?term=ERR7738162
 and renamed to indicate their collected seasons (Table 2). 
 
 S2. Install Anaconda (~3min)
-````````````````````````````
+---------------------------------````
 
 Download and install the latest version of Anaconda for Linux from
 https://www.anaconda.com/download#downloads. Once Anaconda is 
@@ -160,7 +160,7 @@ this environment.
     conda activate CAZyme_annotation
 
 S3. Install all bioinformatics tools (~10min)
-`````````````````````````````````````````````
+-------------------------------------------------------`````
 
 .. code-block:: shell
 
@@ -187,7 +187,7 @@ configuration of all the essential software required for this protocol.
     conda activate CAZyme_annotation
 
 S4. Configure databases required by run_dbcan (~2h)
-````````````````````````````````````````````````````
+------------------------------------------------------------------````
 To install the databases, execute the following commands:
 
 .. include:: database_preparation.rst
@@ -234,7 +234,7 @@ Procedure
 --------------------------------------------
 
 Module 1: Reads processing (Fig. 2) to obtain contigs
-`````````````````````````````````````````````````````
+------------------------------------------------------------------`````
 
 P1. Contamination Check
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -384,7 +384,7 @@ Box 4: Example output of `Prokka`
 
 
 Module 2. run_dbcan annotation (Fig. 2) to obtain CAZymes, CGCs, and substrates
-```````````````````````````````````````````````````````````````````````````````
+---------------------------------------------------------------------------------------------------```````
 
 **CRITICAL STEP**
 
@@ -564,7 +564,7 @@ Box 6. Example output folder content of run_dbcan substrate prediction
     - ``uniInput``: Renamed Fasta file from input protein sequence file.
 
 Module 3. Read mapping (Fig. 2) to calculate abundance for CAZyme families, subfamilies, CGCs, and substrates
-``````````````````````````````````````````````````````````````````````````````````````````````````````````````
+-----------------------------------------------------------------------------------------------------------------------------------------------``````
 P8. Read mapping to all CDS of each sample (TIMING ~20 min)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -696,7 +696,7 @@ Explanation of columns in these TSV files is as follows:
     As shown in Fig. 2 (step3), proteins from multiple samples can be combined to generate a non-redundant set of proteins (Box 8). This may reduce the runtime for the run_dbcan step (step4), as only one faa file will be processed. However, this does not work for the CGC prediction, as contigs (fna files) from each sample will be needed. Therefore, this step is recommended if users only want the CAZyme annotation, and not recommended if CGCs are also to be predicted.
 
 Module 4: dbcan_plot for data visualization (Fig. 2) of abundances of CAZymes, CGCs, and substrates (TIMING variable)
-`````````````````````````````````````````````````````````````````````````````````````````````````````````````````````
+----------------------------------------------------------------------------------------------------------------------------------------------------------`````
 **CRITICAL STEP**
 
 To visualize the CAZyme annotation result, we provide a set of Python scripts as ``dbcan_plot`` to make publication-quality plots with the ``dbcan_utils`` results as the input. The ``dbcan_plot`` scripts are included in the ``run_dbcan`` package. Once the plots are made in PDF format, they can be transferred to users' Windows or Mac computers for visualization.
@@ -767,21 +767,20 @@ Troubleshooting
 
 We provide Table 3 to list possible issues and solutions. Users can also post issues on run_dbcan GitHub site.
 
-Procedure Timing
-----------------
+TIMING 
+------
 
-The estimated time for completing each step of the protocol on the Carter2023 dataset is as follows:
+Step P1. Contamination checking ~10min
+Step P2. Raw reads processing ~20min
+Step P3. Metagenome assembly ~4h20min
+Step P4. Gene models prediction ~21h
+Step P5. CAZyme annotation ~10min
+Step P6. PUL prediction ~15min
+Step P7. Substrate prediction both for CAZyme and PUL ~5h
+Step P8-P12. Reads mapping ~52min
+Step P13. Abundance estimation ~1min 
+Step P14-P16. Data visualization ~3min
 
-- **Step P1. Contamination checking**: Approximately 10 minutes.
-- **Step P2. Raw reads processing**: Approximately 20 minutes.
-- **Step P3. Metagenome assembly**: Approximately 4 hours and 20 minutes.
-- **Step P4. Gene models prediction**: Approximately 21 hours.
-- **Step P5. CAZyme annotation**: Approximately 10 minutes.
-- **Step P6. PUL prediction**: Approximately 15 minutes.
-- **Step P7. Substrate prediction for CAZyme and PUL**: Approximately 5 hours.
-- **Step P8-P12. Reads mapping**: Approximately 52 minutes.
-- **Step P13. Abundance estimation**: Approximately 1 minute.
-- **Step P14-P16. Data visualization**: Approximately 3 minutes.
+Running this protocol on the Carter2023 dataset will take ~33h on a Linux computer with 40 CPUs and 128GB of RAM. The most time-consuming step is P4 (Prokka gene prediction). Prodigal59 can be used to replace Prokka to only predict proteins, which will be significantly faster. The second time-consuming step is P7 (substrate prediction for CGCs and CAZymes). If users choose not to predict substates, this step will take ~15min. RAM usage was not specifically monitored during the execution. The step with the highest RAM usage is likely P3 (read assembly). 
 
-Running this protocol on a Linux computer with 40 CPUs and 128GB of RAM is estimated to take approximately 33 hours. The most time-consuming step is P4 (Prokka gene prediction), which can be replaced by Prodigal59 for protein prediction to save time. The second most time-consuming step is P7 (substrate prediction for CGCs and CAZymes). Omitting substrate prediction reduces this step's time to about 15 minutes. The highest RAM usage is likely during P3 (read assembly), although specific RAM usage was not monitored during the protocol execution.
 
