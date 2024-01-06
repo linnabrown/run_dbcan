@@ -1,28 +1,75 @@
-Run from Raw Reads
-==================
+Run from Raw Reads: Automated CAZyme and Glycan Substrate Annotation in Microbiomes: A Step-by-Step Protocol
+============================================================================================================
 
 Introduction
 ------------
+
+Overview
+````````
+
+In this tutorial, we present a comprehensive protocol to annotate CAZymes and glycan substrates in microbiome datasets. Using a real-world microbiome dataset, this guide will walk you through each step of the computational workflow for analyzing occurrence and abundance. The workflow, depicted in Fig. 1, is designed to be user-friendly and does not require extensive programming knowledge.
+
+.. image:: ../_static/img/Fig1.png
+   :alt: workflow figure
+   :width: 700px
+   :align: center
+
+.. |centered-text| raw:: html
+
+   <div style="text-align: center">Fig.1 <strong>Overview of the protocol</strong></div>
+
+|centered-text|
+
+Workflow Steps
+``````````````
+
+1. **Pre-Processing of Raw Sequencing Reads:** 
+   Begin with the preprocessing of raw sequencing reads. This includes the removal of contaminants, adapter sequences, and trimming of low-quality reads. We'll use `trim_galore` and `Kraken2` for this purpose (Steps 1-2).
+
+2. **Contig Assembly:** 
+   The clean reads from each sample are then assembled into contigs using `MEGAHIT` (Step 3).
+
+3. **Gene Model Annotation:** 
+   These contigs are subsequently passed to `Prokka` for gene model annotation (Step 4).
+
+4. **CAZyme and CGC Annotation:** 
+   The next phase involves annotating the contigs for CAZymes and CGCs. This is achieved by `run_dbcan`, utilizing the protein sequence (faa) and gene annotation (gff) files produced by `Prokka` (Step 5).
+
+5. **Location Mapping and Substrate Prediction:** 
+   Step 6 involves mapping the location of annotated CAZymes and CGCs on the contigs. In Step 7, `run_dbcan`'s substrate prediction function infers glycan substrates for these CAZymes and CGCs.
+
+6. **Abundance Calculation:** 
+   To quantify the abundance of CAZymes, substrates, and CGCs, clean reads from Step 2 are mapped to the nucleotide coding sequences (CDS) of proteins from Step 4 (Steps 8-14).
+
+7. **Data Visualization:** 
+   Finally, steps 15-20 focus on visualizing the occurrence and abundance results. We provide Python scripts for creating publication-quality plots in PDF format.
+
 
 .. image:: ../_static/img/Picture1.png
    :alt: workflow figure
    :width: 800px
    :align: center
 
+.. |centered-text| raw:: html
 
-For this tutorial, we provide a comprehensive pipeline to teach users how to run CAZyme annotations from raw reads to generate abundance information.
-We use Carter2023 and the individual sample assembly route of the figure above. The procedure has 4 modules and 16 steps (P1-P16).
-First, we need to create the environment.
+   <div style="text-align: center">Fig.3 <strong>Experimental design of CAZyme annotation in microbiomes</strong></div>
+
+|centered-text|
+
+User Requirements
+`````````````````
+
+This protocol is designed for users who are comfortable with the Linux command-line interface and can execute Python scripts in the terminal. While extensive programming experience is not necessary, users should be familiar with editing Linux commands and plain-text scripts within a command-line environment.
 
 Equipment
 ---------
 
 Operating System
-^^^^^^^^^^^^^^^^
+````````````````
 
 All the modules of this protocol (Fig. 3) are designed to run on a command line (CLI) environment with a Linux OS (e.g., Ubuntu). 
 We recommend users install these modules and execute all commands on a high-performance Linux cluster or workstation with >32 CPUs 
-and 128 RAM instead of a laptop, as the assembly of raw reads has a high demand of CPU and RAM. 
+and 128GB of RAM instead of a laptop, as the assembly of raw reads has a high demand of CPU and RAM. 
 
 Once users finish the data visualization module (Fig. 3), the resulting image files (PDF format) can be copied 
 to a desktop or laptop with GUI for data visualization. In practice, users can choose not to use our read processing 
@@ -31,7 +78,7 @@ and for calculating abundance for CAZymes and substrates. In that case, they can
 module and read mapping module in this protocol.
 
 Data Files
-^^^^^^^^^^
+``````````
 
 The example dataset (Carter2023) is described above and detailed in Table 2. 
 The raw read data, intermediate data from each analysis step, and final result 
@@ -44,7 +91,7 @@ assembly route for Carter2023 in the main text to demonstrate all the commands.
 Commands for the other routes are provided Supplementary Protocols. 
 
 Software and versions
-^^^^^^^^^^^^^^^^^^^^^
+`````````````````````
 
 - **Anaconda** (`Anaconda <https://www.anaconda.com>`_, version 23.7.3)
 - **MEGAHIT** (`MEGAHIT <https://github.com/voutcn/megahit>`_, version 1.2.9)
@@ -66,8 +113,7 @@ Software and versions
 - **Mmseqs2** (`Mmseqs2 <https://github.com/soedinglab/MMseqs2>`_, release 15-6f452)
 
 Anaconda as the Software Management System
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
+``````````````````````````````````````````
 Anaconda will be used as the software package management system for this 
 protocol. Anaconda uses the ``conda`` command to create a virtual 
 environment to facilitate the easy installation of software packages 
@@ -76,8 +122,8 @@ not need to worry about the potential issues of package dependencies
 and version conflicts.
 
 Like in all bioinformatics data analysis tasks, we recommend users organize
- their data files by creating a dedicated folder for each data analysis 
- step.
+their data files by creating a dedicated folder for each data analysis 
+step.
 
 In this protocol paper, all computer code is written in *Courier New* font 
 and starts with a ``$`` sign as they are shown in a terminal console.
@@ -87,8 +133,7 @@ Installation and Data Preparation
 ---------------------------------
 
 S1. Download Carter2023 (Table 2) raw reads (~10min)
-
-
+`````````````````````````````````````````````````````
 To download the required raw reads, use the following wget commands:
 
 .. code-block:: shell
@@ -104,13 +149,14 @@ and https://www.ncbi.nlm.nih.gov/sra/?term=ERR7738162
 and renamed to indicate their collected seasons (Table 2). 
 
 S2. Install Anaconda (~3min)
+````````````````````````````
 
 Download and install the latest version of Anaconda for Linux from
- https://www.anaconda.com/download#downloads. Once Anaconda is 
- successfully installed, proceed to create a dedicated conda environment 
- named `CAZyme_annotation` and activate it. 
- Subsequently, all the required tools can be seamlessly installed within 
- this environment. 
+https://www.anaconda.com/download#downloads. Once Anaconda is 
+successfully installed, proceed to create a dedicated conda environment 
+named `CAZyme_annotation` and activate it. 
+Subsequently, all the required tools can be seamlessly installed within 
+this environment. 
 
 .. code-block:: shell
 
@@ -118,6 +164,7 @@ Download and install the latest version of Anaconda for Linux from
     conda activate CAZyme_annotation
 
 S3. Install all bioinformatics tools (~10min)
+`````````````````````````````````````````````
 
 .. code-block:: shell
 
@@ -135,6 +182,7 @@ S3. Install all bioinformatics tools (~10min)
 Alternatively, users can run a single configuration file dbcan.yml 
 (replace S2 and S3) that streamlines the above 
 configuration of all the essential software required for this protocol.
+
 .. code-block:: shell
 
     git clone https://github.com/linnabrown/run_dbcan.git
@@ -143,7 +191,7 @@ configuration of all the essential software required for this protocol.
     conda activate CAZyme_annotation
 
 S4. Configure databases required by run_dbcan (~2h)
-
+````````````````````````````````````````````````````
 To install the databases, execute the following commands:
 
 .. code-block:: shell
@@ -169,19 +217,29 @@ if users do not intend to run Kraken2):
 .. code-block:: shell
 
         kraken2-build --standard --db K2
+
 **CRITICAL STEP**
-The downloaded files must be all in the right location (the db folder). 
-The CAZyDB.07262023.fa file is needed for DIAMOND search (Table 1). 
-The dbCAN-HMMdb-V12.txt and dbCAN_sub.hmm files are for HMMER search. 
-The tcdb.fa, tf-1.hmm, tf-2.hmm, and stp.hmm files are for CGC prediction. 
-The PUL.faa file consists of protein sequences from experimentally 
-validated PULs for BLAST search to predict substrates for CGCs. 
-The dbCAN-PUL_12-12-2023.txt and dbCAN-PUL_12-12-2023.xlsx files contain 
-PUL-substrate mapping curated from literature. Lastly, the 
-fam-substrate-mapping-08012023.tsv file is the family-EC-substrate 
-mapping table for the prediction of CAZyme substrates.
+
+    The downloaded files must be all in the right location (the db folder). 
+
+    The CAZyDB.07262023.fa file is needed for DIAMOND search (Table 1). 
+
+    The dbCAN-HMMdb-V12.txt and dbCAN_sub.hmm files are for HMMER search. 
+
+    The tcdb.fa, tf-1.hmm, tf-2.hmm, and stp.hmm files are for CGC prediction. 
+
+    The PUL.faa file consists of protein sequences from experimentally 
+    validated PULs for BLAST search to predict substrates for CGCs. 
+
+    The dbCAN-PUL_12-12-2023.txt and dbCAN-PUL_12-12-2023.xlsx files contain 
+    PUL-substrate mapping curated from literature. 
+
+    Lastly, the 
+    fam-substrate-mapping-08012023.tsv file is the family-EC-substrate 
+    mapping table for the prediction of CAZyme substrates.
 
 .. warning::
+    
     Users should use a clean version of Anaconda. If the above steps failed, we suggest users reinstall their Anaconda. 
     The Anaconda installation and configuration step may experience 
     prolonged time while resolving environment dependencies. 
@@ -195,7 +253,7 @@ Procedure
 --------------------------------------------
 
 Module 1: Reads processing (Fig. 3) to obtain contigs
---------------------------------------------
+`````````````````````````````````````````````````````
 
 P1. Contamination Check
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -241,7 +299,7 @@ Box 1: Removing Contamination Reads from Humans
 
 
 P2. Trim adapter and low-quality reads (TIMING ~20min)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: shell
 
@@ -269,11 +327,10 @@ Box 2: Example output of `trim_galore`
         -rw-rw-r-- 1 jinfang jinfang 4.6K Dec 13 01:46 Wet2014_2.fastq.gz_trimming_report.txt
         -rw-rw-r-- 1 jinfang jinfang 3.7G Dec 13 01:46 Wet2014_2_val_2.fq.gz
 
-
 .. warning::
 
     During the trimming process, certain reads may be entirely removed due to low quality in its entirety. 
-    Using the --retain_unpaired parameter in trim_galore allows for the preservation of single-end reads. 
+    Using the ``--retain_unpaired`` parameter in trim_galore allows for the preservation of single-end reads. 
     In this protocol, this option was not selected, so that both reads of a forward-revise pair were removed.
 
 P3. Assemble reads into contigs
@@ -305,14 +362,13 @@ Box 3: Example output of `MEGAHIT`
 
 .. warning::
 
-    A common practice in metagenomics after assembly is to further bin contigs into metagenome-assembled genomes (MAGs)24,69. 
+    A common practice in metagenomics after assembly is to further bin contigs into metagenome-assembled genomes (MAGs). 
     However, in this protocol, we chose not to generate MAGs because not all contigs can be binned into MAGs, and those un-binned 
-    contigs can also encode CAZymes. Users may refer to a recent paper24 for the protocol to generate MAGs. All the remaining steps 
-    will directly work for MAGs as well.
+    contigs can also encode CAZymes. 
 
 
 P4. Predict genes by `Prokka` (TIMING ~21h)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: shell
 
@@ -347,7 +403,7 @@ Box 4: Example output of `Prokka`
 
 
 Module 2. run_dbcan annotation (Fig. 3) to obtain CAZymes, CGCs, and substrates
-----------------------------------------------------------------------
+```````````````````````````````````````````````````````````````````````````````
 
 **CRITICAL STEP**
 
@@ -361,10 +417,9 @@ P5. CAZyme annotation at the CAZyme family level (TIMING ~10min)
     run_dbcan prokka_Wet2014/Wet2014.faa protein --hmm_cpu 32 --out_dir Wet2014.CAZyme --tools hmmer --db_dir db
     run_dbcan prokka_Dry2014/Dry2014.faa protein --hmm_cpu 32 --out_dir Dry2014.CAZyme --tools hmmer --db_dir db
 
-
 Two arguments are required for ``run_dbcan``: the input sequence file (faa files) and the sequence type (protein). 
 By default, ``run_dbcan`` will use three methods (``HMMER`` vs ``dbCAN HMMdb``, ``DIAMOND`` vs ``CAZy``, ``HMMER`` vs ``dbCAN-sub HMMdb``) for 
-CAZyme annotation (see Table 1, Fig. 2). This default setting is equivalent to the use of the ``--tools all`` parameter (refer to Box 5). Here, 
+CAZyme annotation (see Table 1, Fig. 1). This default setting is equivalent to the use of the ``--tools all`` parameter (refer to Box 5). Here, 
 we only invoke the ``HMMER`` vs ``dbCAN HMMdb`` for CAZyme annotation at the family level.
 
 
@@ -401,7 +456,7 @@ The following commands will re-run run_dbcan to not only predict CAZymes but als
     run_dbcan prokka_Dry2014/Dry2014.faa protein --tools hmmer --tf_cpu 32 --stp_cpu 32 -c prokka_ Dry2014/Dry2014.gff --out_dir Dry2014.PUL --dia_cpu 32 --hmm_cpu 32 
 
 
-As mentioned above (see Table 1, Fig. 2), CGC prediction is a featured function added into dbCAN2 in 2018. 
+As mentioned above (see Table 1, Fig. 1), CGC prediction is a featured function added into dbCAN2 in 2018. 
 To identify CGCs with the protein sequence type, a gene location file (gff) must be provided together. If the input sequence type 
 is ``prok`` or ``meta``, meaning users only have contig ``fna`` files, the CGC prediction can be activated by setting the ``-c cluster`` parameter.
 
@@ -528,8 +583,7 @@ Box 6. Example output folder content of run_dbcan substrate prediction
     - ``uniInput``: Renamed Fasta file from input protein sequence file.
 
 Module 3. Read mapping (Fig. 3) to calculate abundance for CAZyme families, subfamilies, CGCs, and substrates
----------------------------------------------------------------------------------------------------------------
-
+``````````````````````````````````````````````````````````````````````````````````````````````````````````````
 P8. Read mapping to all CDS of each sample (TIMING ~20 min)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -659,8 +713,8 @@ Explanation of columns in these TSV files is as follows:
 .. warning::
     As shown in Fig. 3 (step3), proteins from multiple samples can be combined to generate a non-redundant set of proteins (Box 8). This may reduce the runtime for the run_dbcan step (step4), as only one faa file will be processed. However, this does not work for the CGC prediction, as contigs (fna files) from each sample will be needed. Therefore, this step is recommended if users only want the CAZyme annotation, and not recommended if CGCs are also to be predicted.
 
-Module 4: dbcan_plot for data visualization (Figure 3) of abundances of CAZymes, CGCs, and substrates (TIMING variable)
------------------------------------------------------------------------------------------------------------------------
+Module 4: dbcan_plot for data visualization (Fig. 3) of abundances of CAZymes, CGCs, and substrates (TIMING variable)
+`````````````````````````````````````````````````````````````````````````````````````````````````````````````````````
 **CRITICAL STEP**
 
 To visualize the CAZyme annotation result, we provide a set of Python scripts as ``dbcan_plot`` to make publication-quality plots with the ``dbcan_utils`` results as the input. The ``dbcan_plot`` scripts are included in the ``run_dbcan`` package. Once the plots are made in PDF format, they can be transferred to users' Windows or Mac computers for visualization.
@@ -673,7 +727,7 @@ Five data folders will be needed as the input for ``dbcan_plot``:
 
 
 
-P14. Heatmap for CAZyme substrate abundance across samples (Figure 6A) (TIMING 1min)
+P14. Heatmap for CAZyme substrate abundance across samples (Fig. 6A) (TIMING 1min)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: shell
@@ -723,7 +777,7 @@ If users only want to plot the synteny between the CGC and PUL:
 
 .. warning::
 
-The CGC IDs in different samples do not match each other. For example, specifying -i Wet2014.dbCAN is to plot the 'k141_41392|CGC3' in the Wet2014 sample. The 'k141_41392|CGC3' in the Dry2014 sample most likely does not exist, and even it does, the CGC has a different sequence even if the ID is the same.
+    The CGC IDs in different samples do not match each other. For example, specifying -i Wet2014.dbCAN is to plot the 'k141_41392|CGC3' in the Wet2014 sample. The 'k141_41392|CGC3' in the Dry2014 sample most likely does not exist, and even it does, the CGC has a different sequence even if the ID is the same.
 
 
 Troubleshooting
