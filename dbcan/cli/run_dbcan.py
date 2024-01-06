@@ -13,7 +13,7 @@ import os
 import time
 
 # Recent updated information:
-#   Jan/01/23: Add doc code
+#   Jan/01/23: Add doc code [Haidong Yi, Le Huang]
 #   Oct/10/23: Recontructed the run_dbcan [Haidong Yi]
 #   Sep/07/23: Replace hmmscan with hmmsearch. Update perl code [Le Huang, Yanbin Yin]
 #   Dec/15/22: 1.adding function to convert cgc_standard.out to json format. 2. adding function cgc_[Jinfang Zheng]
@@ -418,10 +418,10 @@ def run_dbCAN(
                 processed_lines = []
                 for line in f:
                     row = line.rstrip().split("\t")
-                    row.append(float(int(row[6]) - int(row[5])) / int(row[1]))
+                    row.append(str(float(int(row[6]) - int(row[5])) / int(row[1])))
                     if float(row[4]) <= 1e-15 and float(row[-1]) >= 0.35:
-                        # out.write("\t".join([str(x) for x in row]) + "\n")
-                        processed_lines.append("\t".join([str(x) for x in row]))
+                        processed_lines.append("\t".join(row))
+        
         # Process dbcan-sub.hmm.out content
         updated_lines = [line for line in processed_lines if line.strip()]
                 
@@ -825,135 +825,98 @@ def run_dbCAN(
     # End SignalP combination
     #######################
     #######################
-    # start Overview
+    # start overview Generation
+    def unique(sequence):
+        """ Remove duplicates from a list while keeping the original order. """
+        seen = set()
+        return [x for x in sequence if not (x in seen or seen.add(x))]
+
+    def read_lines_if_file_exists(filepath):
+        """ Read non-empty lines from a file if it exists, return an empty list otherwise. """
+        if os.path.exists(filepath):
+            with open(filepath, 'r') as file:
+                return [line.strip() for line in file if line.strip()]
+        return []
+    
     print("Preparing overview table from hmmer, dbCAN_sub and diamond output...")
-    workdir = outDir + prefix
 
-    # a function to remove duplicates from lists while keeping original order
-    def unique(seq):
-        exists = set()
-        return [x for x in seq if not (x in exists or exists.add(x))]
+    arr_diamond = read_lines_if_file_exists(outPath + "diamond.out")
+    arr_hmmer = read_lines_if_file_exists(outPath + "hmmer.out")
+    arr_dbsub = read_lines_if_file_exists(outPath + "dbcan-sub.hmm.out")
 
-    arr_dbsub = None
-    arr_hmmer = None
+    diamond_genes = unique([line.split()[0] for line in arr_diamond[1:]])
+    hmmer_genes = unique([line.split()[2] for line in arr_hmmer[1:]])
+    dbsub_genes = unique([line.split("\t")[5] for line in arr_dbsub[1:]])
 
-    # check if files exist. if so, read files and get the gene numbers
-    if tools[0]:
-        arr_diamond = open(workdir + "diamond.out").readlines()
-        diamond_genes = [arr_diamond[i].split()[0] for i in range(1, len(arr_diamond))]  # or diamond_genes = []
+    sigp_genes = {}
+    if use_signalP and os.path.exists(outPath + "signalp.out"):
+        arr_sigp = read_lines_if_file_exists(outPath + "signalp.out")
+        for line in arr_sigp:
+            parts = line.split()
+            sigp_genes[parts[0]] = parts[4]
+            
+    diamond_fams, hmmer_fams, dbsub_fams = {}, {}, {}
 
-    if tools[1]:
-        arr_hmmer = open(workdir + "hmmer.out").readlines()
-        hmmer_genes = [arr_hmmer[i].split()[2] for i in range(1, len(arr_hmmer))]  # or hmmer_genes = []
-
-    if tools[2]:
-        arr_dbsub = open(workdir + "dbcan-sub.hmm.out").readlines()
-        dbsub_genes = [arr_dbsub[i].split("\t")[5] for i in range(1, len(arr_dbsub))]  # or dbsub_genes = []
-
-    if use_signalP and (os.path.exists(workdir + "signalp.out")):
-        arr_sigp = open(workdir + "signalp.out").readlines()
-        sigp_genes = {}
-        for i in range(0, len(arr_sigp)):
-            row = arr_sigp[i].split()
-            sigp_genes[row[0]] = row[4]  # previous one is row[2], use Y-score instead from suggestion of Dongyao Li
-
-    # remove duplicates from input lists
-    if not tools[0]:
-        diamond_genes = []
-    if not tools[1]:
-        hmmer_genes = []
-    if not tools[2]:
-        dbsub_genes = []
-
-    if len(dbsub_genes) > 0:
-        if dbsub_genes[-1] is None:
-            dbsub_genes.pop()
-            dbsub_genes = unique(dbsub_genes)
-            if "hmmer_genes" in locals():
-                hmmer_genes.pop()
-                hmmer_genes = unique(hmmer_genes)
-            if "diamond_genes" in locals():
-                diamond_genes.pop()
-                diamond_genes = unique(diamond_genes)
-
-    # parse input, stroe needed variables
-    if tools[0] and (len(arr_diamond) > 1):
-        diamond_fams = {}
-        for i in range(1, len(arr_diamond)):
-            row = arr_diamond[i].split("\t")
-            fam = row[1].strip("|").split("|")
-            diamond_fams[row[0]] = fam[1:]
-
-    if tools[1] and (len(arr_hmmer) > 1):
-        hmmer_fams = {}
-        for i in range(1, len(arr_hmmer)):
-            row = arr_hmmer[i].split("\t")
-            fam = row[0].split(".")
-            fam = fam[0] + "(" + row[7] + "-" + row[8] + ")"
-            if row[2] not in hmmer_fams:
-                hmmer_fams[row[2]] = []
-            hmmer_fams[row[2]].append(fam)
-
-    if tools[2] and (len(arr_dbsub) > 1):
-        dbsub_fams = {}
-        for i in range(1, len(arr_dbsub)):
-            row_ori = arr_dbsub[i].split("\t")
-            fams_ID = row_ori[5]
-            if fams_ID not in dbsub_fams:
-                dbsub_fams[fams_ID] = {}
-                dbsub_fams[fams_ID]["fam_name"] = []
-                dbsub_fams[fams_ID]["ec_num"] = []
-
-            dbsub_fams[fams_ID]["fam_name"].append(row_ori[0])
-            dbsub_fams[fams_ID]["ec_num"].append(row_ori[2])
-
-    # overall table
-
+    if tools[0]:  # Diamond
+        diamond_fams = {row.split("\t")[0]: row.split("\t")[1].strip("|").split("|")[1:] for row in arr_diamond[1:]}
+    
+    if tools[1]:  # Hmmer
+        for row in arr_hmmer[1:]:
+            parts = row.split("\t")
+            fam = parts[0].split(".")[0] + "(" + parts[7] + "-" + parts[8] + ")"
+            hmmer_fams.setdefault(parts[2], []).append(fam)
+    
+    if tools[2]:  # dbCAN_sub
+        for row in arr_dbsub[1:]:
+            parts = row.split("\t")
+            gene_id = parts[5]
+            dbsub_fams.setdefault(gene_id, {"fam_name": [], "ec_num": []})
+            dbsub_fams[gene_id]["fam_name"].append(parts[0])
+            dbsub_fams[gene_id]["ec_num"].append(parts[2])
+    # Create the overview table
     all_genes = unique(hmmer_genes + dbsub_genes + diamond_genes)
 
-    with open(workdir + "overview.txt", "w+") as fp:
+    with open(outPath + "overview.txt", "w+") as fp:
+        headers = ["Gene ID", "EC#", "HMMER", "dbCAN_sub", "DIAMOND", "#ofTools"]
         if use_signalP:
-            fp.write("Gene ID\tEC#\tHMMER\tdbCAN_sub\tDIAMOND\tSignalp\t#ofTools\n")
-        else:
-            fp.write("Gene ID\tEC#\tHMMER\tdbCAN_sub\tDIAMOND\t#ofTools\n")
+            headers.insert(5, "Signalp")
+        fp.write("\t".join(headers) + "\n")
+        
         for gene in all_genes:
-            csv = [gene]
+            row = [gene]
             num_tools = 0
 
-            if tools[2] and arr_dbsub is not None and (gene in dbsub_genes):
-                if dbsub_fams[gene]["ec_num"] == []:
-                    csv.append("-")
-                else:
-                    csv.append("|".join(dbsub_fams[gene]["ec_num"]))
-            else:
-                csv.append("-")
+            # dbCAN_sub
+            row.append("|".join(dbsub_fams[gene]["ec_num"]) if gene in dbsub_fams else "-")
 
-            if tools[1] and arr_hmmer is not None and (gene in hmmer_genes):
+            # HMMER
+            if gene in hmmer_fams:
                 num_tools += 1
-                csv.append("+".join(hmmer_fams[gene]))
+                row.append("+".join(hmmer_fams[gene]))
             else:
-                csv.append("-")
+                row.append("-")
+            
+            # dbCAN_sub (fam_name)
+            if tools[2] and gene in dbsub_fams:
+                row.append("+".join(dbsub_fams[gene]["fam_name"]))
+                num_tools += 1
+            else:
+                row.append("-")
 
-            if tools[2] and arr_dbsub is not None and (gene in dbsub_genes):
+            # DIAMOND
+            if gene in diamond_fams:
                 num_tools += 1
-                csv.append("+".join(dbsub_fams[gene]["fam_name"]))
+                row.append("+".join(diamond_fams[gene]))
             else:
-                csv.append("-")
+                row.append("-")
 
-            if tools[0] and arr_diamond is not None and (gene in diamond_genes):
-                num_tools += 1
-                csv.append("+".join(diamond_fams[gene]))
-            else:
-                csv.append("-")
+            # SignalP
             if use_signalP:
-                if gene in sigp_genes:
-                    csv.append("Y(1-" + sigp_genes[gene] + ")")
-                else:
-                    csv.append("N")
-            csv.append(str(num_tools))
-            temp = "\t".join(csv) + "\n"
-            fp.write(temp)
-    print("overview table complete. Saved as " + workdir + "overview.txt")
+                row.append("Y(1-" + sigp_genes[gene] + ")" if gene in sigp_genes else "N")
+            
+            row.append(str(num_tools))
+            fp.write("\t".join(row) + "\n")
+    print(f"Overview table complete. Saved as {outPath}overview.txt")
     # End overview
 
 

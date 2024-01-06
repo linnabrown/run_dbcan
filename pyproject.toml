@@ -25,6 +25,7 @@ dependencies = [
     "scipy",
     "pandas",
     "biopython",
+    "tqdm",
     # for debug logging (referenced from the issue template)
     "session-info"
 ]
@@ -50,6 +51,7 @@ syntenic_plot = "dbcan.cli.syntenic_plot:main"
 dbcan_utils = "dbcan.utils.utils:main"
 dbcan_plot = "dbcan.utils.plots:main"
 dbcan_asmfree = "dbcan.utils.diamond_unassembly:main"
+dbcan_build = "dbcan.utils.dbcan_build:main"
 
 [project.optional-dependencies]
 dev = [
