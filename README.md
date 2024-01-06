@@ -1,4 +1,5 @@
 [![dbcan](https://github.com/linnabrown/run_dbcan/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/linnabrown/run_dbcan/actions/workflows/ci.yml)
+[![Documentation Status](https://readthedocs.org/projects/dbcan/badge/?version=latest)](https://dbcan.readthedocs.io/en/latest/?badge=latest)
 [![Package status](https://anaconda.org/bioconda/dbcan/badges/version.svg)](https://anaconda.org/bioconda/dbcan)
 [![GitHub license](https://img.shields.io/badge/license-GNU3.0-blue.svg)](https://github.com/linnabrown/run_dbcan/blob/master/LICENSE)
 [![Platform](https://anaconda.org/bioconda/dbcan/badges/platforms.svg)](https://anaconda.org/bioconda/dbcan/badges/platforms.svg)
