@@ -85,7 +85,7 @@ The raw read data, intermediate data from each analysis step, and final result
 data and visualization files are organized in nested folders available on our 
 website https://bcb.unl.edu/dbCAN_tutorial/dataset1-Carter2023/, Fig. 5) and 
 https://dbcan.readthedocs.io. These websites also include data files and 
-protocols for two additional example datasets (Wastyk202122 and Priest202362), 
+protocols for two additional example datasets (Wastyk2021 and Priest2023), 
 which are not included in this protocol paper. We will use the independent sample 
 assembly route for Carter2023 in the main text to demonstrate all the commands. 
 Commands for the other routes are provided Supplementary Protocols. 
