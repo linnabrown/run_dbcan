@@ -7,7 +7,13 @@ Introduction
 Overview
 ````````
 
-In this tutorial, we present a comprehensive protocol to annotate CAZymes and glycan substrates in microbiome datasets. Using a real-world microbiome dataset, this guide will walk you through each step of the computational workflow for analyzing occurrence and abundance. The workflow, depicted in Fig. 1, is designed to be user-friendly and does not require extensive programming knowledge.
+In this tutorial, we present a comprehensive protocol to annotate CAZymes and glycan substrates in microbiome datasets. Using three real-world microbiome example datasets:
+
+1. :ref:`Carter2023 <cater_2023>` :cite:`2023:carter`,
+2. :ref:`Wastyk2021 <wastyk_2021>` :cite:`2021:Wastyk` (See :doc:`run_from_raw_reads_ex`), and,
+3. :ref:`Priest2023 <priest_2023>` :cite:`2023:Priest` (See :doc:`run_from_raw_reads_ex`),
+
+this guide will walk you through each step of the computational workflow for analyzing occurrence and abundance. The workflow, depicted in Fig. 1, is designed to be user-friendly and does not require extensive programming knowledge.
 
 .. image:: ../_static/img/Fig1.png
    :alt: workflow figure
@@ -125,8 +131,10 @@ Like in all bioinformatics data analysis tasks, we recommend users organize
 their data files by creating a dedicated folder for each data analysis
 step.
 
-Installation and Data Preparation
----------------------------------
+.. _cater_2023:
+
+Example 1: Carter2023 Dataset :cite:`2023:carter`
+-------------------------------------------------
 
 S1. Download Carter2023 (Table 2) raw reads (~10min)
 `````````````````````````````````````````````````````
@@ -784,4 +792,3 @@ The estimated time for completing each step of the protocol on the Carter2023 da
 - **Step P14-P16. Data visualization**: Approximately 3 minutes.
 
 Running this protocol on a Linux computer with 40 CPUs and 128GB of RAM is estimated to take approximately 33 hours. The most time-consuming step is P4 (Prokka gene prediction), which can be replaced by Prodigal59 for protein prediction to save time. The second most time-consuming step is P7 (substrate prediction for CGCs and CAZymes). Omitting substrate prediction reduces this step's time to about 15 minutes. The highest RAM usage is likely during P3 (read assembly), although specific RAM usage was not monitored during the protocol execution.
-
