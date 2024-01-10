@@ -26,7 +26,6 @@ dependencies = [
     "pandas",
     "biopython",
     "tqdm",
-    "shutil",
     # for debug logging (referenced from the issue template)
     "session-info"
 ]
