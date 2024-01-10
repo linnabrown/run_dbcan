@@ -722,7 +722,7 @@ P14. Heatmap for CAZyme substrate abundance across samples (Fig. 6A) (TIMING 1mi
 
 .. code-block:: shell
 
-    dbcan_plot heatmap_plot --samples Wet2014,Dry2014 -i Wet2014_abund/ fam_substrate_abund.out,Dry2014_abund/ fam_substrate_abund.out --show_abund --top 20
+    dbcan_plot heatmap_plot --samples Wet2014,Dry2014 -i Wet2014_abund/fam_substrate_abund.out, Dry2014_abund/fam_substrate_abund.out --show_abund --top 20
 
 Here we plot the top 20 substrates in the two samples (Fig. 6A). The input files are the two CAZyme substrate abundance files calculated based on
 dbCAN-sub result. The default heatmap is ranked by substrate abundances. To rank the heatmap according to abundance profile using
