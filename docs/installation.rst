@@ -41,18 +41,18 @@ To install the `dbcan`_ package, use the ``conda install`` command:
 Build database
 --------------
 
-You can build database via this command,
+You can build database via this command:
 
 .. code-block:: shell
 
     dbcan_build --cpus 8 --db-dir db --clean
 
 
-`--cpu` indicates count of cpu you can use. Try as many as possible for fast building.
+1. `--cpu` indicates count of cpu you can use. Try as many as possible for fast building.
 
-`--db-dir` indicates database folder path. Default is `db` on your current database
+2. `--db-dir` indicates database folder path. Default is `db` on your current database
 
-`--clean` indicates clean the folder indicated by `--db-dir`. 
+3. `--clean` indicates clean the folder indicated by `--db-dir`. 
 You can remove this parameter if you don't want to clean, but we recommend you add this to keep
 away from index contamination.
 
