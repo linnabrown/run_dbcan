@@ -37,6 +37,22 @@ To install the `dbcan`_ package, use the ``conda install`` command:
 
     conda install dbcan -c conda-forge -c bioconda
 
+
+Build database
+--------------
+
+You can build database via this command,
+
+.. code-block:: shell
+   dbcan_build --cpus 8 --db-dir db --clean
+
+`--cpu` indicates count of cpu you can use. Try as many as possible for fast building.
+`--db-dir` indicates database folder path. Default is `db` on your current database
+`--clean` indicates clean the folder indicated by `--db-dir`. 
+You can remove this parameter if you don't want to clean, but we recommend you add this to keep
+away from index contamination.
+
+
 Installing with PyPI
 --------------------
 

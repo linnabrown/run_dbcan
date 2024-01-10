@@ -1015,7 +1015,7 @@ def rundbCAN_parser():
         default="all",
         help="Choose gram+(p) or gram-(n) for proteome/prokaryote nucleotide, which are params of SingalP, only if user use singalP",
     )
-    parser.add_argument("-v", "--version", default="4.1.0", type=str)
+    parser.add_argument("-v", "--version", default="4.1.1", type=str)
     # dbCAN-sub
     dbCAN_sub_group = parser.add_argument_group("dbCAN-sub parameters")
     dbCAN_sub_group.add_argument("--dbcan_thread", "-dt", default=12, type=int)
