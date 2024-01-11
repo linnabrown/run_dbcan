@@ -27,7 +27,7 @@ or `Miniconda <https://docs.conda.io/projects/miniconda/en/latest/>`_. Then, you
 
 .. code-block:: shell
 
-    conda create --dbcan python=3.8
+    conda create --name dbcan python=3.8
 
 If you already have a ``conda`` environment, you can skip the step above.
 
