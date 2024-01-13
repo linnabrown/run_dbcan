@@ -11,7 +11,7 @@ In this tutorial, we present a comprehensive protocol to annotate CAZymes and gl
 
 1. :ref:`Carter2023 <cater_2023>` :cite:`2023:carter`,
 2. :ref:`Wastyk2021 <wastyk_2021>` :cite:`2021:Wastyk` (See :doc:`run_from_raw_reads_ex`), and,
-3. :ref:`Priest2023 <priest_2023>` :cite:`2023:Priest` (See :doc:`run_from_raw_reads_ex`),
+3. :ref:`Priest2023 <priest_2023>` :cite:`2023:Priest` (See :doc:`run_from_raw_reads_pr.rst`),
 
 this guide will walk you through each step of the computational workflow for analyzing occurrence and abundance. The workflow, depicted in Fig. 1, is designed to be user-friendly and does not require extensive programming knowledge.
 
