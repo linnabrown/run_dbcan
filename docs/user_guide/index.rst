@@ -11,3 +11,4 @@ User Guide
    run_from_raw_reads
    run_from_DNA_sequence
    run_from_raw_reads_ex
+   run_from_raw_reads_pr
