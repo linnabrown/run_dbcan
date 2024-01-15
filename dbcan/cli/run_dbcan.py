@@ -60,8 +60,21 @@ def runHmmer(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name):
     hmm_file = f"{dbDir}{db_name}.hmm"
     uniInput_file = f"{outPath}uniInput"
 
-    hmmer = Popen(
-        [
+    # hmmer = Popen(
+    #     [
+    #         "hmmsearch",
+    #         "--domtblout",
+    #         domtblout_file,
+    #         "--cpu",
+    #         str(hmm_cpu),
+    #         "-o",
+    #         "/dev/null",
+    #         hmm_file,
+    #         uniInput_file,
+    #     ]
+    # )
+    # hmmer.wait()
+    hmmer_list = [
             "hmmsearch",
             "--domtblout",
             domtblout_file,
@@ -72,8 +85,9 @@ def runHmmer(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name):
             hmm_file,
             uniInput_file,
         ]
-    )
-    hmmer.wait()
+    cmd_str = " ".join(hmmer_list)
+    os.system(cmd_str)
+    
     parsed_hmm_output = hmmer_parser.run(input_file=f"{outPath}h{db_name}.out", eval_num=hmm_eval, coverage=hmm_cov)
     with open(f"{outPath}{db_name}.out", "w") as f:
         f.write(parsed_hmm_output)
@@ -109,8 +123,22 @@ def split_uniInput(uniInput, dbcan_thread, outPath, dbDir, hmm_eval, hmm_cov, hm
     """
     ticks = time.time()
     
-    dbsub = Popen(
-        [
+    # dbsub = Popen(
+    #     [
+    #         "hmmsearch",
+    #         "--domtblout",
+    #         f"{outPath}d.txt",
+    #         "--cpu",
+    #         str(hmm_cpu),
+    #         "-o",
+    #         "/dev/null",
+    #         f"{dbDir}dbCAN_sub.hmm",
+    #         f"{outPath}uniInput",
+    #     ]
+    # )
+    # dbsub.wait()
+
+    dbsub_list = [
             "hmmsearch",
             "--domtblout",
             f"{outPath}d.txt",
@@ -121,8 +149,9 @@ def split_uniInput(uniInput, dbcan_thread, outPath, dbDir, hmm_eval, hmm_cov, hm
             f"{dbDir}dbCAN_sub.hmm",
             f"{outPath}uniInput",
         ]
-    )
-    dbsub.wait()
+    
+    dbsub_str = " ".join(dbsub_list)
+    os.system(dbsub_str)
 
     hmm_parser_output = hmmer_parser.run(f"{outPath}d.txt", eval_num=hmm_eval, coverage=hmm_cov)
     with open(f"{outPath}dtemp.out", "w") as temp_hmmer_file:
@@ -653,8 +682,8 @@ def run_dbCAN(
                 with open(auxFile) as f:
                     with open(outDir + prefix + "cgc.gff", "w") as out:
                         for line in f:
-                            if not line.startswith("#"):
-                                row = line.rstrip().split("\t")
+                            row = line.rstrip().split("\t")
+                            if (not line.startswith("#")) and len(row) >= 9:
                                 if row[2] == "CDS":
                                     note = row[8].strip().rstrip(";").split(";")
                                     gene = ""
