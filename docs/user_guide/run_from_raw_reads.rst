@@ -442,7 +442,7 @@ The following commands will re-run run_dbcan to not only predict CAZymes but als
 .. code-block:: shell
 
     run_dbcan prokka_Wet2014/Wet2014.faa protein --tools hmmer --tf_cpu 32 --stp_cpu 32 -c prokka_Wet2014/Wet2014.gff --out_dir Wet2014.PUL --dia_cpu 32 --hmm_cpu 32
-    run_dbcan prokka_Dry2014/Dry2014.faa protein --tools hmmer --tf_cpu 32 --stp_cpu 32 -c prokka_ Dry2014/Dry2014.gff --out_dir Dry2014.PUL --dia_cpu 32 --hmm_cpu 32
+    run_dbcan prokka_Dry2014/Dry2014.faa protein --tools hmmer --tf_cpu 32 --stp_cpu 32 -c prokka_Dry2014/Dry2014.gff --out_dir Dry2014.PUL --dia_cpu 32 --hmm_cpu 32
 
 
 As mentioned above (see Table 1, Fig. 1), CGC prediction is a featured function added into dbCAN2 in 2018.
@@ -581,7 +581,7 @@ P8. Read mapping to all CDS of each sample (TIMING ~20 min)
     bwa index prokka_Wet2014/Wet2014.ffn
     bwa index prokka_Dry2014/Dry2014.ffn
     mkdir samfiles
-    bwa mem -t 32 -o samfiles/Wet2014.CDS.sam prokka_Wet2014/Wet2014.ffn Wet2014_1_val_1.fq.gz Wet2014 _2_val_2.fq.gz
+    bwa mem -t 32 -o samfiles/Wet2014.CDS.sam prokka_Wet2014/Wet2014.ffn Wet2014_1_val_1.fq.gz Wet2014_2_val_2.fq.gz
     bwa mem -t 32 -o samfiles/Dry2014.CDS.sam prokka_Dry2014/Dry2014.ffn Dry2014_1_val_1.fq.gz Dry2014_2_val_2.fq.gz
 
 
@@ -728,7 +728,7 @@ Here we plot the top 20 substrates in the two samples (Fig. 6A). The input files
 dbCAN-sub result. The default heatmap is ranked by substrate abundances. To rank the heatmap according to abundance profile using
 the clustermap function of the seaborn package (https://github.com/mwaskom/seaborn), users can invoke the ``--cluster_map`` parameter.
 
-P15. Barplot for CAZyme family/subfamily/EC abundance across samples (Fig. B,C) (TIMING 1min)
+P15. Barplot for CAZyme family/subfamily/EC abundance across samples (Fig. 6B,C) (TIMING 1min)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. code-block:: shell
 
