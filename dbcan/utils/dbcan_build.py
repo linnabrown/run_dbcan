@@ -95,13 +95,15 @@ def main():
         "makeblastdb -in PUL.faa -dbtype prot",
         "mv dbCAN-PUL_12-12-2023.xlsx dbCAN-PUL.xlsx",
         "tar xzvf dbCAN-PUL.tar.gz",
-        "hmmpress dbCAN_sub.hmm",
-        "mv CAZyDB.07262023.fa CAZyDB.fa && diamond makedb --in CAZyDB.fa -d CAZy",
-        "mv dbCAN-HMMdb-V12.txt dbCAN.txt && hmmpress dbCAN.txt",
+        "hmmpress -f dbCAN_sub.hmm",
+        "mv CAZyDB.07262023.fa CAZyDB.fa",
+        "diamond makedb --in CAZyDB.fa -d CAZy",
+        "mv dbCAN-HMMdb-V12.txt dbCAN.txt",
+        "hmmpress dbCAN.txt"
         "diamond makedb --in tcdb.fa -d tcdb",
-        "hmmpress tf-1.hmm",
-        "hmmpress tf-2.hmm",
-        "hmmpress stp.hmm"
+        "hmmpress -f tf-1.hmm",
+        "hmmpress -f tf-2.hmm",
+        "hmmpress -f stp.hmm"
     ]
     for cmd in other_commands:
         subprocess.run(cmd, shell=True)
