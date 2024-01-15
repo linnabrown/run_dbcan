@@ -1,4 +1,4 @@
-Run from Protein Sequence
+Run from DNA Sequence
 =========================
 
 This section provides a quick guide to running the run_dbcan tool suite with example data and explains the output files generated.
