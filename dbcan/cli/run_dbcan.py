@@ -108,85 +108,25 @@ def split_uniInput(uniInput, dbcan_thread, outPath, dbDir, hmm_eval, hmm_cov, hm
         - Time taken for execution is printed at the end of the function's run.
     """
     ticks = time.time()
-    file = open(uniInput)
-    uniInput_file = file.readlines()
-    file.close()
-    signal_count = 0
-    min_files = dbcan_thread
-    file_number = None
-    split_files = []
-    fsize = int(os.path.getsize(uniInput) / float(1024 * 1024) * dbcan_offset)
+    
+    dbsub = Popen(
+        [
+            "hmmsearch",
+            "--domtblout",
+            f"{outPath}d.txt",
+            "--cpu",
+            str(hmm_cpu),
+            "-o",
+            "/dev/null",
+            f"{dbDir}dbCAN_sub.hmm",
+            f"{outPath}uniInput",
+        ]
+    )
+    dbsub.wait()
 
-    if fsize < 1:
-        fsize = 1
-
-    for line in uniInput_file:
-        if ">" in line:
-            signal_count += 1
-    print(f"Count of proteins: {signal_count}")
-
-    if signal_count >= min_files:
-        for i in range(fsize):
-            with open(f"{outPath}{i}.txt", "w") as f:
-                pass
-            split_files.append(f"{i}.txt")
-        for i in range(len(uniInput_file)):
-            if ">" in uniInput_file[i]:
-                file_number = i % fsize
-            with open(f"{outPath}{file_number}.txt", "a") as f:
-                f.write(uniInput_file[i])
-
-        ths = []
-        for j in split_files:
-            ths.append(
-                Popen(
-                    [
-                        "hmmsearch",
-                        "--domtblout",
-                        f"{outPath}d{j}",
-                        "--cpu",
-                        str(hmm_cpu),
-                        "-o",
-                        "/dev/null",
-                        f"{dbDir}dbCAN_sub.hmm",
-                        f"{outPath}{j}",
-                    ]
-                )
-            )
-        for th in ths:
-            th.wait()
-        for m in split_files:
-            hmm_parser_output = hmmer_parser.run(f"{outPath}d{m}", eval_num=hmm_eval, coverage=hmm_cov)
-            with open(f"{outPath}temp_{m}", "w") as temp_hmmer_file:
-                temp_hmmer_file.write(hmm_parser_output)
-            os.remove(f"{outPath}d{m}")
-            os.remove(f"{outPath}{m}")
-        with open(f"{outPath}dtemp.out", "w"): pass
-        for n in split_files:
-            with open(f"{outPath}temp_{n}") as file_read:
-                files_lines = file_read.readlines()
-            os.remove(f"{outPath}temp_{n}")
-            with open(f"{outPath}dtemp.out", "a") as f:
-                f.writelines(files_lines)
-    else:
-        dbsub = Popen(
-            [
-                "hmmsearch",
-                "--domtblout",
-                f"{outPath}d.txt",
-                "--cpu",
-                str(hmm_cpu),
-                "-o",
-                "/dev/null",
-                f"{dbDir}dbCAN_sub.hmm",
-                f"{outPath}uniInput",
-            ]
-        )
-        dbsub.wait()
-
-        hmm_parser_output = hmmer_parser.run(f"{outPath}d.txt", eval_num=hmm_eval, coverage=hmm_cov)
-        with open(f"{outPath}dtemp.out", "w") as temp_hmmer_file:
-            temp_hmmer_file.write(hmm_parser_output)
+    hmm_parser_output = hmmer_parser.run(f"{outPath}d.txt", eval_num=hmm_eval, coverage=hmm_cov)
+    with open(f"{outPath}dtemp.out", "w") as temp_hmmer_file:
+        temp_hmmer_file.write(hmm_parser_output)
 
     print("total time:", time.time() - ticks)
 
@@ -197,10 +137,10 @@ def run_dbCAN(
     cluster=None,
     dbCANFile="dbCAN.txt",
     dia_eval=1e-102,
-    dia_cpu=4,
+    dia_cpu=8,
     hmm_eval=1e-15,
     hmm_cov=0.35,
-    hmm_cpu=4,
+    hmm_cpu=8,
     dbcan_thread=5,
     dbcan_offset=2,
     tf_eval=1e-4,

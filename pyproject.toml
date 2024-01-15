@@ -26,6 +26,8 @@ dependencies = [
     "pandas",
     "biopython",
     "tqdm",
+    "openpyxl",
+    "matplotlib",
     # for debug logging (referenced from the issue template)
     "session-info"
 ]
