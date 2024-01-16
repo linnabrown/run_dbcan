@@ -27,7 +27,7 @@ or `Miniconda <https://docs.conda.io/projects/miniconda/en/latest/>`_. Then, you
 
 .. code-block:: shell
 
-    conda create --dbcan python=3.8
+    conda create --name dbcan python=3.8
 
 If you already have a ``conda`` environment, you can skip the step above.
 
@@ -36,6 +36,26 @@ To install the `dbcan`_ package, use the ``conda install`` command:
 .. code-block:: shell
 
     conda install dbcan -c conda-forge -c bioconda
+
+
+Build database
+--------------
+
+You can build database via this command:
+
+.. code-block:: shell
+
+    dbcan_build --cpus 8 --db-dir db --clean
+
+
+1. `--cpu` indicates count of cpu you can use. Try as many as possible for fast building.
+
+2. `--db-dir` indicates database folder path. Default is `db` on your current database
+
+3. `--clean` indicates clean the folder indicated by `--db-dir`. 
+You can remove this parameter if you don't want to clean, but we recommend you add this to keep
+away from index contamination.
+
 
 Installing with PyPI
 --------------------
@@ -55,10 +75,12 @@ dependencies:
    Due to the specific licensing terms of `SignalP`, it is not included directly as a dependency in our package. This requires users to undertake a separate installation process.
 
    **Installing SignalP (Optional)**:
+
       - `SignalP` is optional and not essential for the core functionality of our software. Users requiring its specific features can integrate it as follows:
          1. Visit the `SignalP website <https://services.healthtech.dtu.dk/services/SignalP-4.1/>`_.
          2. Submit a download `request <https://services.healthtech.dtu.dk/cgi-bin/sw_request?software=signalp&version=4.1&packageversion=4.1g&platform=Linux>`_.
          3. Post-download, add `SignalP` to your system's environmental variables to make it executable.
+      
       - For installation assistance, refer to the :doc:`faq/signalp_installation`.
 
    This approach ensures compliance with `SignalP`'s licensing while offering the tool's functionality to those who need it.

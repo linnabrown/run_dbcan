@@ -15,10 +15,10 @@ from matplotlib import pyplot
 from matplotlib.patches import Patch
 #plt.style.use('seaborn')
 from dbcan.utils.utils import cgc_standard_line
-from dbcan_cli.syntenic_plot import syntenic_plot,read_blast_result_cgc,read_UHGG_CGC_stanrdard_out,read_PUL_cgcgff
-from dbcan_cli.syntenic_plot import Get_parameters_for_plot,plot_Polygon_homologous,plot_syntenic_block
-from dbcan_cli.syntenic_plot import Get_Position as synGet_Position
-from dbcan_cli.syntenic_plot import plot_genome_line as synplot_genome_line
+from dbcan.cli.syntenic_plot import syntenic_plot,read_blast_result_cgc,read_UHGG_CGC_stanrdard_out,read_PUL_cgcgff
+from dbcan.cli.syntenic_plot import Get_parameters_for_plot,plot_Polygon_homologous,plot_syntenic_block
+from dbcan.cli.syntenic_plot import Get_Position as synGet_Position
+from dbcan.cli.syntenic_plot import plot_genome_line as synplot_genome_line
 import matplotlib as mpl
 mpl.rcParams['pdf.fonttype'] = 42
 mpl.rcParams['ps.fonttype'] = 42
