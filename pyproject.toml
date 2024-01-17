@@ -29,6 +29,7 @@ dependencies = [
     "openpyxl",
     "matplotlib",
     "pyhmmer",
+    "requests",
     # for debug logging (referenced from the issue template)
     "session-info"
 ]
