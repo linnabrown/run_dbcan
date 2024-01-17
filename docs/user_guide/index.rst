@@ -1,6 +1,11 @@
 User Guide
 ==========
 
+Hint:If you want to run from raw reads from metagenome, please refer to Run from Raw Reads: Automated CAZyme and Glycan Substrate Annotation in Microbiomes: A Step-by-Step Protocol.
+Otherwise, please refer to any following instruction
+
+
+
 .. toctree::
    :maxdepth: 1
 
