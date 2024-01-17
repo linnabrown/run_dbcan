@@ -198,7 +198,9 @@ S4. Configure databases required by run_dbcan (~2h)
 ````````````````````````````````````````````````````
 To install the databases, execute the following commands:
 
-.. include:: database_preparation.rst
+.. code-block:: shell
+    
+    dbcan_build --cpus 8 --db-dir db --clean
 
 Download database required by Kraken2 (very slow; can be skipped
 if users do not intend to run Kraken2):
@@ -329,8 +331,8 @@ Use Megahit for assembling reads into contigs:
 
 .. code-block:: shell
 
-    megahit -m 0.5 -t 32 -o megahit_ Wet2014 -1 Wet2014_1_val_1.fq.gz -2 Wet2014_2_val_2.fq.gz --out-prefix Wet2014 --min-contig-len 1000
-    megahit -m 0.5 -t 32 -o megahit_ Dry2014 -1 Dry2014_1_val_1.fq.gz -2 Dry2014_2_val_2.fq.gz --out-prefix Dry2014 --min-contig-len 1000
+    megahit -m 0.5 -t 32 -o megahit_Wet2014 -1 Wet2014_1_val_1.fq.gz -2 Wet2014_2_val_2.fq.gz --out-prefix Wet2014 --min-contig-len 1000
+    megahit -m 0.5 -t 32 -o megahit_Dry2014 -1 Dry2014_1_val_1.fq.gz -2 Dry2014_2_val_2.fq.gz --out-prefix Dry2014 --min-contig-len 1000
 
 
 ``MEGAHIT`` generates two output folders. Each contains five files and one sub-folder (Box 3).
@@ -361,8 +363,8 @@ P4. Predict genes by `Prokka` (TIMING ~21h)
 
 .. code-block:: shell
 
-    prokka --kingdom Bacteria --cpus 32 --outdir prokka_ Wet2014 --prefix Wet2014 --addgenes --addmrna --locustag Wet2014 megahit_ Wet2014/Wet2014.contigs.fa
-    prokka --kingdom Bacteria --cpus 32 --outdir prokka_ Dry2014 --prefix Dry2014 --addgenes --addmrna --locustag Dry2014 megahit_ Dry2014/Dry2014.contigs.fa
+    prokka --kingdom Bacteria --cpus 32 --outdir prokka_Wet2014 --prefix Wet2014 --addgenes --addmrna --locustag Wet2014 megahit_Wet2014/Wet2014.contigs.fa
+    prokka --kingdom Bacteria --cpus 32 --outdir prokka_Dry2014 --prefix Dry2014 --addgenes --addmrna --locustag Dry2014 megahit_Dry2014/Dry2014.contigs.fa
 
 
 The parameter ``--kingdom Bacteria`` is required for bacterial gene prediction.
