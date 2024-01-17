@@ -646,6 +646,9 @@ def run_dbCAN(
         # End CAZyme Extraction
         ######################
         # Begin GFF preperation
+            
+        #union for CAZyme, tf, tp, stp
+        candidate_gene_set = cazyme.union(tf, tp, stp)
 
         if inputType in ["prok", "meta"]:  # use Prodigal GFF output
             with open(outDir + prefix + "prodigal.gff") as f:
@@ -679,38 +682,40 @@ def run_dbCAN(
                             gff = True
                             break
             if gff:  # user file was in GFF format
-                with open(auxFile) as f:
-                    with open(outDir + prefix + "cgc.gff", "w") as out:
-                        for line in f:
-                            row = line.rstrip().split("\t")
-                            if (not line.startswith("#")) and len(row) >= 9:
-                                if row[2] == "CDS":
-                                    note = row[8].strip().rstrip(";").split(";")
-                                    gene = ""
-                                    notes = {}
-                                    for x in note:
-                                        temp = x.split("=")
-                                        notes[temp[0]] = temp[1]
-                                    if "ID" in notes:
-                                        gene = notes["ID"]
-                                    else:
-                                        continue
-                                    if gene in cazyme:
-                                        row[2] = "CAZyme"
-                                        row[8] = "DB=" + cazyme_genes[gene]
-                                    elif gene in tf:
-                                        row[2] = "TF"
-                                        row[8] = "DB=" + tf_genes[gene]
-                                    elif gene in tp:
-                                        row[2] = "TC"
-                                        row[8] = "DB=" + tp_genes[gene]
-                                    elif gene in stp:
-                                        row[2] = "STP"
-                                        row[8] = "DB=" + stp_genes[gene]
-                                    else:
-                                        row[8] = ""
-                                    row[8] += ";ID=" + gene
-                                    out.write("\t".join(row) + "\n")
+                with open(auxFile) as f, open(outDir + prefix + "cgc.gff", "w") as out:
+                    for line in f:
+                        row = line.rstrip().split("\t")
+                        if (not line.startswith("#")) and len(row) >= 9:
+                            if row[2] == "CDS":
+                                note = row[8].strip().rstrip(";").split(";")
+                                gene1 = ""
+                                gene2 = ""
+                                notes = {}
+                                for x in note:
+                                    temp = x.split("=")
+                                    notes[temp[0]] = temp[1]
+                                 # fix it tomorrow
+                                if "ID" in notes:
+                                    gene1 = notes["ID"]
+                                if "Name" in notes:
+                                    gene2 = notes["Name"]
+                                # fix it tomorrow
+                                if gene in cazyme:
+                                    row[2] = "CAZyme"
+                                    row[8] = "DB=" + cazyme_genes[gene]
+                                elif gene in tf:
+                                    row[2] = "TF"
+                                    row[8] = "DB=" + tf_genes[gene]
+                                elif gene in tp:
+                                    row[2] = "TC"
+                                    row[8] = "DB=" + tp_genes[gene]
+                                elif gene in stp:
+                                    row[2] = "STP"
+                                    row[8] = "DB=" + stp_genes[gene]
+                                else:
+                                    row[8] = ""
+                                row[8] += ";ID=" + gene
+                                out.write("\t".join(row) + "\n")
             else:  # user file was in BED format
                 with open(auxFile) as f:
                     with open(outDir + prefix + "cgc.gff", "w") as out:

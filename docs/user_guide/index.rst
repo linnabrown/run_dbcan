@@ -4,7 +4,6 @@ User Guide
 .. toctree::
    :maxdepth: 1
 
-   database_preparation
    quick_start
    run_from_protein_sequence
    run_with_CGCFinder
