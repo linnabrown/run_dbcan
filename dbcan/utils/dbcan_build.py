@@ -107,8 +107,6 @@ def main():
     ]
     for cmd in other_commands:
         subprocess.run(cmd, shell=True)
-    # for cmd in other_commands:
-    #     os.system(cmd)
 
     os.chdir('..')
     # 下载样本文件

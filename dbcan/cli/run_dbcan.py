@@ -13,7 +13,7 @@ import os
 import time
 
 # Recent updated information:
-#   Jan/01/23: Add doc code [Haidong Yi, Le Huang]
+#   Jan/01/23: Add doc code [Haidong Yi, Le Huang] [Haidong Yi, Le Huang]
 #   Oct/10/23: Recontructed the run_dbcan [Haidong Yi]
 #   Sep/07/23: Replace hmmscan with hmmsearch. Update perl code [Le Huang, Yanbin Yin]
 #   Dec/15/22: 1.adding function to convert cgc_standard.out to json format. 2. adding function cgc_[Jinfang Zheng]
@@ -60,8 +60,21 @@ def runHmmer(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name):
     hmm_file = f"{dbDir}{db_name}.hmm"
     uniInput_file = f"{outPath}uniInput"
 
-    # hmmer = Popen(
-    #     [
+    # # hmmer = Popen(
+    # #     [
+    #         "hmmsearch",
+    #         "--domtblout",
+    #         domtblout_file,
+    #         "--cpu",
+    #         str(hmm_cpu),
+    #         "-o",
+    #         "/dev/null",
+    #         hmm_file,
+    #         uniInput_file,
+    #     ]
+    # )
+    # hmmer.wait()
+    hmmer_list = [
     #         "hmmsearch",
     #         "--domtblout",
     #         domtblout_file,
@@ -85,6 +98,9 @@ def runHmmer(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name):
             hmm_file,
             uniInput_file,
         ]
+    cmd_str = " ".join(hmmer_list)
+    os.system(cmd_str)
+    
     cmd_str = " ".join(hmmer_list)
     os.system(cmd_str)
     
@@ -122,6 +138,36 @@ def split_uniInput(uniInput, dbcan_thread, outPath, dbDir, hmm_eval, hmm_cov, hm
         - Time taken for execution is printed at the end of the function's run.
     """
     ticks = time.time()
+    
+    # dbsub = Popen(
+    #     [
+    #         "hmmsearch",
+    #         "--domtblout",
+    #         f"{outPath}d.txt",
+    #         "--cpu",
+    #         str(hmm_cpu),
+    #         "-o",
+    #         "/dev/null",
+    #         f"{dbDir}dbCAN_sub.hmm",
+    #         f"{outPath}uniInput",
+    #     ]
+    # )
+    # dbsub.wait()
+
+    dbsub_list = [
+            "hmmsearch",
+            "--domtblout",
+            f"{outPath}d.txt",
+            "--cpu",
+            str(hmm_cpu),
+            "-o",
+            "/dev/null",
+            f"{dbDir}dbCAN_sub.hmm",
+            f"{outPath}uniInput",
+        ]
+    
+    dbsub_str = " ".join(dbsub_list)
+    os.system(dbsub_str)
     
     # dbsub = Popen(
     #     [

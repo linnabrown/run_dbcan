@@ -11,6 +11,7 @@ source:
   url: https://github.com/linnabrown/run_dbcan/releases/download/{{ version }}/dbcan-{{ version }}.tar.gz
   sha256: 6346e0b6b2c810e2f808bc0bc901643c16f3eda2652d50b8f8470eb722fb419b
 
+
 build:
   number: 0
   script: "{{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vvv"

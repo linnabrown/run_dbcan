@@ -198,6 +198,11 @@ S4. Configure databases required by run_dbcan (~2h)
 ````````````````````````````````````````````````````
 To install the databases, execute the following commands:
 
+.. include:: database_preparation.rst
+
+Download database required by Kraken2 (very slow; can be skipped
+if users do not intend to run Kraken2):
+
 .. code-block:: shell
     
     dbcan_build --cpus 8 --db-dir db --clean
