@@ -57,46 +57,59 @@ You can remove this parameter if you don't want to clean, but we recommend you a
 away from index contamination.
 
 
-Installing with PyPI
---------------------
+Installing SignalP (Optional)
+--------------------------------
 
-To install the `dbcan`_ package via ``pip``, you first need to install a few executable
-dependencies:
 
-- `NCBI-BLAST+ <https://blast.ncbi.nlm.nih.gov/doc/blast-help/downloadblastdata.html>`_;
-- `HMMER <http://hmmer.org/>`_ (:cite:`2011:hmmer`);
-- `DIAMOND <https://github.com/bbuchfink/diamond>`_ (:cite:`2021:diamond`);
-- `SignalP <https://services.healthtech.dtu.dk/services/SignalP-4.1/>`_ (:cite:`2017:nielsen`) (Optional).
+- `SignalP` is optional and not essential for the core functionality of our software. Users requiring its specific features can integrate it as follows:
+   1. Visit the `SignalP website <https://services.healthtech.dtu.dk/services/SignalP-4.1/>`_.
+   2. Submit a download `request <https://services.healthtech.dtu.dk/cgi-bin/sw_request?software=signalp&version=4.1&packageversion=4.1g&platform=Linux>`_.
+   3. Post-download, add `SignalP` to your system's environmental variables to make it executable.
 
-.. warning::
+- For installation assistance, refer to the :doc:`faq/signalp_installation`.
 
-   **SignalP Integration Notice**
 
-   Due to the specific licensing terms of `SignalP`, it is not included directly as a dependency in our package. This requires users to undertake a separate installation process.
 
-   **Installing SignalP (Optional)**:
+.. Installing with PyPI
+.. --------------------
 
-      - `SignalP` is optional and not essential for the core functionality of our software. Users requiring its specific features can integrate it as follows:
-         1. Visit the `SignalP website <https://services.healthtech.dtu.dk/services/SignalP-4.1/>`_.
-         2. Submit a download `request <https://services.healthtech.dtu.dk/cgi-bin/sw_request?software=signalp&version=4.1&packageversion=4.1g&platform=Linux>`_.
-         3. Post-download, add `SignalP` to your system's environmental variables to make it executable.
+.. To install the `dbcan`_ package via ``pip``, you first need to install a few executable
+.. dependencies:
+
+.. - `NCBI-BLAST+ <https://blast.ncbi.nlm.nih.gov/doc/blast-help/downloadblastdata.html>`_;
+.. - `HMMER <http://hmmer.org/>`_ (:cite:`2011:hmmer`);
+.. - `DIAMOND <https://github.com/bbuchfink/diamond>`_ (:cite:`2021:diamond`);
+.. - `SignalP <https://services.healthtech.dtu.dk/services/SignalP-4.1/>`_ (:cite:`2017:nielsen`) (Optional).
+
+.. .. warning::
+
+..    **SignalP Integration Notice**
+
+..    Due to the specific licensing terms of `SignalP`, it is not included directly as a dependency in our package. This requires users to undertake a separate installation process.
+
+..    **Installing SignalP (Optional)**:
+
+..       - `SignalP` is optional and not essential for the core functionality of our software. Users requiring its specific features can integrate it as follows:
+..          1. Visit the `SignalP website <https://services.healthtech.dtu.dk/services/SignalP-4.1/>`_.
+..          2. Submit a download `request <https://services.healthtech.dtu.dk/cgi-bin/sw_request?software=signalp&version=4.1&packageversion=4.1g&platform=Linux>`_.
+..          3. Post-download, add `SignalP` to your system's environmental variables to make it executable.
       
-      - For installation assistance, refer to the :doc:`faq/signalp_installation`.
+..       - For installation assistance, refer to the :doc:`faq/signalp_installation`.
 
-   This approach ensures compliance with `SignalP`'s licensing while offering the tool's functionality to those who need it.
+..    This approach ensures compliance with `SignalP`'s licensing while offering the tool's functionality to those who need it.
 
 
 
-After the dependencies are installed, `dbcan`_ can be installed via `PyPI <https://pypi.org/>`_:
+.. After the dependencies are installed, `dbcan`_ can be installed via `PyPI <https://pypi.org/>`_:
 
-.. code-block:: shell
+.. .. code-block:: shell
 
-    pip install dbcan
+..     pip install dbcan
 
-.. note::
+.. .. note::
 
-   Since ``PyPI`` doesn't have an independent build system, the dependencies of dbcan need to be installed seperatedly.
-   Therefore, we recommended users to install ``dbcan`` via ``Conda`` which can resolve all dependencies automatically.
+..    Since ``PyPI`` doesn't have an independent build system, the dependencies of dbcan need to be installed seperatedly.
+..    Therefore, we recommended users to install ``dbcan`` via ``Conda`` which can resolve all dependencies automatically.
 
 Installing with Docker
 ----------------------

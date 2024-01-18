@@ -13,7 +13,7 @@ import os
 import time
 
 # Recent updated information:
-#   Jan/01/23: Add doc code [Haidong Yi, Le Huang]
+#   Jan/01/23: Add doc code [Haidong Yi, Le Huang] [Haidong Yi, Le Huang]
 #   Oct/10/23: Recontructed the run_dbcan [Haidong Yi]
 #   Sep/07/23: Replace hmmscan with hmmsearch. Update perl code [Le Huang, Yanbin Yin]
 #   Dec/15/22: 1.adding function to convert cgc_standard.out to json format. 2. adding function cgc_[Jinfang Zheng]
@@ -60,8 +60,21 @@ def runHmmer(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name):
     hmm_file = f"{dbDir}{db_name}.hmm"
     uniInput_file = f"{outPath}uniInput"
 
-    # hmmer = Popen(
-    #     [
+    # # hmmer = Popen(
+    # #     [
+    #         "hmmsearch",
+    #         "--domtblout",
+    #         domtblout_file,
+    #         "--cpu",
+    #         str(hmm_cpu),
+    #         "-o",
+    #         "/dev/null",
+    #         hmm_file,
+    #         uniInput_file,
+    #     ]
+    # )
+    # hmmer.wait()
+    hmmer_list = [
     #         "hmmsearch",
     #         "--domtblout",
     #         domtblout_file,
@@ -85,6 +98,9 @@ def runHmmer(outPath, hmm_cpu, dbDir, hmm_eval, hmm_cov, db_name):
             hmm_file,
             uniInput_file,
         ]
+    cmd_str = " ".join(hmmer_list)
+    os.system(cmd_str)
+    
     cmd_str = " ".join(hmmer_list)
     os.system(cmd_str)
     
@@ -122,6 +138,36 @@ def split_uniInput(uniInput, dbcan_thread, outPath, dbDir, hmm_eval, hmm_cov, hm
         - Time taken for execution is printed at the end of the function's run.
     """
     ticks = time.time()
+    
+    # dbsub = Popen(
+    #     [
+    #         "hmmsearch",
+    #         "--domtblout",
+    #         f"{outPath}d.txt",
+    #         "--cpu",
+    #         str(hmm_cpu),
+    #         "-o",
+    #         "/dev/null",
+    #         f"{dbDir}dbCAN_sub.hmm",
+    #         f"{outPath}uniInput",
+    #     ]
+    # )
+    # dbsub.wait()
+
+    dbsub_list = [
+            "hmmsearch",
+            "--domtblout",
+            f"{outPath}d.txt",
+            "--cpu",
+            str(hmm_cpu),
+            "-o",
+            "/dev/null",
+            f"{dbDir}dbCAN_sub.hmm",
+            f"{outPath}uniInput",
+        ]
+    
+    dbsub_str = " ".join(dbsub_list)
+    os.system(dbsub_str)
     
     # dbsub = Popen(
     #     [
@@ -646,6 +692,9 @@ def run_dbCAN(
         # End CAZyme Extraction
         ######################
         # Begin GFF preperation
+            
+        #union for CAZyme, tf, tp, stp
+        candidate_gene_set = cazyme.union(tf, tp, stp)
 
         if inputType in ["prok", "meta"]:  # use Prodigal GFF output
             with open(outDir + prefix + "prodigal.gff") as f:
@@ -679,38 +728,40 @@ def run_dbCAN(
                             gff = True
                             break
             if gff:  # user file was in GFF format
-                with open(auxFile) as f:
-                    with open(outDir + prefix + "cgc.gff", "w") as out:
-                        for line in f:
-                            row = line.rstrip().split("\t")
-                            if (not line.startswith("#")) and len(row) >= 9:
-                                if row[2] == "CDS":
-                                    note = row[8].strip().rstrip(";").split(";")
-                                    gene = ""
-                                    notes = {}
-                                    for x in note:
-                                        temp = x.split("=")
-                                        notes[temp[0]] = temp[1]
-                                    if "ID" in notes:
-                                        gene = notes["ID"]
-                                    else:
-                                        continue
-                                    if gene in cazyme:
-                                        row[2] = "CAZyme"
-                                        row[8] = "DB=" + cazyme_genes[gene]
-                                    elif gene in tf:
-                                        row[2] = "TF"
-                                        row[8] = "DB=" + tf_genes[gene]
-                                    elif gene in tp:
-                                        row[2] = "TC"
-                                        row[8] = "DB=" + tp_genes[gene]
-                                    elif gene in stp:
-                                        row[2] = "STP"
-                                        row[8] = "DB=" + stp_genes[gene]
-                                    else:
-                                        row[8] = ""
-                                    row[8] += ";ID=" + gene
-                                    out.write("\t".join(row) + "\n")
+                with open(auxFile) as f, open(outDir + prefix + "cgc.gff", "w") as out:
+                    for line in f:
+                        row = line.rstrip().split("\t")
+                        if (not line.startswith("#")) and len(row) >= 9:
+                            if row[2] == "CDS":
+                                note = row[8].strip().rstrip(";").split(";")
+                                gene1 = ""
+                                gene2 = ""
+                                notes = {}
+                                for x in note:
+                                    temp = x.split("=")
+                                    notes[temp[0]] = temp[1]
+                                 # fix it tomorrow
+                                if "ID" in notes:
+                                    gene1 = notes["ID"]
+                                if "Name" in notes:
+                                    gene2 = notes["Name"]
+                                # fix it tomorrow
+                                if gene in cazyme:
+                                    row[2] = "CAZyme"
+                                    row[8] = "DB=" + cazyme_genes[gene]
+                                elif gene in tf:
+                                    row[2] = "TF"
+                                    row[8] = "DB=" + tf_genes[gene]
+                                elif gene in tp:
+                                    row[2] = "TC"
+                                    row[8] = "DB=" + tp_genes[gene]
+                                elif gene in stp:
+                                    row[2] = "STP"
+                                    row[8] = "DB=" + stp_genes[gene]
+                                else:
+                                    row[8] = ""
+                                row[8] += ";ID=" + gene
+                                out.write("\t".join(row) + "\n")
             else:  # user file was in BED format
                 with open(auxFile) as f:
                     with open(outDir + prefix + "cgc.gff", "w") as out:

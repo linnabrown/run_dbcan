@@ -4,7 +4,7 @@ requires = ["hatchling"]
 
 [project]
 name = "dbcan"
-version = "4.1.2"
+version = "4.1.3"
 description = "Standalone version of dbCAN annotation tool for automated CAZyme annotation"
 readme = "README.md"
 requires-python = ">=3.6"
@@ -29,6 +29,7 @@ dependencies = [
     "openpyxl",
     "matplotlib",
     "pyhmmer",
+    "requests",
     # for debug logging (referenced from the issue template)
     "session-info"
 ]
