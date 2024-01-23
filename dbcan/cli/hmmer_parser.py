@@ -67,7 +67,9 @@ def run(input_file, eval_num=1e-15, coverage=0.35, verbose=False):
                 if verbose:
                     print("\t".join([str(x) for x in row]))
                 output += "\t".join([str(x) for x in row]) + "\n"
-    call(["rm", tmpfile])
+    # call(["rm", tmpfile])
+    if os.path.exists(tmpfile):
+        os.system(f"rm {tmpfile}")
 
     return output
 
