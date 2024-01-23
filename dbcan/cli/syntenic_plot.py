@@ -383,7 +383,7 @@ def syntenic_plot_allpairs(args):
                 index2 = genes2.index(pul_proteinid)
                 blocks.append(f"{index1}-{index2}-{record.pident}")
             except:
-                print (cgcpul,query,hit,cgc_proteinid,pul_proteinid,genes1,genes2)
+                # print (cgcpul,query,hit,cgc_proteinid,pul_proteinid,genes1,genes2)
                 continue
             #print (cgc_proteinid2gene[cgc_proteinid],pul_proteinid2gene[pul_proteinid])
         syntenic_plot(starts1,starts2,ends1,ends2,strands1,strands2,types1,types2,blocks,cgc,pul)
