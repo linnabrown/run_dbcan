@@ -37,6 +37,15 @@ To install the `dbcan`_ package, use the ``conda install`` command:
 
     conda install dbcan -c conda-forge -c bioconda
 
+Current run_dbcan version in bioconda is `4.1.3`, and I currently could not update my pckage to `4.1.4` 
+(please help me to resolve this issue). Therefore, this is a strategy that you follow after you install
+the package using Bioconda.
+
+.. code-block:: shell
+
+   1. wget https://github.com/linnabrown/run_dbcan/releases/download/4.1.4/dbcan-4.1.4.tar.gz
+   2. pip install dbcan-4.1.4.tar.gz
+
 
 Build database
 --------------
