@@ -81,6 +81,7 @@ doc = [
 test = [
     "pytest",
     "pytest-cov",
+    "pytest-xdist",
 ]
 
 [tool.coverage.run]
@@ -95,6 +96,12 @@ xfail_strict = true
 addopts = [
     "--import-mode=importlib",  # allow using test files with same name
 ]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::FutureWarning",
+    "ignore::UserWarning",
+]
+
 
 [tool.black]
 line-length = 120
@@ -102,6 +109,8 @@ line-length = 120
 [tool.ruff]
 src = ["dbcan"]
 line-length = 120
+
+[tool.ruff.lint]
 select = [
     "F",  # Errors detected by Pyflakes
     "E",  # Error detected by Pycodestyle
@@ -143,10 +152,10 @@ ignore = [
     "D213",
 ]
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "numpy"
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "docs/*" = ["I"]
 "tests/*" = ["D"]
 "*/__init__.py" = ["F401"]
