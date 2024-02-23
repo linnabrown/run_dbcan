@@ -57,11 +57,12 @@ jobs:
       - name: Install dependencies
         run: |
           pip install ${{ matrix.pip-flags }} ".[dev,test]"
-      - name: Build dbCAN Database
+      - name: Add conda to PATH
         run: |
           echo $CONDA/bin >> $GITHUB_PATH
+      - name: Build dbCAN Database
+        run: |
           conda install -y -c bioconda -c conda-forge hmmer diamond blast prodigal
-          echo "$(conda info --base)/bin" >> $GITHUB_PATH
           dbcan_build --cpus 1 --db-dir db --clean
       - name: Test
         env:
