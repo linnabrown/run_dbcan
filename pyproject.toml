@@ -69,7 +69,8 @@ dbcan_build = "dbcan.utils.dbcan_build:main"
 [project.optional-dependencies]
 dev = [
     "pre-commit",
-    "twine>=4.0.2"
+    "twine>=4.0.2; python_version>='3.7'",
+    "twine>=3.8; python_version>='3.6',<'3.7'"
 ]
 doc = [
     "docutils>=0.8,!=0.18.*,!=0.19.*",
