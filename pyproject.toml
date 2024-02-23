@@ -89,8 +89,10 @@ doc = [
 ]
 test = [
     "pytest",
+    "pytest-html",
     "pytest-cov",
     "pytest-xdist",
+    "coverage",
 ]
 
 [tool.coverage.run]
