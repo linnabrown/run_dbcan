@@ -1,6 +1,15 @@
 [build-system]
 build-backend = "hatchling.build"
-requires = ["hatchling"]
+requires = ["hatchling", "setuptools_scm[toml]>=3.4"]
+
+[tool.setuptools_scm]
+write_to = "dbcan/_version.py"
+
+[tool.hatch.build.targets.sdist]
+exclude = ["tests", "tests/*"]
+
+[tool.hatch.build.targets.wheel]
+exclude = ["tests", "tests/*"]
 
 [project]
 name = "dbcan"
