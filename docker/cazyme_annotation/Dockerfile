@@ -11,4 +11,11 @@ RUN conda env create -f dbcan.yml && conda clean -ya
 RUN echo "source activate CAZyme_annotation" > ~/.bashrc
 ENV PATH /opt/conda/envs/CAZyme_annotation/bin:$PATH
 
+# download and make the databases
+RUN dbcan_build --cpus 1 --db-dir db --clean
+
+# define the entrypoint
+ENTRYPOINT ["run_dbcan"]
+
+# define the default command
 CMD [ "run_dbcan -h" ]
