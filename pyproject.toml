@@ -40,7 +40,9 @@ dependencies = [
     "pyhmmer",
     "requests",
     # for debug logging (referenced from the issue template)
-    "session-info"
+    "session-info",
+    # for back compatibility to python<3.7
+    "future-annotation; python_version<'3.7'"
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
