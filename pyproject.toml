@@ -16,7 +16,7 @@ name = "dbcan"
 version = "4.1.4"
 description = "Standalone version of dbCAN annotation tool for automated CAZyme annotation"
 readme = "README.md"
-requires-python = ">=3.6"
+requires-python = ">=3.7"
 license = {file = "LICENSE"}
 authors = [
     {name = "Le Huang"},
@@ -40,9 +40,7 @@ dependencies = [
     "pyhmmer",
     "requests",
     # for debug logging (referenced from the issue template)
-    "session-info",
-    # for back compatibility to python<3.7
-    "future-annotation; python_version<'3.7'"
+    "session-info"
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
