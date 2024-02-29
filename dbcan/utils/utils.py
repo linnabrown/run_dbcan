@@ -89,9 +89,9 @@ class bedtools_read_count():
     def __repr__(self):
         return "\t".join([str(getattr(self, value)) for value in vars(self)])
 
-def ReadBedtoos(filename):
+def ReadBedtools(filename):
     lines = open(filename).readlines()
-    seqid2info = {line.split()[0]:bedtools_read_count(line.split()) for line in lines[1:]}
+    seqid2info = {line.split()[0]:bedtools_read_count(line.split()) for line in lines[0:]}
     normalized_tpm = 0.
     for seqid in seqid2info:
         seqid_depth = seqid2info[seqid]
@@ -241,7 +241,7 @@ class CAZyme_Abundance_estimate():
         #self.fq_reads_count = fq_file_line_count(self.pars.R1)
         self.fq_reads_count = total_mapped_reads_count(self.pars.bedtools)
         print(f"Total reads count: {self.fq_reads_count}!")
-        seqid2readcount,normalized_tpm = ReadBedtoos(parameters.bedtools)
+        seqid2readcount,normalized_tpm = ReadBedtools(parameters.bedtools)
         self.normalized_tpm = normalized_tpm
         ### read overview to 
         if parameters.function == "fam_abund":
