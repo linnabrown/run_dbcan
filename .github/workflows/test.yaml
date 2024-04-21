@@ -22,17 +22,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: ubuntu-latest
-            python: "3.7"
-          - os: ubuntu-latest
-            python: "3.8"
-          - os: ubuntu-latest
-            python: "3.9"
-          - os: ubuntu-latest
-            python: "3.10"
-          - os: ubuntu-latest
-            python: "3.11"
+        os: [ubuntu-latest, macos-latest]
+        python: ["3.7", "3.8", "3.9", "3.10", "3.11"]
 
     name: ${{ matrix.name }} Python ${{ matrix.python }}
 
