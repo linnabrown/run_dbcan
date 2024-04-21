@@ -32,7 +32,6 @@ wheels/
 *.egg
 MANIFEST
 output*
-.vscode/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -129,3 +128,10 @@ Hotpep_bkp*
 
 
 34*
+
+# IDE
+.idea/
+.vscode/
+
+# ignore version file
+**/_version.py
