@@ -1,4 +1,11 @@
-from importlib.metadata import PackageNotFoundError, version
+import sys
+
+if sys.version_info >= (3, 8):
+    # For Python 3.8 and later, use the standard library import
+    from importlib.metadata import PackageNotFoundError, version
+else:
+    # For Python 3.7 and earlier, use the backport
+    from importlib_metadata import PackageNotFoundError, version
 
 try:
     __version__ = version("dbcan")
