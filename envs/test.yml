@@ -1,0 +1,10 @@
+name: test_dbcan
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - hmmer
+  - diamond
+  - blast
+  - prodigal

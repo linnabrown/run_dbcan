@@ -1,13 +1,26 @@
 [build-system]
 build-backend = "hatchling.build"
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "dbcan/_version.py"
+
+[tool.hatch.build.targets.sdist]
+only-include = ["dbcan", "docs", "tests", "README.md", "LICENSE"]
+exclude = ["tests/**/_data"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["dbcan"]
 
 [project]
 name = "dbcan"
-version = "4.1.4"
+dynamic = ["version"]
 description = "Standalone version of dbCAN annotation tool for automated CAZyme annotation"
 readme = "README.md"
-requires-python = ">=3.6"
+requires-python = ">=3.7"
 license = {file = "LICENSE"}
 authors = [
     {name = "Le Huang"},
@@ -31,6 +44,7 @@ dependencies = [
     "pyhmmer",
     "requests",
     # for debug logging (referenced from the issue template)
+    "importlib_metadata; python_version<'3.8'",
     "session-info"
 ]
 classifiers = [
@@ -60,7 +74,9 @@ dbcan_build = "dbcan.utils.dbcan_build:main"
 [project.optional-dependencies]
 dev = [
     "pre-commit",
-    "twine>=4.0.2"
+    "twine>=4.0.2",
+    "pkginfo>=1.10.0",
+    "setuptools_scm>7,<8",
 ]
 doc = [
     "docutils>=0.8,!=0.18.*,!=0.19.*",
@@ -80,7 +96,10 @@ doc = [
 ]
 test = [
     "pytest",
+    "pytest-html",
     "pytest-cov",
+    "pytest-xdist",
+    "coverage",
 ]
 
 [tool.coverage.run]
@@ -95,6 +114,12 @@ xfail_strict = true
 addopts = [
     "--import-mode=importlib",  # allow using test files with same name
 ]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::FutureWarning",
+    "ignore::UserWarning",
+]
+
 
 [tool.black]
 line-length = 120
@@ -102,6 +127,9 @@ line-length = 120
 [tool.ruff]
 src = ["dbcan"]
 line-length = 120
+exclude = ["dbcan/**/__init__.py"]
+
+[tool.ruff.lint]
 select = [
     "F",  # Errors detected by Pyflakes
     "E",  # Error detected by Pycodestyle
@@ -143,10 +171,10 @@ ignore = [
     "D213",
 ]
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "numpy"
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "docs/*" = ["I"]
 "tests/*" = ["D"]
 "*/__init__.py" = ["F401"]
