@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-13]
+        os: [macos-13]
         python: ["3.7", "3.8", "3.9", "3.10", "3.11"]
 
     name: ${{ matrix.name }} Python ${{ matrix.python }}
@@ -33,16 +33,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      # - name: Set up Python ${{ matrix.python }}
-      #   uses: actions/setup-python@v4
-      #   with:
-      #     python-version: ${{ matrix.python }}
-      #     cache: "pip"
-      #     cache-dependency-path: "**/pyproject.toml"
-      - uses: conda-incubator/setup-miniconda@v3
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v4
         with:
-          auto-update-conda: true
           python-version: ${{ matrix.python }}
+          cache: "pip"
+          cache-dependency-path: "**/pyproject.toml"
+      # - uses: conda-incubator/setup-miniconda@v3
+      #   with:
+      #     auto-update-conda: true
+      #     python-version: ${{ matrix.python }}
 
       - name: Install test dependencies
         run: |
@@ -50,9 +50,9 @@ jobs:
       - name: Install dependencies
         run: |
           pip install ${{ matrix.pip-flags }} ".[dev,test]"
-      # - name: Add conda to PATH
-      #   run: |
-      #     echo $CONDA/bin >> $GITHUB_PATH
+      - name: Add conda to PATH
+        run: |
+          echo ::add-path::$CONDA/bin
       - name: Build dbCAN Database
         run: |
           conda install -y -c bioconda -c conda-forge hmmer diamond blast prodigal
