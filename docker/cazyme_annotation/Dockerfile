@@ -5,7 +5,7 @@ WORKDIR /app
 COPY dbcan.yml .
 
 # install conda packages
-RUN conda env create -f dbcan.yml && conda clean -ya
+RUN conda env create -f envs/dbcan_protocol.yml && conda clean -ya
 
 # add run_dbcan environment to path
 RUN echo "source activate CAZyme_annotation" > ~/.bashrc
