@@ -50,6 +50,7 @@ requirements:
     - blast
     - requests
     - importlib_metadata
+    - seaborn
 
 test:
   imports:
