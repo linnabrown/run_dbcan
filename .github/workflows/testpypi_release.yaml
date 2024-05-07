@@ -3,7 +3,9 @@ name: Test PyPI Release
 on:
   push:
     tags:
-      - "v*"
+      - "v*-alpha*"
+      - "v*-beta*"
+      - "v*-rc*"
 
 # Use "trusted publishing", see https://docs.pypi.org/trusted-publishers/
 jobs:
