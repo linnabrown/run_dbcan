@@ -1,0 +1,84 @@
+name: Test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  schedule:
+    - cron: "0 5 1,15 * *"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -l {0} # -e to fail on error
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-13]
+        python: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+
+    name: ${{ matrix.name }} Python ${{ matrix.python }}
+
+    env:
+      OS: ${{ matrix.os }}
+      PYTHON: ${{ matrix.python }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # - name: Set up Python ${{ matrix.python }}
+      #   uses: actions/setup-python@v4
+      #   with:
+      #     python-version: ${{ matrix.python }}
+      #     cache: "pip"
+      #     cache-dependency-path: "**/pyproject.toml"
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          mamba-version: "*"
+          auto-update-conda: true
+          auto-activate-base: false
+          python-version: ${{ matrix.python }}
+          channels: conda-forge, bioconda, defaults
+          activate-environment: test_dbcan
+          environment-file: envs/test.yml
+
+      - name: export test_dbcan environment
+        run: mamba env export
+
+      # - name: Install test dependencies
+      #   run: |
+      #     python -m pip install --upgrade pip wheel
+      # - name: create run_dbcan environment
+      #   run: conda create -n run_dbcan python=${{ matrix.python }}
+      # - name: activate run_dbcan environment
+      #   run: conda activate run_dbcan
+
+      - name: Install dependencies
+        run: |
+          pip install ${{ matrix.pip-flags }} ".[dev,test]"
+
+      # - name: Add conda to PATH
+      #   run: |
+      #     echo ::add-path::$CONDA/bin
+
+      - name: Build dbCAN Database
+        run: |
+          dbcan_build --cpus 1 --db-dir db --clean
+          # conda install -y -c bioconda -c conda-forge hmmer diamond blast prodigal
+
+      - name: Test
+        env:
+          MPLBACKEND: agg
+          PLATFORM: ${{ matrix.os }}
+          DISPLAY: :42
+        run: |
+          coverage run -m pytest -v --color=yes
