@@ -43,6 +43,7 @@ dependencies = [
     "matplotlib",
     "pyhmmer",
     "requests",
+    "seaborn",
     # for debug logging (referenced from the issue template)
     "importlib_metadata; python_version<'3.8'",
     "session-info"
