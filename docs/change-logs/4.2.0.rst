@@ -1,0 +1,9 @@
+4.2.0
+~~~~~
+
+.. rubric:: Features
+
+#. Add unit testing in ``tests/test_dbcan.py`` to test `run_dbcan` using different configurations.
+#. Make the docker images hosted via github packages instead of docker hub for CI/CD experience.
+#. Add more github workflows in github actions.
+

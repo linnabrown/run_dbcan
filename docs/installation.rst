@@ -37,14 +37,6 @@ To install the `dbcan`_ package, use the ``conda install`` command:
 
     conda install dbcan -c conda-forge -c bioconda
 
-Current run_dbcan version in bioconda is `4.1.3`, and I currently could not update my pckage to `4.1.4` 
-(please help me to resolve this issue). Therefore, this is a strategy that you follow after you install
-the package using Bioconda.
-
-.. code-block:: shell
-
-   1. wget https://github.com/linnabrown/run_dbcan/releases/download/4.1.4/dbcan-4.1.4.tar.gz
-   2. pip install dbcan-4.1.4.tar.gz
 
 
 Build database
@@ -61,7 +53,7 @@ You can build database via this command:
 
 2. `--db-dir` indicates database folder path. Default is `db` on your current database
 
-3. `--clean` indicates clean the folder indicated by `--db-dir`. 
+3. `--clean` indicates clean the folder indicated by `--db-dir`.
 You can remove this parameter if you don't want to clean, but we recommend you add this to keep
 away from index contamination.
 
@@ -102,7 +94,7 @@ Installing SignalP (Optional)
 ..          1. Visit the `SignalP website <https://services.healthtech.dtu.dk/services/SignalP-4.1/>`_.
 ..          2. Submit a download `request <https://services.healthtech.dtu.dk/cgi-bin/sw_request?software=signalp&version=4.1&packageversion=4.1g&platform=Linux>`_.
 ..          3. Post-download, add `SignalP` to your system's environmental variables to make it executable.
-      
+
 ..       - For installation assistance, refer to the :doc:`faq/signalp_installation`.
 
 ..    This approach ensures compliance with `SignalP`'s licensing while offering the tool's functionality to those who need it.
@@ -127,16 +119,16 @@ To use `dbcan`_ via `Docker <https://www.docker.com/>`_, please follow these
 steps:
 
 1. Install ``Docker`` on your system (e.g. Linux, MacOS);
-2. Pull the image `haidyi/run_dbcan <https://hub.docker.com/r/haidyi/run_dbcan>`_ from `Docker Hub <https://hub.docker.com/>`_;
+2. Pull the github container package: `ghcr.io/linnabrown/run_dbcan <https://github.com/linnabrown/run_dbcan/pkgs/container/run_dbcan>`_;
 3. Run the ``run_dbcan`` tool via Docker:
 
    .. code-block:: shell
 
-      docker run -it haidyi/run_dbcan:latest <input_file> [args] --out_dir <output_dir>
+      docker run -it ghcr.io/linnabrown/run_dbcan:{tag_name} <input_file> [args] --out_dir <output_dir>
 
    .. note::
 
-      To use your own local files as input when using Docker, make sure the local files are ``mounted`` and visible to your container.
+      To use your own local files (e.g. database) as input when using Docker, make sure the local files are ``mounted`` and visible to your container.
 
 Check Installation
 ------------------

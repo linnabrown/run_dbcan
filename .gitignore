@@ -32,7 +32,6 @@ wheels/
 *.egg
 MANIFEST
 output*
-.vscode/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -127,8 +126,12 @@ conda-recipe/meta.yaml
 
 Hotpep_bkp*
 
-#ignore example data
-EscheriaColiK12MG1655.*
-
 
 34*
+
+# IDE
+.idea/
+.vscode/
+
+# ignore version file
+**/_version.py
