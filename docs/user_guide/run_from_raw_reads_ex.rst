@@ -538,9 +538,3 @@ If users only want to plot the synteny between the CGC and PUL:
     The CGC IDs in different samples do not match each other. For example, specifying ``-i fefifo_8022_1.dbCAN`` is to plot
     the ``'k141_2168|CGC1'`` in the fefifo_8022_1 sample. The ``'k141_2168|CGC1'`` in the fefifo_8022_7 sample most likely does not exist,
     and even it does, the CGC has a different sequence even if the ID is the same.
-
-
-.. _priest_2023:
-
-Example 3: Priest2023 Dataset :cite:`2023:Priest`
--------------------------------------------------

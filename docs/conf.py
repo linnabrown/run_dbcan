@@ -13,6 +13,10 @@ from pathlib import Path
 HERE = Path(__file__).parent
 sys.path.insert(0, str(HERE / "extensions"))
 
+# general configuration
+suppress_warnings = [
+    "myst.header",  # https://github.com/executablebooks/MyST-Parser/issues/262
+]
 
 # -- Project information -----------------------------------------------------
 
