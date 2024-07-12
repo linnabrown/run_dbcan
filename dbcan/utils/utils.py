@@ -5,6 +5,7 @@ from subprocess import Popen, call, check_output
 from dbcan.cli import hmmer_parser
 import argparse,os
 import numpy as np
+from tqdm import tqdm
 '''
 design some functions and classes for dbCAN tutorial
 
@@ -27,7 +28,7 @@ def total_mapped_reads_count(file_name):
     total_mapped_reads = 0 
     for line in open(file_name):
         lines = line.split()
-        total_mapped_reads += int(lines[-1])
+        total_mapped_reads += float(lines[-1])
     return total_mapped_reads
 
 class abund_parameters():
@@ -45,7 +46,7 @@ class abund_parameters():
         self.parameters_check()
     
     def parameters_check(self):
-        if self.function == "fam_abund":
+        if self.function.startswith("fam_abund"):
             print("You are estimating the abundance of CAZyme!")
             self.output = "fam_abund.out"
             if not os.path.exists(self.CAZyme_annotation):
@@ -71,12 +72,12 @@ class abund_parameters():
             if not os.path.exists(self.PUL_annotation):
                 print(f"CGC annotation file {self.PUL_annotation} dose not exit, please check run_dbcan finish status!")
                 exit(1)
-        if self.R2:
-            self.ngs_pe = True
-            print("Reads are pair end!")
-        else:
-            self.ngs_pe = False
-            print("Reads are single end!")
+        #if self.R2:
+        #    self.ngs_pe = True
+        #    print("Reads are pair end!")
+        #else:
+        #    self.ngs_pe = False
+        #    print("Reads are single end!")
         if not os.path.exists(self.bedtools):
             print(f"Reads count file {self.bedtools} dose not exit!")
             exit(1)
@@ -84,14 +85,14 @@ class abund_parameters():
 class bedtools_read_count():
     def __init__(self,lines):
         self.seqid = lines[0]
-        self.length = int(lines[2])
-        self.read_count = int(lines[3])
+        self.length = int(lines[1])
+        self.read_count = float(lines[2])
     def __repr__(self):
         return "\t".join([str(getattr(self, value)) for value in vars(self)])
 
-def ReadBedtoos(filename):
+def ReadBedtools(filename):
     lines = open(filename).readlines()
-    seqid2info = {line.split()[0]:bedtools_read_count(line.split()) for line in lines[1:]}
+    seqid2info = {line.split()[0]:bedtools_read_count(line.split()) for line in lines}
     normalized_tpm = 0.
     for seqid in seqid2info:
         seqid_depth = seqid2info[seqid]
@@ -241,7 +242,7 @@ class CAZyme_Abundance_estimate():
         #self.fq_reads_count = fq_file_line_count(self.pars.R1)
         self.fq_reads_count = total_mapped_reads_count(self.pars.bedtools)
         print(f"Total reads count: {self.fq_reads_count}!")
-        seqid2readcount,normalized_tpm = ReadBedtoos(parameters.bedtools)
+        seqid2readcount,normalized_tpm = ReadBedtools(parameters.bedtools)
         self.normalized_tpm = normalized_tpm
         ### read overview to 
         if parameters.function == "fam_abund":
@@ -473,6 +474,30 @@ class CAZyme_Abundance_estimate():
                 fams = ";".join(record.protfam if record.gene_type== "CAZyme" else record.gene_type for record in cgc_standard_records[idx])
                 f.write(f"{cgcids[idx]}\t{round(abunds[idx],3)}\t{seqs_tmp}\t{seqs_tmp_abunds}\t{fams}\n")
 
+### add in 05-04-2024 to save each line of inStrain output
+class inStrain_record():
+    def __init__(self,lines):
+        self.scaffold = lines[0]
+        self.gene = lines[1]
+        self.gene_length = lines[2]
+        self.coverage = float(lines[3])
+        self.breadth = lines[4]
+        self.breadth_minCov  = lines[5]
+        self.nucl_diversity  = lines[6]
+        self.start  = lines[7]
+        self.end = lines[8]
+        self.direction = lines[9]
+        self.partial = lines[10]
+        self.dNdS_substitutions  = lines[11]
+        self.pNpS_variants  = lines[12]
+        self.SNV_count  = lines[13]
+        self.SNV_S_count  = lines[14]
+        self.SNV_N_count  = lines[15]
+        self.SNS_count  = lines[16]
+        self.SNS_S_count  = lines[17]
+        self.SNS_N_count  = lines[18]
+        self.divergent_site_count = lines[19]
+
 def CAZyme_abundance(args):
     paras = abund_parameters(args)
     CAZyme_abund = CAZyme_Abundance_estimate(paras)
@@ -583,6 +608,244 @@ def generate_PULfaa(args):
                     seqs.append(seq)
     SeqIO.write(seqs,"PUL_updated.faa",'fasta')
 
+def get_attributes_value(attribute,ID="ID="):
+    attributes = attribute.split(";")
+    for attr in attributes:
+        if attr.startswith(ID):
+            return attr[len(ID):len(attr)]
+    print(f"not found {ID} in {attribute}")
+
+class GFF_record(object):
+    def __init__(self,lines):
+        self.contig_id = lines[0]
+        self.source = lines[1]
+        self.type = lines[2]
+        self.start = int(lines[3])
+        self.end = int(lines[4])
+        self.score = lines[5]
+        self.strand = lines[6]
+        self.phase = lines[7]
+        self.attribute = lines[8]
+        self.seqid      = get_attributes_value(self.attribute)
+        self.length = self.end - self.start + 1
+        self.read_count = 0
+    def __repr__(self):
+        return "\t".join([str(getattr(self, value)) for value in vars(self)])
+
+### https://pysam.readthedocs.io/en/latest/api.html#pysam.AlignedSegment
+### read alignment results API
+
+### aligned_pairs -> deprecated
+### bin -> properties bin 
+### blocks deprecated 
+### cigar deprecated 
+
+### cigarstring -> the cigar alignment as a string.
+#M	BAM_CMATCH	0
+#I	BAM_CINS	1
+#D	BAM_CDEL	2
+#N	BAM_CREF_SKIP	3
+#S	BAM_CSOFT_CLIP	4
+#H	BAM_CHARD_CLIP	5
+#P	BAM_CPAD	6
+#=	BAM_CEQUAL	7
+#X	BAM_CDIFF	8
+#B	BAM_CBACK	9
+
+### cigartuples
+### compare
+### flag -> properties flag
+### from_dict
+### fromstring
+### get_aligned_pairs -> a list of aligned read (query) and reference positions.
+### get_blocks -> a list of start and end positions of aligned gapless blocks.
+### get_cigar_stats -> The output order in the array is “MIDNSHP=X” followed by a field for the NM tag
+### get_forward_qualities -> query_qualities
+### get_forward_sequence -> return the original read sequence.
+### get_overlap -> return number of aligned bases of read overlapping the interval start and end on the reference sequence
+### get_reference_positions
+### get_reference_sequence
+
+import pysam
+def cal_coverage(args):
+    '''
+    generate coverge and read counts file like output of bedtools but with more parameters,
+
+    '''
+    genes = [GFF_record(line.rstrip("\n").split("\t")) for line in open(args.gff) if not line.startswith("#")]
+    ### read bamfiles 
+
+    coverage_file = open(args.output,'w')
+    
+    ### need mutil-processes
+    if args.threads >= 2: ### works
+        gene_abunds = multi_masks(args,genes,args.input)
+        for genes in gene_abunds:
+            genes = genes.get()
+            for gene in genes:
+                coverage_file.write(f'{gene.seqid}\t{gene.length}\t{gene.read_count}\n')
+
+    if args.threads == 1:
+        samfile = pysam.AlignmentFile(args.input,"rb")
+        for i in tqdm(range(len(genes)),desc="Processing gene"):
+            gene = genes[i]
+            reads = samfile.fetch(gene.contig_id,gene.start,gene.end)
+            aligned_reads_num = [1 if justify_reads_alignment_properties(args,read,gene) else 0 for read in reads]
+            gene.read_count = np.sum(aligned_reads_num)
+        for gene in genes:
+            coverage_file.write(f'{gene.seqid}\t{gene.length}\t{gene.read_count}\n')
+        #print(gene.seqid,gene.read_count)
+    print(f"Writing read count to file {args.output}.")
+
+### for multiprocessing gene
+
+from multiprocessing import Pool
+
+def accomplete_function(args,genes,m,samfile_name):
+    samfile = pysam.AlignmentFile(samfile_name,"rb")
+    for i in tqdm(range(len(genes)),desc=f"Processing gene set {m}"):
+        gene = genes[i]
+        reads = samfile.fetch(gene.contig_id,gene.start,gene.end)
+        aligned_reads_num = [1 if justify_reads_alignment_properties(args,read,gene) else 0 for read in reads]
+        gene.read_count = np.sum(aligned_reads_num)
+    return genes
+
+def multi_masks(paras,genes,samfile_name):
+    split_genes = slice_list(genes,paras.threads)
+    print('Parent process %s.' % os.getpid())
+    p = Pool(paras.threads)
+    genes_abunds = []
+    for i in range(paras.threads):
+        genes_abunds.append(p.apply_async(func=accomplete_function,args=(paras,split_genes[i],i,samfile_name,)))
+        #p.apply(func=accomplete_function,args=(paras,split_genes[i],samfile_name,))
+    print('Waiting for all subprocesses done...')
+    p.close()
+    p.join()
+    return genes_abunds
+
+### calculate read count for each gene
+
+### split list into different size
+def slice_list(input, size):
+    input_size = len(input)
+    slice_size = int(input_size / size)
+    remain = input_size % size
+    result = []
+    iterator = iter(input)
+    for i in range(size):
+        result.append([])
+        for j in range(slice_size):
+            result[i].append(next(iterator))
+            if remain:
+                result[i].append(next(iterator))
+                remain -= 1
+    return result
+
+
+### sequence identity (SI) for each reads is calculated based on the description
+### https://vincebuffalo.com/notes/2014/01/17/md-tags-in-bam-files.html
+### https://zombieprocess.wordpress.com/2013/05/21/calculating-percent-identity-from-sam-files/
+### MD tag: page 2, String encoding mismatched and deleted reference bases ,https://samtools.github.io/hts-specs/SAMtags.pdf
+### but I do not condier the insertion and deletion in read, so is a little different to tradtional SI
+
+from itertools import groupby
+
+def cal_identity_based_on_MDtag(MDtag):
+    ### [('NM', 0), ('MD', '139'), ('AS', 139), ('XS', 0)]
+    tag_value = 0
+    for tag in MDtag:
+        if tag[0] == "MD":
+            tag_value = tag[1]
+    #print(tag_value)
+    if tag_value:
+        tag_list_char_digit = [''.join(list(g)) for k, g in groupby(tag_value, key=lambda x: x.isdigit())]
+        match_base = 0 ; mismatch_base = 0
+        for aln in tag_list_char_digit:
+            if aln.isdigit():
+                match_base += int(aln)
+            else:
+                mismatch_base += len(aln)
+        ### but mismatch base should substract deletion
+        deletion_base = tag_value.count("^")
+        return float(match_base) / (match_base + mismatch_base - deletion_base)
+    else:
+        return -1
+
+def justify_reads_alignment_properties(args,read,gene):
+    '''
+    input AlignedSegment,gene and alignment filter conditions
+    return True or False
+    filter conditions: overlap base ratio,  mapping quaility, sequence identity
+
+    '''
+    overlap_base_numer = read.get_overlap(gene.start,gene.end)
+    tags = read.get_tags()
+    
+    if not overlap_base_numer: ### not aligned 
+        return False
+    
+    if args.hifi:### for hifi reads
+        ### for hifi, we may consider the overlap region with gene length or
+        ### in some case, the read.query_length return None, so using infer_read_length instead
+        query_length = read.query_length if read.query_length else read.infer_read_length()
+        ### ### some reads may less than gene lengt
+        gene_len = gene.end - gene.start if (gene.end - gene.start) <= query_length else query_length
+        overlap_base_ratio = overlap_base_numer / gene_len
+        print(overlap_base_ratio)
+    else: ### for not hifi reads
+        overlap_base_ratio = overlap_base_numer / read.query_length
+        
+    if overlap_base_ratio < args.overlap_base_ratio:
+        return False
+
+    mapping_quality = read.mapping_quality
+    
+    if mapping_quality < args.mapping_quality:
+        return False
+    
+    sequence_identity = cal_identity_based_on_MDtag(tags)
+    
+    if sequence_identity == -1:
+        print(f"Can not find MD tag of read: {read.query_name} in bam file ")
+        return False
+    
+    if sequence_identity < args.identity : ### 
+        #print(tags,sequence_identity) ### for debug
+        return False
+    #print(sequence_identity)
+    return True
+
+def pep_fasta_analysis(filename):
+    from Bio import SeqIO
+    seqs = SeqIO.parse(filename,'fasta')
+    ID2geneID = {}
+    for seq in seqs:
+        description = seq.description.split(";")[0] ### 1st field
+        geneID = description.split()[0]
+        tmpID  = description.split()[-1].split("=")[-1]
+        ID2geneID[tmpID] = geneID
+    return ID2geneID
+
+def gff_refine(args):
+    
+    ID2geneID = pep_fasta_analysis(args.input)
+    
+    gff_filename,ext = os.path.splitext(args.gff)
+    gff = open(gff_filename+".fix.gff",'w')
+
+    for line in open(args.gff):
+        if line.startswith("#"):
+            continue
+        lines = line.rstrip("\n").split("\t")
+        tmpID = get_attributes_value(lines[-1],"ID=")
+        geneID = ID2geneID.get(tmpID,"")
+        if not geneID:
+            print(f"Can not find real gene id of {tmpID} in file: {args.gff}")
+        tmp_line = line.replace("ID="+tmpID,"ID="+geneID)
+        gff.write(tmp_line)
+        #print(tmpID,geneID);exit()
+    print(f"Writing fix gff to file {gff_filename}.fix.gff")
+
 def parse_argv():
 
     usage = '''
@@ -597,14 +860,21 @@ def parse_argv():
     CGC_substrate_abund [calculate the abundance of PUL substrate]. Example usage: dbcan_utils CGC_substrate_abund -bt samfiles/fefifo_8002_7.depth.txt -i fefifo_8002_7.dbCAN
     '''
     parser = argparse.ArgumentParser(description='Calculate the abundance CAZyme, PUL and substrate.',prog='dbcan_utils',usage=usage)
-    parser.add_argument('function', help='What function will be used to analyze?',choices=["fam_abund","fam_substrate_abund","CGC_abund","CGC_substrate_abund","generate_PULfaa"])
+    parser.add_argument('function', help='What function will be used to analyze?',choices=["fam_abund","fam_substrate_abund","CGC_abund","CGC_substrate_abund","generate_PULfaa","cal_coverage",'gff_fix'])
     parser.add_argument('-i','--input',help='dbCAN CAZyme annotation output folder.',default="output",required=True)
-    parser.add_argument('-bt','--bedtools',help='bedtools gene reads count results.')
+    parser.add_argument('-bt','--bedtools',help='cal_coverage gene reads count results.')
+    parser.add_argument('-g','--gff',help='prokaa gene annotation file.')
     parser.add_argument('-1','--R1',help='R1 reads, support gz compress file')
     parser.add_argument('-2','--R2',help='R2 reads, support gz compress file, None for single end sequencing',default=None)
     parser.add_argument('-o','--output',help='output files',default="output")
     parser.add_argument('-a','--abundance',default="RPM",help='normalized method',choices=["FPKM","RPM","TPM"])
     parser.add_argument('--db_dir', default="db", help='dbCAN database directory')
+    parser.add_argument('--overlap_base_ratio',default = 0.2 )
+    parser.add_argument('--mapping_quality',default =30,type=int)
+    parser.add_argument('-c','--identity',default =0.98,type=float)
+    parser.add_argument('-t','--threads',default = 1,type = int)
+    parser.add_argument('--hifi',action="store_true")
+
     args = parser.parse_args()
     return args
 
@@ -625,5 +895,12 @@ def main():
     if args.function == "generate_PULfaa": ### update dbCAN-PUL faa proteins
         # dbcan_utils generate_PULfaa -i db
         generate_PULfaa(args)
+    if args.function == "cal_coverage":
+        # dbcan_utils cal_coverage -g Wet2014_gene.gff -i Wet2014.bam -o Wet2014.depth.txt -t 6
+        cal_coverage(args)
+    if args.function == "gff_fix":
+        # dbcan_utils gff_fix -i Boomerang_Shelter_soil1.genes.faa -g Boomerang_Shelter_soil1.gff
+        # dbcan_utils gff_fix -i UT30.3.faa -g UT30.3.gff
+        gff_refine(args)
 if __name__ =="__main__": ### for test
     pass
