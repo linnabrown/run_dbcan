@@ -11,7 +11,7 @@ In this tutorial, we present a comprehensive protocol to annotate CAZymes and gl
 
 1. :ref:`Carter2023 <cater_2023>` :cite:`2023:carter`,
 2. :ref:`Wastyk2021 <wastyk_2021>` :cite:`2021:Wastyk` (See :doc:`run_from_raw_reads_ex`), and,
-3. :ref:`Priest2023 <priest_2023>` :cite:`2023:Priest` (See :doc:`run_from_raw_reads_pr.rst`),
+3. :ref:`Priest2023 <priest_2023>` :cite:`2023:Priest` (See :doc:`run_from_raw_reads_pr`),
 
 this guide will walk you through each step of the computational workflow for analyzing occurrence and abundance. The workflow, depicted in Fig. 1, is designed to be user-friendly and does not require extensive programming knowledge.
 
@@ -204,7 +204,7 @@ Download database required by Kraken2 (very slow; can be skipped
 if users do not intend to run Kraken2):
 
 .. code-block:: shell
-    
+
     dbcan_build --cpus 8 --db-dir db --clean
 
 Download database required by Kraken2 (very slow; can be skipped
@@ -736,7 +736,8 @@ dbCAN-sub result. The default heatmap is ranked by substrate abundances. To rank
 the clustermap function of the seaborn package (https://github.com/mwaskom/seaborn), users can invoke the ``--cluster_map`` parameter.
 
 P15. Barplot for CAZyme family/subfamily/EC abundance across samples (Fig. 6B,C) (TIMING 1min)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 .. code-block:: shell
 
     dbcan_plot bar_plot --samples Wet2014,Dry2014 --vertical_bar --top 20 -i Wet2014_abund/fam_abund.out,Dry2014_abund/fam_abund.out
@@ -746,7 +747,7 @@ P15. Barplot for CAZyme family/subfamily/EC abundance across samples (Fig. 6B,C)
 Users can choose to generate a barplot instead of heatmap using the bar_plot method.
 
 P16. Synteny plot between a CGC and its best PUL hit with read mapping coverage to CGC (Fig. 6D) (TIMING 1min)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: shell
 
