@@ -62,6 +62,10 @@ class PafRecord(object):
         self.SeqID = self.Tsn.split('|')[0]
         self.CAZys = CAZy_filter(self.Tsn.strip("|").split("|")[1:]) ### seqid|cazy1|cazy2|...| ## not subfamily
         self.UniReadId = lines[0].split(".")[0]
+
+        ### need some filter conditions
+        ### overlap ratio, evalue, identity
+
     def __str__(self):
         return "\t".join([str(getattr(self, value)) for value in vars(self) if value != "CAZys"])
 
