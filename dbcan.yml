@@ -30,3 +30,4 @@ dependencies:
   - biopython
   - bbtools
   - seaborn
+  - pysam
