@@ -794,8 +794,9 @@ def justify_reads_alignment_properties(args,read,gene):
         print(overlap_base_ratio)
     else: ### for not hifi reads
         overlap_base_ratio = overlap_base_numer / read.query_length
-        
-    if overlap_base_ratio < args.overlap_base_ratio:
+
+    overlap_base_ratio_threshold = float(args.overlap_base_ratio)
+    if overlap_base_ratio < overlap_base_ratio_threshold:
         return False
 
     mapping_quality = read.mapping_quality
