@@ -31,3 +31,4 @@ dependencies:
   - bbtools
   - seaborn
   - pysam
+  - krakentools
