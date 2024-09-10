@@ -1,0 +1,34 @@
+name: CAZyme_annotation
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+  - agBiome
+dependencies:
+  - python=3.9
+  - prokka
+  - megahit
+  - trim-galore
+  - blast
+  - bwa
+  - diamond
+  - hmmer
+  - samtools
+  - bedtools
+  - seqkit
+  - kraken2
+  - seqtk
+  - flye
+  - minimap2
+  - mmseqs2
+  - dbcan
+  - numpy
+  - pandas
+  - scipy
+  - matplotlib
+  - openpyxl
+  - biopython
+  - bbtools
+  - seaborn
+  - pysam
+  - krakentools

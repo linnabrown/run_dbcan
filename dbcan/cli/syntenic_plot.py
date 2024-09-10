@@ -326,7 +326,8 @@ def syntenic_plot(starts,starts1,ends,ends1,strands,strands1,Types,Types1,blocks
     plt.tight_layout(pad=0.01)
     cgcid = cgcid.replace("|","_") ### need to replace "|" to "_", because | is a special chara for system
     ### for local 
-    #print(f"Save figure to file synteny.pdf/{cgcid}-syntenic.pdf ")
+    os.makedirs("synteny.pdf",exist_ok=True)
+    print(f"Save figure to file synteny.pdf/{cgcid}-syntenic.pdf ")
     plt.savefig(f"synteny.pdf/{cgcid}-syntenic.pdf")
     plt.close()
     
