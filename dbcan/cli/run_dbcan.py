@@ -668,6 +668,8 @@ def run_dbCAN(
                     for line in f:
                         row = line.rstrip().split("\t")
                         if (not line.startswith("#")) and len(row) >= 9:
+                            original_row = row.copy()
+
                             if row[2] == "CDS":
                                 note = row[8].strip().rstrip(";").split(";")
                                 gene1 = ""
@@ -691,6 +693,7 @@ def run_dbCAN(
                                 elif gene2 in candidate_gene_set:
                                     gene = gene2
                                 else:
+                                    out.write("\t".join(original_row) + "\n")
                                     continue
                                 # fix it tomorrow
                                 if gene in cazyme:
@@ -706,7 +709,7 @@ def run_dbCAN(
                                     row[2] = "STP"
                                     row[8] = "DB=" + stp_genes[gene]
                                 else:
-                                    row[8] = ""
+                                    row[8] = original_row[8]
                                 row[8] += ";ID=" + gene
                                 out.write("\t".join(row) + "\n")
             else:  # user file was in BED format
