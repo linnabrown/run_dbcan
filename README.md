@@ -21,6 +21,11 @@
   <a href="https://github.com/linnabrown/run_dbcan/actions/workflows/test.yaml"><img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/linnabrown/run_dbcan/test.yaml?branch=master&style=for-the-badge&logo=github&label=Test&labelColor=363a4f&color=a6d189"></a>
 </p>
 
+## News and Updates
+
+* [2025.4.22] 🔥 This `run_dbcan` project is not maintained under this repo and has been moved to [bcb-unl/run_dbcan](https://github.com/bcb-unl/run_dbcan). This repo will be archived and go to read-only mode.
+
+
 ## Introduction
 
 **run_dbcan** is the standalone version of the [dbCAN3](http://bcb.unl.edu/dbCAN2/) annotation tool for automated CAZyme annotation. This tool, known as `run_dbcan`, incorporates HMMER, Diamond, and dbCAN_sub for annotating CAZyme families, and integrates Cazyme Gene Clusters (CGCs) and substrate predictions.
